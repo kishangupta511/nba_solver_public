@@ -1,0 +1,6 @@
+solution_files/*
+output/*
+time_test.py
+timing.txt
+data/fixture_info.csv
+data/fixture_ticker.csv
