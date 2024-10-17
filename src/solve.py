@@ -55,7 +55,10 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         sell_prices = []
 
     # Importing Data
-    all_data = pd.read_csv('data/projections.csv')
+    if os.path.exists('data/projections_overwrite.csv'):
+        all_data = pd.read_csv('data/projections_overwrite.csv')
+    else:    
+        all_data = pd.read_csv('data/projections.csv')
     team_data = pd.read_csv('data/teams.csv')
     gameday_data = pd.read_csv('data/fixture_info.csv')
 

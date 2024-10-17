@@ -8,8 +8,12 @@ from retrieve import get_team
 import json
 from run import refresh_data
 from tksheet import Sheet
-from tksheet import float_formatter, int_formatter  
+from tksheet import float_formatter, int_formatter, num2alpha
 from matplotlib import colors as mcolors
+import os
+from datetime import datetime
+import pytz
+
 
 class NBAOptimizerGUI:
     def __init__(self, root):
@@ -450,41 +454,113 @@ class NBAOptimizerGUI:
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
-        # Button to open projections window
-        projections_button = ctk.CTkButton(root, text="Open Projections", command=self.open_projections_window)
-        projections_button.grid(row=0, column=0, padx=10, pady=10)
-
     def open_projections_window(self):
         # Create a new window for projections
-        projections_window = ctk.CTkToplevel(self.root)
-        projections_window.title("Projections, xMins, and Fixtures")
+        self.projections_window = ctk.CTkToplevel(self.root)
+        self.projections_window.title("Projections, xMins, and Fixtures")
 
         # Set the window size close to full screen
-        projections_window.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}+0+0")
+        self.projections_window.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}+0+0")
 
         # Create a Tab view
-        tabs = ctk.CTkTabview(projections_window, width=1200, height=800)
+        tabs = ctk.CTkTabview(self.projections_window, width=1200, height=800)
         tabs.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
 
         # Configure the new window to expand properly
-        projections_window.grid_rowconfigure(0, weight=1)
-        projections_window.grid_columnconfigure(0, weight=1)
+        self.projections_window.grid_rowconfigure(0, weight=1)
+        self.projections_window.grid_columnconfigure(0, weight=1)
 
         # Add xPoints tab
-        xpoints_tab = tabs.add("xPoints")
-        self.create_table_tab(xpoints_tab, 'data/projections.csv')
+        self.xpoints_tab = tabs.add("xPoints")
+        self.xmins_tab = tabs.add("xMins")
+        
+        self.create_table_tab(csv_file='data/projections.csv', tab= self.xpoints_tab, sheet_name = "xpoints_sheet")
 
         # Add xMins tab
-        xmins_tab = tabs.add("xMins")
-        self.create_table_tab(xmins_tab, 'data/xmins.csv')
+        self.create_table_tab(csv_file='data/xmins.csv', tab=self.xmins_tab,sheet_name = "xmins_sheet")
 
         # Add Fixtures tab
-        fixtures_tab = tabs.add("Fixtures")
-        self.create_table_tab_fix(fixtures_tab, 'data/fixture_ticker.csv')
+        self.fixtures_tab = tabs.add("Fixtures")
+        self.create_table_tab_fix(self.fixtures_tab,'data/fixture_ticker.csv')
 
-    def create_table_tab(self, tab, csv_file):
+    def create_table_tab(self, csv_file, tab, sheet_name):
+
         # Read the data from CSV
         data = pd.read_csv(csv_file)
+        data = data.reset_index(drop=True)
+        mins_exceptions_path = "data/mins_changes.json"
+        projections_custom_path = "data/projections_overwrite.csv"
+        mins_players = []
+        mins_column_name = []
+        mins_value = []
+
+        if csv_file == "data/xmins.csv" and os.path.exists(mins_exceptions_path):
+            with open(mins_exceptions_path, 'r') as f:
+                mins_exceptions = json.load(f)
+
+            # Apply changes to the xMins DataFrame
+            for change in mins_exceptions:
+                player_name = change.get("name")
+                if isinstance(player_name, tuple):
+                    player_name = player_name[0]
+                # Ensure player_name is a string, not a list
+                if isinstance(player_name, list):
+                    player_name = player_name[0]
+                # Add player name to mins_players list
+                mins_players.append(player_name)
+                mins_column_name.append(str(change.get("column")))
+                mins_value.append(change.get("value"))
+
+            custom_mins = pd.read_csv('data/xmins_overwrite.csv')
+
+            # Get the index of the players in the custom_mins DataFrame
+            custom_mins_index = custom_mins[custom_mins['name'].isin(mins_players)].index
+
+            # get the index of the players in the mins DataFrame
+            mins_index = data[data['name'].isin(mins_players)].index
+
+            # Update the entire row of the mins DataFrame with the custom_mins values
+            data.iloc[mins_index, 5:] = custom_mins.iloc[custom_mins_index, 5:]
+        
+        if csv_file == "data/projections.csv" and os.path.exists(projections_custom_path):
+            data = pd.read_csv(projections_custom_path)
+
+        # Create a frame to hold the search entry and table
+        setattr(self,f"search_frame_{sheet_name}", ctk.CTkFrame(tab))
+        getattr(self,f"search_frame_{sheet_name}").grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+
+        # Add a search label and entry widget
+        search_label = ctk.CTkLabel(getattr(self,f"search_frame_{sheet_name}"), text="Search Player:")
+        search_label.grid(row=0, column=0, padx=(10, 0), pady=5, sticky="w")
+
+        setattr(self,f"search_bar_{sheet_name}",ctk.CTkEntry(getattr(self,f"search_frame_{sheet_name}"), placeholder_text="Enter player name", width=200))
+        getattr(self,f"search_bar_{sheet_name}").grid(row=0, column=1, padx=(5, 10), pady=5, sticky="ew")
+
+        # Add dropdown for Team
+        team_label = ctk.CTkLabel(getattr(self, f"search_frame_{sheet_name}"), text="Team:")
+        team_label.grid(row=0, column=2, padx=(10, 0), pady=5, sticky="w")
+
+        unique_teams = sorted(data['team'].unique())
+        setattr(self, f"team_dropdown_{sheet_name}", ctk.CTkComboBox(getattr(self, f"search_frame_{sheet_name}"), values=["All"] + unique_teams, width=100))
+        getattr(self, f"team_dropdown_{sheet_name}").grid(row=0, column=3, padx=(5, 10), pady=5, sticky="ew")
+
+        # Add dropdown for Position
+        position_label = ctk.CTkLabel(getattr(self, f"search_frame_{sheet_name}"), text="Position:")
+        position_label.grid(row=0, column=4, padx=(10, 0), pady=5, sticky="w")
+
+        unique_positions = sorted(data['position'].unique())
+        setattr(self, f"position_dropdown_{sheet_name}", ctk.CTkComboBox(getattr(self, f"search_frame_{sheet_name}"), values=["All"] + unique_positions, width=100))
+        getattr(self, f"position_dropdown_{sheet_name}").grid(row=0, column=5, padx=(5, 10), pady=5, sticky="ew")
+
+        # Add dropdown for Price (max price selection)
+        price_label = ctk.CTkLabel(getattr(self, f"search_frame_{sheet_name}"), text="Max Price:")
+        price_label.grid(row=0, column=6, padx=(10, 0), pady=5, sticky="w")
+
+        max_price = int(round(data['price'].max()))
+        price_values = list(range(0, max_price+1, 1))  
+        setattr(self, f"price_dropdown_{sheet_name}", ctk.CTkComboBox(getattr(self, f"search_frame_{sheet_name}"), values=[str(p) for p in price_values], width=100))
+        getattr(self, f"price_dropdown_{sheet_name}").set(str(max_price+1))
+        getattr(self, f"price_dropdown_{sheet_name}").grid(row=0, column=7, padx=(5, 10), pady=5, sticky="ew")
 
         data = data.drop(columns=['id'])
         
@@ -495,7 +571,8 @@ class NBAOptimizerGUI:
         data.columns = data.columns.str.capitalize()
 
         # Sort data by price in descending order
-        data = data.sort_values(by='Price', ascending=False)
+        data = data.sort_values(by=['Price','Name'], ascending=False)
+        data = data.reset_index(drop=True)
 
         # Change name of Min column to xMins
         if 'Min' in data.columns:
@@ -512,12 +589,16 @@ class NBAOptimizerGUI:
 
         self.data = data
 
+        # Store the data in an instance variable for later access
+        self.original_data = data
+        self.filtered_data = data.copy()
+
         # Extract column names and row data
-        headers = list(data.columns)
-        rows = data.values.tolist()  
+        headers = list(self.original_data.columns)
+        rows = self.original_data.values.tolist()  
 
         # Create a tksheet table inside the tab
-        self.sheet = Sheet(tab,
+        setattr(self, sheet_name, Sheet(tab,
                       headers=headers,
                       data=rows,
                       header_font= ("Calibri", 13, "bold"),
@@ -536,60 +617,301 @@ class NBAOptimizerGUI:
                       index_fg = "white",
                       align = 'c',
                       width=1470,
-                      height=790)
-        self.sheet.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+                      height=790))
+        getattr(self,sheet_name).grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
         
-        self.sheet.column_width(0,150)
-        self.sheet.column_width(1,60)
-        self.sheet.column_width(2,50)
-        self.sheet.column_width(3,75)
-        self.sheet.align(self.sheet.span('A'),align="w")
-        if csv_file == 'data/xmins.csv':
-            self.sheet['E:'].format(int_formatter())
-        self.sheet['A:D'].readonly()
+        getattr(self,sheet_name).column_width(0,150)
+        getattr(self,sheet_name).column_width(1,60)
+        getattr(self,sheet_name).column_width(2,50)
+        getattr(self,sheet_name).column_width(3,75)
+        getattr(self,sheet_name).align(getattr(self,sheet_name).span('A'),align="w")
+        getattr(self,sheet_name)['A:D'].readonly()
 
         # Apply conditional formatting to numeric columns
-        new_data = data.drop(columns=['Name', 'Team','Price','Position'])
+        new_data = self.original_data.drop(columns=['Name', 'Team','Price','Position'])
         numeric_columns = new_data.columns  # Define numeric columns for formatting
-        self.apply_conditional_formatting(data, numeric_columns)
+        self.apply_conditional_formatting(self.original_data, numeric_columns, sheet_name)
 
         # Set options for appearance (optional)
-        self.sheet.enable_bindings()
+        getattr(self,sheet_name).enable_bindings()
 
-        self.sheet.dropdown(
-            self.sheet.span('B', header=True, table=False),
-            values=["All", "ATL", "BOS"],
-            set_value="All",
-            selection_function=self.header_dropdown_selected,
-            text="Team",
-        )
+        # Bind the search functionality to the entry widget
+        getattr(self,f"search_bar_{sheet_name}").bind("<KeyRelease>", lambda event: self.filter_table(getattr(self,f"search_bar_{sheet_name}").get(), sheet_name))
+        getattr(self, f"team_dropdown_{sheet_name}").bind("<<ComboboxSelected>>", lambda event: self.filter_table(sheet_name))
+        getattr(self, f"position_dropdown_{sheet_name}").bind("<<ComboboxSelected>>", lambda event: self.filter_table(sheet_name))
+        getattr(self, f"price_dropdown_{sheet_name}").bind("<<ComboboxSelected>>", lambda event: self.filter_table(sheet_name))
 
-    def header_dropdown_selected(self, event=None):
-        hdrs = self.sheet.headers()  # Get the current headers
-        hdrs[event.loc] = event.value  # Update the headers with the selected value from the dropdown
+        if sheet_name == 'xmins_sheet':
+            getattr(self,sheet_name)['E:'].format(int_formatter())
+            header_data = getattr(self,sheet_name)["A:"].options(table=False, header=True).data
 
-        # If "All" is selected for all headers, display all rows
-        if all(dd == "All" for dd in hdrs):
-            self.sheet.display_rows("All")
+            mins_column_index = []
+            mins_row_index = []
+            for i in mins_column_name:
+                mins_column_index.append(header_data.index(i))
+            for i in mins_players:
+                mins_row_index.append(getattr(self,sheet_name)['A'].data.index(i))
+            for i in range(len(mins_row_index)):
+                getattr(self,sheet_name).highlight_cells(mins_row_index[i], mins_column_index[i], bg='#800080', fg='white')
+
+            # Bind a function to track changes when the xMins values are edited
+            getattr(self, sheet_name).bind("<<SheetModified>>", lambda event: self.on_xmins_edit(sheet_name, event))
+            # Add the Delete Custom xMins button
+            delete_button = ctk.CTkButton(getattr(self, f"search_frame_{sheet_name}"), text="Delete Custom xMins", command=self.delete_custom_xmins)
+            delete_button.grid(row=0, column=9, pady=5, padx=(10, 0), sticky="w")
+
+    def xmins_overwrite(self, row_final, column):
+        # Paths to the input CSV and changes log JSON
+        xmins_csv_path = 'data/xmins.csv'
+        changes_log_path = 'data/mins_changes.json'
+        output_csv_path = 'data/xmins_overwrite.csv'
+
+        # Read the original xMins CSV file
+        if not os.path.exists(xmins_csv_path):
+            messagebox.showerror("Error", f"{xmins_csv_path} not found.")
+            return
+
+        xmins_df = pd.read_csv(xmins_csv_path)
+        #sort xmins by id
+        xmins_df = xmins_df.sort_values(by='id').reset_index(drop=True)
+
+        # Read the changes log JSON file
+        if not os.path.exists(changes_log_path):
+            messagebox.showinfo("No Changes", "No custom xMins found to apply.")
+            return
+
+        with open(changes_log_path, 'r') as f:
+            changes = json.load(f)
+
+        # Apply changes to the xMins DataFrame
+        for change in changes:
+            player_name = change.get("name")
+            if isinstance(player_name, tuple):
+                player_name = player_name[0]
+            # Ensure player_name is a string, not a list
+            if isinstance(player_name, list):
+                player_name = player_name[0]
+            column_name = change.get("column")
+            new_value = change.get("value")
+
+            def convert_to_aest_and_remove_time(date_str):
+                # Convert the string to datetime in UTC
+                utc_time = pd.to_datetime(date_str)
+
+                # Convert from UTC to AEST (UTC+10)
+                aest_time = utc_time.tz_convert('Australia/Sydney')
+
+                # Return just the date part (YYYY-MM-DD)
+                return aest_time.date()
+
+            # Locate the row corresponding to the player
+            if player_name in xmins_df['name'].values:
+                row_index = xmins_df.index[xmins_df['name'] == player_name].tolist()[0]
+                player_team = xmins_df.loc[row_index, 'team']
+                fixture_info = pd.read_csv('data/fixture_info.csv')
+                # Convert the date strings to AEST and remove the time
+                fixture_info['deadline'] = fixture_info['deadline'].apply(convert_to_aest_and_remove_time)
+
+                if column_name == "xMins":
+                    column_name = "MIN"
+                    fixture_ticker = pd.read_csv('data/fixture_ticker.csv')
+                    fixture_index = fixture_ticker[fixture_ticker['team'] == player_team].index.tolist()
+                    for col in fixture_ticker.columns[1:]:
+                        fixture_ticker[col] = fixture_ticker[col].apply(lambda x: 1 if isinstance(x, str) else x)
+                    fixture_ticker = fixture_ticker.fillna(0)
+                    fixture_ticker = fixture_ticker.loc[fixture_index]
+                    xmins_df.iloc[row_index, 6:] = (
+                        (xmins_df.iloc[row_index, 6:].astype(float) + fixture_ticker.iloc[:, 1:].astype(float)) /
+                        (xmins_df.iloc[row_index, 6:].astype(float) + fixture_ticker.iloc[:, 1:].astype(float)))
+
+                    xmins_df.iloc[row_index, 6:] = xmins_df.iloc[row_index, 6:].multiply(new_value)
+                    xmins_df.at[row_index, column_name] = new_value
+                    gds = xmins_df.columns.tolist()
+                    gds = gds[6:]
+
+                    # Convert the list of strings to floats using map()
+                    gds = list(map(float, gds))
+
+                    # Read options from the file
+                    with open('solver_settings.json') as f:
+                        solver_options = json.load(f)
+
+                    games_left = solver_options.get('games_left')
+                    decay_factor = solver_options.get('mins_decay')
+                    b2b_decay = solver_options.get('b2b_decay')
+
+                    # Define the mins_decay function with decay for normal games
+                    def mins_decay(projected_mins, row, column, games_left, decay_factor, actual_gd):
+                        fraction = (1 - (72 / games_left)) / decay_factor
+                        projected_mins.loc[row, f'{int(column)}'] = projected_mins.loc[row, f'{int(column)}'] * (1 - fraction) ** actual_gd
+                        return projected_mins
+                    
+                    # Define the back-to-back decay function
+                    def back_to_back_decay(projected_mins, row, first_game, second_game):
+                        # Reduce minutes for the first game
+                        projected_mins.loc[row, f'{int(first_game)}'] *= b2b_decay[0]
+                        # Reduce minutes for the second game
+                        projected_mins.loc[row, f'{int(second_game)}'] *= b2b_decay[1]
+                        return projected_mins
+                    xmins_df = xmins_df.fillna(0)
+                    # Apply decay only on game days where the player will play
+                    actual_gd = 1
+                    for i, gd in enumerate(gds):
+                        if xmins_df.loc[row_index,f'{int(gd)}'] != 0:
+                            # Check for consecutive games
+                            if i < len(gds) - 1:  # Ensure not to go out of bounds
+                                next_gd = gds[i + 1]
+
+                                # Get the dates for the current game day and the next game day
+                                current_date = fixture_info.loc[fixture_info['id'] == int(gd), 'deadline'].values[0]
+                                next_date = fixture_info.loc[fixture_info['id'] == int(next_gd), 'deadline'].values[0]
+
+                                if (next_date - current_date).days == 1 and xmins_df.loc[row_index, f'{int(next_gd)}'] != 0:  
+                                    # Apply back-to-back minute reductions
+                                    xmins_df = back_to_back_decay(xmins_df, row_index, gd, next_gd)
+
+                            # Apply normal decay for single games
+                            xmins_df = mins_decay(xmins_df, row=row_index, column=gd, games_left=games_left, decay_factor=decay_factor, actual_gd=actual_gd)
+                            actual_gd += 1
+
+                else:
+                    fixture_info_dict = fixture_info.set_index('code')['id'].to_dict()
+                    column_name = str(fixture_info_dict[column_name])
+                    xmins_df.at[row_index, column_name] = new_value
+                
+            
+            # Iterate over each column in the row and update the corresponding cell
+            for col_index, value in enumerate(xmins_df.iloc[row_index, 1:]):
+                if col_index >= 5:
+                    if value > 36:
+                        color = self.get_color_for_value(value, 0, 50)
+                    else:
+                        color = self.get_color_for_value(value, 0, 36)
+                    getattr(self, "xmins_sheet").set_cell_data(int(row_final), col_index, value).highlight_cells(row=int(row_final), column=col_index, bg=color, fg="black")
+                else:
+                    getattr(self, "xmins_sheet").set_cell_data(int(row_final), col_index, value)
+            
+            getattr(self, "xmins_sheet").highlight_cells(row=row_final, column=column, bg='#800080', fg='white')
+
+            # Redraw the sheet to reflect changes
+            getattr(self, "xmins_sheet").redraw()
+
+            projections36 = pd.read_csv("data/projections36.csv")
+           
+            projections_overwrite = projections36.copy()
+            projections_overwrite.iloc[:,5:] = (projections36.iloc[:,5:].multiply(xmins_df.iloc[:,6:]))/36
+
+            proj_row_index = projections_overwrite.index[projections_overwrite['name'] == player_name].tolist()[0]
+
+            for col_index, value in enumerate(projections_overwrite.iloc[proj_row_index, 1:]):
+                if col_index >= 4:
+                    if value > 60:
+                        color = self.get_color_for_value(value, 0, 100)
+                    else:
+                        color = self.get_color_for_value(value, 0, 60)
+                    getattr(self, "xpoints_sheet").set_cell_data(int(row_final), col_index, value.round(1)).highlight_cells(row=int(row_final), column=col_index, bg=color, fg="black")
+
+                else:
+                    getattr(self, "xpoints_sheet").set_cell_data(int(row_final), col_index, value)
+
+            getattr(self, "xpoints_sheet").redraw()
+            projections_overwrite = projections_overwrite.round(1)
+            xmins_df = xmins_df.round(2)
+
+        # Save the modified DataFrame to a new CSV file
+        xmins_df.to_csv(output_csv_path, index=False)
+        projections_overwrite.to_csv('data/projections_overwrite.csv', index=False)
+
+    def on_xmins_edit(self, sheet_name, event):
+        # Get the row and column of the edited cell
+        edited_cell = event.get('cells', {}).get('table', {})
+        mins_changes = []
+        row, column =  list(edited_cell.keys())[0]
+
+        getattr(self, sheet_name).highlight_cells(row=row, column=column, bg='#800080', fg='white')
+        getattr(self, sheet_name).redraw()
+
+        player_name = getattr(self, sheet_name)[row,0].data, 
+        new_mins = getattr(self, sheet_name)[row,column].data
+        column_name = getattr(self, sheet_name)[f'{num2alpha(column)}'].options(table=False, hdisp=False, header=True).data
+        change_entry = {
+            "name": player_name,
+            "column": column_name,
+            "value": new_mins
+        }
+
+        # Add the change entry to the list
+        mins_changes.append(change_entry)
+
+        # Path to the JSON file where changes will be stored
+        json_file_path = "data/mins_changes.json"
+
+        # Check if the file already exists and load existing data if it does
+        if os.path.exists(json_file_path):
+            with open(json_file_path, 'r') as file:
+                existing_mins_changes = json.load(file)
         else:
-            # Filter the rows in the data that match the header filters
-            filtered_rows = []
-            for rn, row in self.data.iterrows():  # Iterate over rows of the DataFrame
-                match = True
-                for c, e in enumerate(hdrs):
-                    # Check only non-numeric headers (like Team, Position, etc.)
-                    if isinstance(row[c], str) and (row[c] != e and e != "All"):
-                        match = False
-                        break
-                if match:
-                    filtered_rows.append(rn)
+            existing_mins_changes = []
 
-            # Update the sheet to display only the filtered rows
-            self.sheet.display_rows(rows=filtered_rows, all_displayed=False)
+        # Append new changes to the existing data
+        existing_mins_changes.extend(mins_changes)
+
+        # Write the updated data back to the JSON file
+        with open(json_file_path, 'w') as file:
+            json.dump(existing_mins_changes, file, indent=4)
+
+        # Output to console for verification
+        print(f"Changes saved to {json_file_path}: {mins_changes}")
+        self.xmins_overwrite(row,column)
+
+    def delete_custom_xmins(self):
+        # Path to the JSON file where changes are stored
+        json_file_path = "data/mins_changes.json"
+
+        # Check if the file exists
+        if os.path.exists(json_file_path):
+            # Delete the file
+            os.remove(json_file_path)
+            if os.path.exists('data/xmins_overwrite.csv'):
+                os.remove('data/xmins_overwrite.csv')
+                os.remove('data/projections_overwrite.csv')
+            messagebox.showinfo("Success", "Custom xMins have been deleted.")
+            self.projections_window.destroy()
+            self.open_projections_window()
+        else:
+            messagebox.showinfo("No Changes", "No custom xMins to delete.")
         
-        self.sheet.redraw()
+    def filter_table(self, search_query, sheet_name):
 
+        search_query = search_query.lower()
+        # Check if search query is empty
+        if search_query == "":
+            filtered_data = self.original_data
+        else:
+            filtered_data = self.original_data[self.original_data['Name'].str.lower().str.contains(search_query)]
+        
+        # Get filter values from dropdowns
+        selected_team = getattr(self, f"team_dropdown_{sheet_name}").get()
+        selected_position = getattr(self, f"position_dropdown_{sheet_name}").get()
+        selected_max_price = getattr(self, f"price_dropdown_{sheet_name}").get()
     
+        # Apply team filter
+        if selected_team != "All":
+            filtered_data = filtered_data[filtered_data['Team'] == selected_team]
+
+        # Apply position filter
+        if selected_position != "All":
+            filtered_data = filtered_data[filtered_data['Position'] == selected_position]
+
+        # Apply price filter
+        if selected_max_price.isdigit():
+            filtered_data = filtered_data[filtered_data['Price'] <= int(selected_max_price)]
+
+        indexes = filtered_data.index.tolist()
+
+        getattr(self,sheet_name).display_rows(rows=indexes, all_displayed = False)
+        getattr(self,sheet_name).redraw()
+
     def create_table_tab_fix(self, tab, csv_file):
         # Read the data from CSV
         data = pd.read_csv(csv_file)
@@ -619,7 +941,7 @@ class NBAOptimizerGUI:
         self.sheet.align(self.sheet.span('A'),align="w")
         self.sheet.set_options(grid_vert_lines=True, grid_horiz_lines=True)
 
-    def apply_conditional_formatting(self, data, numeric_columns):
+    def apply_conditional_formatting(self, data, numeric_columns,sheet_name):
         """Apply conditional formatting to numeric columns: red for low values, yellow for middle, green for high"""
         for col in numeric_columns:
             if col in data.columns:
@@ -630,7 +952,7 @@ class NBAOptimizerGUI:
                 # Apply color gradient based on value
                 for row_index, value in enumerate(data[col]):
                     color = self.get_color_for_value(value, min_val, max_val)
-                    self.sheet.highlight_cells(row=row_index, column=col_index, bg=color, fg="black")
+                    getattr(self,sheet_name).highlight_cells(row=row_index, column=col_index, bg=color, fg="black")
 
     def get_color_for_value(self, value, min_val, max_val):
         """Interpolate between red (low), yellow (mid), and green (high) based on value"""
@@ -654,6 +976,7 @@ class NBAOptimizerGUI:
         c2 = mcolors.to_rgb(color2)
         interpolated = [(1 - factor) * c1[i] + factor * c2[i] for i in range(3)]
         return mcolors.to_hex(interpolated)
+
 
 if __name__ == "__main__":
     ctk.set_appearance_mode("dark")
