@@ -56,7 +56,7 @@ class NBAOptimizerGUI:
         self.no_sols_var = ctk.IntVar(value=solver_options.get('no_sols'))
         self.alternative_solution_var = ctk.StringVar()
         alternative_list = ["1gd_buy","1week_buy"]
-        value_inside = ctk.StringVar(value=solver_options.get('alternative_solution'))
+        self.alternative_solution_var.set(value=solver_options.get('alternative_solution'))
 
         # Forced Decisions
         banned_player_text = ', '.join(solver_options.get('banned_players'))
@@ -108,8 +108,8 @@ class NBAOptimizerGUI:
         threshold_label = ctk.CTkLabel(root, text= "Threshold:")
         threshold_entry = ctk.CTkEntry(root, textvariable=self.threshold_var, width=50)
         alternative_solution_label = ctk.CTkLabel(root, text="Alt Solution:")
-        alternative_menu = tk.OptionMenu(root, value_inside, *alternative_list)
-        alternative_menu.config(fg= "#353638", bg = "#242424")
+        self.alternative_menu = tk.OptionMenu(root, self.alternative_solution_var, *alternative_list)
+        self.alternative_menu.config(fg= "#353638", bg = "#242424")
         no_sols_label = ctk.CTkLabel(root, text="No. Solutions:")
         no_sols_entry = ctk.CTkEntry(root, textvariable=self.no_sols_var, width=50)
         
@@ -173,7 +173,7 @@ class NBAOptimizerGUI:
         tf_last_label.grid(row=10, column=4, pady=5, padx=(20,10), sticky="w")
         tf_last_entry.grid(row=10, column=5, pady=5, padx=0, sticky="w")
         alternative_solution_label.grid(row=10, column=6, pady=5, padx=(20,10), sticky="w")
-        alternative_menu.grid(row=10, column=7, pady=5, padx=(0,40), sticky="w")
+        self.alternative_menu.grid(row=10, column=7, pady=5, padx=(0,40), sticky="w")
         ft_value_label.grid(row=11, column=0, pady=(5,60), padx=(40,10), sticky="w")
         ft_value_entry.grid(row=11, column=1, pady=(5,60), padx=0, sticky="w")
         solve_time_label.grid(row=11, column=2, pady=(5,60), padx=(20,10), sticky="w")
@@ -232,227 +232,222 @@ class NBAOptimizerGUI:
 
     def run_optimizer(self):
 
-        # Read options from the file
+    # Read options from the file
         with open('solver_settings.json') as f:
             solver_options = json.load(f)
 
-        try:
-            if solver_options.get('preseason') == False:
-            # Get player input
-                players = self.players_entry.get().split(', ')
-                prices = [float(price) for price in self.prices_entry.get().split(', ')]
-            else:
-                players = []
-                prices = []
+        if solver_options.get('preseason') == False:
+        # Get player input
+            players = self.players_entry.get().split(', ')
+            prices = [float(price) for price in self.prices_entry.get().split(', ')]
+        else:
+            players = []
+            prices = []
 
-            banned_players = self.banned_players_entry.get().split(', ')
-            forced_players = self.forced_players_entry.get().split(', ')
+        banned_players = self.banned_players_entry.get().split(', ')
+        forced_players = self.forced_players_entry.get().split(', ')
 
-            # Get options input
-            new_options = {
-                'horizon': self.horizon_var.get(),
-                'ft': self.ft_var.get(),
-                'tm': self.tm_var.get(),
-                'decay_base': self.decay_base_var.get(),
-                'bench_weight': self.bench_weight_var.get(),
-                'trf_last_gw': self.trf_last_var.get(),
-                'ft_value': self.ft_value_var.get(),
-                'wc_day': self.wc_day_var.get(),
-                'solve_time': self.solve_time_var.get(),
-                'banned_players': banned_players,
-                'forced_players': forced_players,
-                'no_sols': self.no_sols_var.get(),
-                'threshold_value': self.threshold_var.get(),
-                'alternative_solution': self.alternative_solution_var.get(),
-                'preseason': self.preseason_var.get(),
-                'team_id': self.team_id_var.get()
-            }
+        # Get options input
+        new_options = {
+            'horizon': self.horizon_var.get(),
+            'ft': self.ft_var.get(),
+            'tm': self.tm_var.get(),
+            'decay_base': self.decay_base_var.get(),
+            'bench_weight': self.bench_weight_var.get(),
+            'trf_last_gw': self.trf_last_var.get(),
+            'ft_value': self.ft_value_var.get(),
+            'wc_day': self.wc_day_var.get(),
+            'solve_time': self.solve_time_var.get(),
+            'banned_players': banned_players,
+            'forced_players': forced_players,
+            'no_sols': self.no_sols_var.get(),
+            'threshold_value': self.threshold_var.get(),
+            'alternative_solution': self.alternative_solution_var.get(),
+            'preseason': self.preseason_var.get(),
+            'team_id': self.team_id_var.get()
+        }
 
-            # Run the optimizer
-            r = solve_multi_period_NBA(squad=players, sell_prices=prices, gd=self.gd_entry.get(), itb=self.itb_entry.get(), options=new_options)
-            print()
+        # Run the optimizer
+        r = solve_multi_period_NBA(squad=players, sell_prices=prices, gd=self.gd_entry.get(), itb=self.itb_entry.get(), options=new_options)
+        print()
 
-            # Display result in a new window
-            result_window = ctk.CTkToplevel(self.root)
-            result_window.title("Plan")
+        # Display result in a new window
+        result_window = ctk.CTkToplevel(self.root)
+        result_window.title("Plan")
+        
+        # Splitting window into tabs
+        tabs = ctk.CTkTabview(result_window)
+        tabs.grid(row=0, column=0, padx=20)
+
+        for i in range(new_options['no_sols']):
+
+            result = r['results']
+            result = result[i]
             
-            # Splitting window into tabs
-            tabs = ctk.CTkTabview(result_window)
-            tabs.grid(row=0, column=0, padx=20)
+            planner_tab = tabs.add(f"Plan {i+1}")
+            #transfer_tab = tabs.add("Transfers")
+        
+            # Define the width of each column
+            gameday_width = 5
+            name_width = 15
+            team_width = 4
+            price_width = 4
+            xP_width = 6
 
-            for i in range(new_options['no_sols']):
+            # Function to truncate names
+            def truncate_name(name, max_length):
+                return (name[:max_length - 3] + '...') if len(name) > max_length else name
 
-                result = r['results']
-                result = result[i]
+            # Extract week number from gameday
+            result['picks']['week'] = (result['picks']['gameday']).apply(lambda x: math.floor(x))
+
+            # Determine the range of weeks and gamedays
+            unique_weeks = result['picks']['week'].unique()
+            unique_gamedays = result['picks']['gameday'].unique()
+
+            # Calculate the number of lines in the weekly summary
+            num_lines = len(result['weekly_summary'].split('\n'))
+
+            # Create a frame widget for the planner tab
+            my_frame = ctk.CTkScrollableFrame(planner_tab, width=1350, height=750, corner_radius=0, fg_color="transparent")
+            my_frame.grid(row=0, column=0, sticky="nsew")
+            
+            # Create a single text widget for the weekly summary
+            weekly_summary_text = tk.Text(my_frame, height=3, width=25, bg='#242424', fg='white', highlightbackground='#4a4a4a')
+            weekly_summary_text.grid(row=0, column=0, pady=(5, 5), padx=35, sticky="w")
+
+            # Get the last line of the summary
+            last_summary_line = result['weekly_summary'].splitlines()[-1]
+
+            # Insert the last line to the left of the text widget
+            weekly_summary_text.insert(tk.END, f'\n {last_summary_line}')
+
+            # Iterate through unique weeks
+            for i, week in enumerate(unique_weeks):
                 
-                planner_tab = tabs.add(f"Plan {i+1}")
-                #transfer_tab = tabs.add("Transfers")
-           
-                # Define the width of each column
-                gameday_width = 5
-                name_width = 15
-                team_width = 4
-                price_width = 4
-                xP_width = 6
+                # Filter picks for the current week
+                week_picks = result['picks'][result['picks']['week'] == week]
 
-                # Function to truncate names
-                def truncate_name(name, max_length):
-                    return (name[:max_length - 3] + '...') if len(name) > max_length else name
+                # Get unique gamedays for the current week
+                current_week_gamedays = week_picks['gameday'].unique()
 
-                # Extract week number from gameday
-                result['picks']['week'] = (result['picks']['gameday']).apply(lambda x: math.floor(x))
+                # Create a header for the week including the summary line
+                week_header = f'{result['weekly_summary'].splitlines()[i]}'
+                header_label = ctk.CTkLabel(my_frame, text=week_header)
+                header_label.grid(row=(2*i+1), column=0, padx=35, sticky="w")
 
-                # Determine the range of weeks and gamedays
-                unique_weeks = result['picks']['week'].unique()
-                unique_gamedays = result['picks']['gameday'].unique()
+                # Create a frame widget for the current week
+                frame_widget = ctk.CTkScrollableFrame(my_frame, orientation="horizontal",width=1300, height=210)
+                frame_widget.grid(row=(2*i+2), column=0, padx=(20,40), pady=(0,10), columnspan=len(current_week_gamedays), sticky="ew")
 
-                # Calculate the number of lines in the weekly summary
-                num_lines = len(result['weekly_summary'].split('\n'))
+                # Iterate through unique gamedays
+                for j, gameday in enumerate(current_week_gamedays):
+                    
+                    # Create a text widget for each gameday column
+                    text_widget = ctk.CTkLabel(frame_widget, height=14, width=21)
+                    text_widget.grid(row=1, column=j, padx=5, pady=5)
 
-                # Create a frame widget for the planner tab
-                my_frame = ctk.CTkScrollableFrame(planner_tab, width=1350, height=750, corner_radius=0, fg_color="transparent")
-                my_frame.grid(row=0, column=0, sticky="nsew")
-                
-                # Create a single text widget for the weekly summary
-                weekly_summary_text = tk.Text(my_frame, height=3, width=25, bg='#242424', fg='white', highlightbackground='#4a4a4a')
-                weekly_summary_text.grid(row=0, column=0, pady=(5, 5), padx=35, sticky="w")
+                    # Filter picks for the current gameday and week where transfer_out is 0
+                    gameday_week_picks = week_picks[(week_picks['gameday'] == gameday) & (week_picks['transfer_out'] == 0)]
 
-                # Get the last line of the summary
-                last_summary_line = result['weekly_summary'].splitlines()[-1]
+                    # Filter picks based on the players in the squad
+                    squad_picks = gameday_week_picks
 
-                # Insert the last line to the left of the text widget
-                weekly_summary_text.insert(tk.END, f'\n {last_summary_line}')
+                    # Check if there are picks for the current gameday and squad
+                    if not squad_picks.empty:
+                        # Gameday header
+                        gameday_header = f'{gameday:.1f}'
+                        header_line = gameday_header.center(34)
 
-                # Iterate through unique weeks
-                for i, week in enumerate(unique_weeks):
-                   
-                    # Filter picks for the current week
-                    week_picks = result['picks'][result['picks']['week'] == week]
-
-                    # Get unique gamedays for the current week
-                    current_week_gamedays = week_picks['gameday'].unique()
-
-                    # Create a header for the week including the summary line
-                    week_header = f'{result['weekly_summary'].splitlines()[i]}'
-                    header_label = ctk.CTkLabel(my_frame, text=week_header)
-                    header_label.grid(row=(2*i+1), column=0, padx=35, sticky="w")
-
-                    # Create a frame widget for the current week
-                    frame_widget = ctk.CTkScrollableFrame(my_frame, orientation="horizontal",width=1300, height=210)
-                    frame_widget.grid(row=(2*i+2), column=0, padx=(20,40), pady=(0,10), columnspan=len(current_week_gamedays), sticky="ew")
-
-                    # Iterate through unique gamedays
-                    for j, gameday in enumerate(current_week_gamedays):
-                        
                         # Create a text widget for each gameday column
-                        text_widget = ctk.CTkLabel(frame_widget, height=14, width=21)
+                        text_widget = tk.Text(frame_widget, height=15, width=34, bg='#242424', fg='white', highlightbackground='#4a4a4a')
                         text_widget.grid(row=1, column=j, padx=5, pady=5)
+                        text_widget.insert(tk.END, f"\n{header_line}\n\n")
 
-                        # Filter picks for the current gameday and week where transfer_out is 0
-                        gameday_week_picks = week_picks[(week_picks['gameday'] == gameday) & (week_picks['transfer_out'] == 0)]
-
-                        # Filter picks based on the players in the squad
-                        squad_picks = gameday_week_picks
-
-                        # Check if there are picks for the current gameday and squad
-                        if not squad_picks.empty:
-                            # Gameday header
-                            gameday_header = f'{gameday:.1f}'
-                            header_line = gameday_header.center(34)
-
-                            # Create a text widget for each gameday column
-                            text_widget = tk.Text(frame_widget, height=15, width=34, bg='#242424', fg='white', highlightbackground='#4a4a4a')
-                            text_widget.grid(row=1, column=j, padx=5, pady=5)
-                            text_widget.insert(tk.END, f"\n{header_line}\n\n")
-
-                            # Iterate through the picks for the current gameday, week, and squad
-                            for k, (index, row) in enumerate(squad_picks.iterrows()):
-                                truncated_name = truncate_name(row['name'], name_width)
-                                xP_text = f"{row['xP']:.2f}"  
-                                
-                                # Check xP value for coloring
-                                color = 'red' if row['xP'] == 0 else 'yellow' if row['xP'] < 20 else 'green'
-
-                                # Check player position for the colored line
-                                position_line_color = '#C80044' 
-                                if row['pos'] == "FRONT":
-                                    position_line_color = '#C80044' 
-                                else:
-                                    position_line_color = '#1B3B9A'
-
-                                # Define a tag for transferred in players
-                                text_widget.tag_configure('transferred_in', background='orange', foreground='white')
-
-                                # Define a tag for captained players
-                                text_widget.tag_configure('captain', background='green', foreground='white')
-                                
-                                # Define a bold font
-                                bold_font = tk.font.Font(family="Helvetica", size=12, weight="bold")
+                        # Iterate through the picks for the current gameday, week, and squad
+                        for k, (index, row) in enumerate(squad_picks.iterrows()):
+                            truncated_name = truncate_name(row['name'], name_width)
+                            xP_text = f"{row['xP']:.2f}"  
                             
-                                # Tags for players that are transferred in and captained
-                                if row['transfer_in'] + row['captain'] == 2:
+                            # Check xP value for coloring
+                            color = 'red' if row['xP'] == 0 else 'yellow' if row['xP'] < 20 else 'green'
 
-                                    # Position tag
-                                    text_widget.tag_configure(position_line_color, foreground=position_line_color, font=bold_font)
-                                    text_widget.insert(tk.END, '  | ', position_line_color)
+                            # Check player position for the colored line
+                            position_line_color = '#C80044' 
+                            if row['pos'] == "FRONT":
+                                position_line_color = '#C80044' 
+                            else:
+                                position_line_color = '#1B3B9A'
 
-                                    # Insert player name with transfer tag
-                                    text_widget.insert(tk.END, f"{truncated_name:{name_width}} {row['team']:{team_width}} {row['price']:{price_width}.1f}", 'transferred_in')
-                                    
-                                    # Insert xPoints with Captain tag
-                                    text_widget.insert(tk.END, " ")
-                                    text_widget.insert(tk.END, xP_text, 'captain')
+                            # Define a tag for transferred in players
+                            text_widget.tag_configure('transferred_in', background='orange', foreground='white')
+
+                            # Define a tag for captained players
+                            text_widget.tag_configure('captain', background='green', foreground='white')
+                            
+                            # Define a bold font
+                            bold_font = tk.font.Font(family="Helvetica", size=12, weight="bold")
+                        
+                            # Tags for players that are transferred in and captained
+                            if row['transfer_in'] + row['captain'] == 2:
+
+                                # Position tag
+                                text_widget.tag_configure(position_line_color, foreground=position_line_color, font=bold_font)
+                                text_widget.insert(tk.END, '  | ', position_line_color)
+
+                                # Insert player name with transfer tag
+                                text_widget.insert(tk.END, f"{truncated_name:{name_width}} {row['team']:{team_width}} {row['price']:{price_width}.1f}", 'transferred_in')
                                 
-                                # Tags for players that are transferred in
-                                elif row['transfer_in'] == 1:
+                                # Insert xPoints with Captain tag
+                                text_widget.insert(tk.END, " ")
+                                text_widget.insert(tk.END, xP_text, 'captain')
+                            
+                            # Tags for players that are transferred in
+                            elif row['transfer_in'] == 1:
 
-                                    # Position tag
-                                    text_widget.tag_configure(position_line_color, foreground=position_line_color, font=bold_font)
-                                    text_widget.insert(tk.END, '  | ', position_line_color)
-                                    
-                                    # Insert player name with captain tag
-                                    text_widget.insert(tk.END, f"{truncated_name:{name_width}} {row['team']:{team_width}} {row['price']:{price_width}.1f}", 'transferred_in')
-                                    
-                                    # xPoints tag
-                                    text_widget.tag_configure(color, foreground=color)
-                                    text_widget.insert(tk.END, " ")
-                                    text_widget.insert(tk.END, xP_text, color)
+                                # Position tag
+                                text_widget.tag_configure(position_line_color, foreground=position_line_color, font=bold_font)
+                                text_widget.insert(tk.END, '  | ', position_line_color)
+                                
+                                # Insert player name with captain tag
+                                text_widget.insert(tk.END, f"{truncated_name:{name_width}} {row['team']:{team_width}} {row['price']:{price_width}.1f}", 'transferred_in')
+                                
+                                # xPoints tag
+                                text_widget.tag_configure(color, foreground=color)
+                                text_widget.insert(tk.END, " ")
+                                text_widget.insert(tk.END, xP_text, color)
 
-                                # Tags for players that are captained
-                                elif row['captain'] == 1:
+                            # Tags for players that are captained
+                            elif row['captain'] == 1:
 
-                                    # Position tag
-                                    text_widget.tag_configure(position_line_color, foreground=position_line_color, font=bold_font)
-                                    text_widget.insert(tk.END, '  | ', position_line_color)
+                                # Position tag
+                                text_widget.tag_configure(position_line_color, foreground=position_line_color, font=bold_font)
+                                text_widget.insert(tk.END, '  | ', position_line_color)
 
-                                    # Insert player name
-                                    text_widget.insert(tk.END, f"{truncated_name:{name_width}} {row['team']:{team_width}} {row['price']:{price_width}.1f}")
-                                    
-                                    # Insert xPoints with Captain tag
-                                    text_widget.tag_configure(color, foreground=color)
-                                    text_widget.insert(tk.END, " ")
-                                    text_widget.insert(tk.END, xP_text, 'captain')
-                                    
-                                else:
+                                # Insert player name
+                                text_widget.insert(tk.END, f"{truncated_name:{name_width}} {row['team']:{team_width}} {row['price']:{price_width}.1f}")
+                                
+                                # Insert xPoints with Captain tag
+                                text_widget.tag_configure(color, foreground=color)
+                                text_widget.insert(tk.END, " ")
+                                text_widget.insert(tk.END, xP_text, 'captain')
+                                
+                            else:
 
-                                    # Position tag
-                                    text_widget.tag_configure(position_line_color, foreground=position_line_color, font=bold_font)
-                                    text_widget.insert(tk.END, '  | ', position_line_color)
+                                # Position tag
+                                text_widget.tag_configure(position_line_color, foreground=position_line_color, font=bold_font)
+                                text_widget.insert(tk.END, '  | ', position_line_color)
 
-                                    # Insert player name
-                                    text_widget.insert(tk.END, f"{truncated_name:{name_width}} {row['team']:{team_width}} {row['price']:{price_width}.1f}")
-                                    
-                                    # Insert xPoints
-                                    text_widget.tag_configure(color, foreground=color)
-                                    text_widget.insert(tk.END, " ")
-                                    text_widget.insert(tk.END, xP_text, color)
+                                # Insert player name
+                                text_widget.insert(tk.END, f"{truncated_name:{name_width}} {row['team']:{team_width}} {row['price']:{price_width}.1f}")
+                                
+                                # Insert xPoints
+                                text_widget.tag_configure(color, foreground=color)
+                                text_widget.insert(tk.END, " ")
+                                text_widget.insert(tk.END, xP_text, color)
 
-                                # Insert a new line at the end of the widget
-                                text_widget.insert(tk.END, "\n")
-
-        # Error handling    
-        except Exception as e:
-            messagebox.showerror("Error", f"An error occurred: {str(e)}")
+                            # Insert a new line at the end of the widget
+                            text_widget.insert(tk.END, "\n")
 
     def open_projections_window(self):
         # Create a new window for projections

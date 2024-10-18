@@ -126,11 +126,12 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         all_data['sell_price'] = all_data['price'] + 1 - 1
         for t in indices:
             print(t)
+
             row_numbers = all_data.index[all_data['name'] == squad[t]].tolist()
             row_numbers = row_numbers[0]
             all_data.at[row_numbers, 'sell_price'] = sell_prices[t]
     except:
-        print('Player index not found')
+        print(f'Player {squad[t]} index not found')
 
     # Ensure the 'output' folder exists
     if not os.path.exists('output'):
@@ -341,7 +342,8 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
 
         if it != number_solutions-1:
             if alternative_solution == '1gd_buy':
-                actions = so.expr_sum(transfer_in[p,next_gd] for p in players if transfer_in[p,next_gd].get_value() > 0.5)
+                actions = so.expr_sum(transfer_in[p,next_gd] for p in players
+                 if transfer_in[p,next_gd].get_value() > 0.5)
                 gd_range = [next_gd]
             elif alternative_solution == '1week_buy':
                 gw_range = [gameweeks[0]]
@@ -365,7 +367,7 @@ if __name__ == '__main__':
 
     options = {
 
-        'horizon': 7,
+        'horizon': 5,
         'ft': 2,
         'tm': 0,
         'itb_overwrite': None,
@@ -377,14 +379,14 @@ if __name__ == '__main__':
         'solve_time': 3000,
         'banned_players': [],
         'forced_players': [],
-        'no_sols': 1,
+        'no_sols': 2,
         'alternative_solution': '1week_buy',
-        'threshold_value': 1,
-        'preseason': False,
+        'threshold_value': 0,
+        'preseason': True,
         'trf_last_gw': 2
 
         }
 
     r = solve_multi_period_NBA(squad=["Anthony Davis", "Anthony Edwards", "Karl-Anthony Towns", "Jaylen Brown", "Josh Giddey", "Rob Dillingham", "Matas Buzelis", "Zach Edey", "Davion Mitchell", "Kyle Filipowski"], sell_prices=[17.0, 16.0, 14.0, 14.0, 11.0, 6.5, 6.0, 6.0, 5.0, 4.5], options=options, 
-                               gd=1.2, itb=0)
+                               gd=1.1, itb=0)
     res = r['results']

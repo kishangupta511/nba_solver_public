@@ -35,21 +35,21 @@ def get_players():
     # Extracting player data from API
     players = []
     for i in general_info.json()["elements"]:
-
-        # add web name
-        player_webname = i["web_name"]
-        player_id = i["id"]
-        player_name = f'{i["first_name"]} {i["second_name"]}' 
-        player_team = i["team"]
-        player_team = teams_df.loc[player_team-1, 'Code']
-        player_price = i["now_cost"]/10
+        if i["web_name"] != "Unavailable":
+            # add web name
+            player_webname = i["web_name"]
+            player_id = i["id"]
+            player_name = f'{i["first_name"]} {i["second_name"]}' 
+            player_team = i["team"]
+            player_team = teams_df.loc[player_team-1, 'Code']
+            player_price = i["now_cost"]/10
+            
+            if i["element_type"] == 1:
+                player_position = "BACK"
+            else:
+                player_position = "FRONT"
         
-        if i["element_type"] == 1:
-            player_position = "BACK"
-        else:
-            player_position = "FRONT"
-    
-        players.append([player_id, player_name, player_webname, player_team, player_price, player_position])
+            players.append([player_id, player_name, player_webname, player_team, player_price, player_position])
 
     # Constructing data frame
     players_df = pd.DataFrame(players, columns=['id', 'name', 'web name','team', 'price', 'position'])

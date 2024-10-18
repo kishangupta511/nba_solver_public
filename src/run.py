@@ -5,8 +5,6 @@ from retrieve import get_fixtures, get_players
 from retrieve import get_team
 import os
 import sys
-import os
-import sys
 
 # Read options from the file
 with open('solver_settings.json') as f:
@@ -14,11 +12,11 @@ with open('solver_settings.json') as f:
 
 def refresh_data():
  # Attempt to add the private src folder to the path if projections.py exists
-    projections_path = os.path.join(os.path.dirname(__file__), '..', 'src', 'project.py')
+    projections_path = "/Users/kishangupta/dev/nba_fantasy/nba_solver/src/project.py"
 
     if os.path.exists(projections_path):
         # Add the private src folder to sys.path
-        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+        sys.path.append("/Users/kishangupta/dev/nba_fantasy/nba_solver/src")
         projections_available = True
         try:
             from project import mins_projection, player_projection 
@@ -49,4 +47,5 @@ def run_optimisation():
                         gd=fantasy_team['gd'], itb=fantasy_team['itb'], options=solver_options)
     
 if __name__ == '__main__':
-    run_optimisation()
+    refresh_data()
+    #run_optimisation()
