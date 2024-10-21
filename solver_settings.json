@@ -1,0 +1,26 @@
+{
+    "gd_overwrite": null,
+    "horizon": 5,
+    "ft": 2,
+    "tm": 0,
+    "itb_overwrite": null,
+    "decay_base": 0.97,
+    "bench_weight": 0.1,
+    "ft_value":25,
+    "wc_day":0,   
+    "solve_time": 300,
+    "banned_players": [],
+    "forced_players": [],
+    "no_sols": 1,
+    "alternative_solution": "1week_buy",
+    "threshold_value": 1,
+    "preseason": true,
+    "trf_last_gw": 0,
+    "team_id": 148,
+
+    "mins_decay": 30,
+    "b2b_decay": [0.975,0.95],
+    "current_season": "2024-25",
+    "fixture_weight": "low",
+    "games_left": 82
+}
