@@ -115,9 +115,20 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     all_data['total'] = (all_data[columns_to_sum].sum(axis=1)).round(2)
     all_data = all_data.sort_values(by='total', ascending=False)
     
-    # Filtering players
-    all_data = all_data[all_data['total'] > threshold_value*len(all_gd)]
+    # Keep players who may not meet the threshold
+    keep_players = (
+        all_data['name'].isin(squad) | 
+        all_data['name'].isin(banned_players) | 
+        all_data['name'].isin(forced_players)
+    )
 
+    # Filtering players who meet the threshold or are in the keep_players list
+    all_data = all_data[(all_data['total'] > threshold_value * len(all_gd)) | keep_players]
+
+    # Removing duplicates by keeping the first occurrence of each player
+    all_data = all_data.drop_duplicates(subset='name', keep='first')
+
+    # Get the index of the final players list
     players = all_data.index.to_list()
 
     # Adding player sell prices
