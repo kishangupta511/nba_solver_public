@@ -136,9 +136,9 @@ class NBAOptimizerGUI:
 
         # Layout widgets using grid
         players_label.grid(row=1, column=0, pady=30, padx=40, sticky="w")
-        self.players_entry.grid(row=1, column=1, pady=30, columnspan = 6, sticky="ew")
+        self.players_entry.grid(row=1, column=1, pady=30, padx=(0,40), columnspan=7, sticky="ew")
         prices_label.grid(row=2, column=0, pady=5, padx=40, sticky="w")
-        self.prices_entry.grid(row=2, column=1, pady=5, columnspan = 5, sticky="ew")
+        self.prices_entry.grid(row=2, column=1, pady=5, columnspan = 4, sticky="ew")
 
         # Main options grid
         main_options_label.grid(row=3, column=0, pady=(40,10), padx=60, columnspan = 2, sticky="w")
@@ -200,22 +200,22 @@ class NBAOptimizerGUI:
 
         # Create entry for squad
         self.players_var = ctk.StringVar(value=squad['initial_squad'])
-        self.players_entry = ctk.CTkEntry(root, textvariable=self.players_var, width=150)
-        self.players_entry.grid(row=1, column=1, pady=30, padx=(5,60), columnspan = 5, sticky="ew")
+        self.players_entry = ctk.CTkEntry(root, textvariable=self.players_var)
+        self.players_entry.grid(row=1, column=1, pady=5, padx=(0,40), columnspan = 7, sticky="ew")
 
         # Create entry for sell prices
         self.prices_var = ctk.StringVar(value=squad['sell_prices'])
-        self.prices_entry = ctk.CTkEntry(root, textvariable=self.prices_var, width=150)
-        self.prices_entry.grid(row=2, column=1, pady=5, padx=(5,40), columnspan = 4, sticky="ew")
+        self.prices_entry = ctk.CTkEntry(root, textvariable=self.prices_var)
+        self.prices_entry.grid(row=2, column=1, pady=5, columnspan = 4, sticky="ew")
 
         # Create entry for in the bank value
         self.itb_var = ctk.DoubleVar(value=squad['itb'])
         self.itb_entry = ctk.CTkEntry(root, textvariable=self.itb_var, width=50)
-        self.itb_entry.grid(row=4, column=5, pady=5, padx=(10,40), sticky="w")
+        self.itb_entry.grid(row=4, column=5, pady=5, padx=0, sticky="w")
 
         # Create entry for the game day
         try:
-            period_index = gameday_data[gameday_data['id'] == (squad['gd']+1)].index.tolist()
+            period_index = gameday_data[gameday_data['id'] == (squad['gd'])].index.tolist()
             period_index = list(map(int, period_index))
             new_gd = gameday_data.loc[period_index, 'code'].astype(float).tolist()
             new_gd = new_gd[0]
@@ -224,7 +224,7 @@ class NBAOptimizerGUI:
             self.gd_var = ctk.DoubleVar(value=None)
     
         self.gd_entry = ctk.CTkEntry(root, textvariable=self.gd_var, width=50)
-        self.gd_entry.grid(row=4, column=1, pady=5, padx=10, sticky="w")
+        self.gd_entry.grid(row=4, column=1, pady=5, padx=0, sticky="w")
 
     def refresh_data(self):
         refresh_data()
@@ -236,13 +236,8 @@ class NBAOptimizerGUI:
         with open('solver_settings.json') as f:
             solver_options = json.load(f)
 
-        if solver_options.get('preseason') == False:
-        # Get player input
-            players = self.players_entry.get().split(', ')
-            prices = [float(price) for price in self.prices_entry.get().split(', ')]
-        else:
-            players = []
-            prices = []
+        players = self.players_entry.get().split(', ')
+        prices = [float(price) for price in self.prices_entry.get().split(', ')]
 
         banned_players = self.banned_players_entry.get().split(', ')
         forced_players = self.forced_players_entry.get().split(', ')

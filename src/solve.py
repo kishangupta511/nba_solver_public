@@ -121,12 +121,17 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         all_data['name'].isin(banned_players) | 
         all_data['name'].isin(forced_players)
     )
-
+    keep_players = all_data[keep_players]
+    
     # Filtering players who meet the threshold or are in the keep_players list
-    all_data = all_data[(all_data['total'] > threshold_value * len(all_gd)) | keep_players]
-
+    all_data = all_data[(all_data['total'] > threshold_value * len(all_gd))]
+    all_data = pd.concat([all_data, keep_players])
+   
     # Removing duplicates by keeping the first occurrence of each player
-    all_data = all_data.drop_duplicates(subset='name', keep='first')
+    all_data = all_data.drop_duplicates(subset='id', keep='first')
+    
+    # Sort by id
+    all_data = all_data.sort_values(by='id', ascending=True)
 
     # Get the index of the final players list
     players = all_data.index.to_list()
@@ -136,8 +141,6 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         indices = range(len(squad))
         all_data['sell_price'] = all_data['price'] + 1 - 1
         for t in indices:
-            print(t)
-
             row_numbers = all_data.index[all_data['name'] == squad[t]].tolist()
             row_numbers = row_numbers[0]
             all_data.at[row_numbers, 'sell_price'] = sell_prices[t]
@@ -378,7 +381,7 @@ if __name__ == '__main__':
 
     options = {
 
-        'horizon': 5,
+        'horizon': 12,
         'ft': 2,
         'tm': 0,
         'itb_overwrite': None,
@@ -393,11 +396,11 @@ if __name__ == '__main__':
         'no_sols': 2,
         'alternative_solution': '1week_buy',
         'threshold_value': 0,
-        'preseason': True,
+        'preseason': False,
         'trf_last_gw': 2
 
         }
 
     r = solve_multi_period_NBA(squad=["Anthony Davis", "Anthony Edwards", "Karl-Anthony Towns", "Jaylen Brown", "Josh Giddey", "Rob Dillingham", "Matas Buzelis", "Zach Edey", "Davion Mitchell", "Kyle Filipowski"], sell_prices=[17.0, 16.0, 14.0, 14.0, 11.0, 6.5, 6.0, 6.0, 5.0, 4.5], options=options, 
-                               gd=1.1, itb=0)
+                               gd=1.2, itb=0.5)
     res = r['results']

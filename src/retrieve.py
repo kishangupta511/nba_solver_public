@@ -167,7 +167,7 @@ def get_team(team_id):
             print("Gameday Not Found")
 
         # Calling team info
-        team = requests.get("https://nbafantasy.nba.com/api/entry/"+str(team_id)+"/event/"+str(gd)+"/picks")
+        team = requests.get("https://nbafantasy.nba.com/api/entry/"+str(team_id)+"/event/"+str(gd-1)+"/picks")
         transfer_history = requests.get("https://nbafantasy.nba.com/api/entry/"+str(team_id)+"/transfers/")
 
         # Extracting basic info
