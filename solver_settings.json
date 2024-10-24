@@ -18,9 +18,8 @@
     "trf_last_gw": 2,
     "team_id": 148,
 
-    "mins_decay": 30,
+    "mins_decay": 15,
     "b2b_decay": [0.975,0.95],
     "current_season": "2024-25",
-    "fixture_weight": "low",
-    "games_left": 82
+    "fixture_weight": "low"
 }

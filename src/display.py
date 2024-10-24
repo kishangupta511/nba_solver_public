@@ -726,14 +726,13 @@ class NBAOptimizerGUI:
                     with open('solver_settings.json') as f:
                         solver_options = json.load(f)
 
-                    games_left = solver_options.get('games_left')
                     decay_factor = solver_options.get('mins_decay')
                     b2b_decay = solver_options.get('b2b_decay')
 
                     # Define the mins_decay function with decay for normal games
-                    def mins_decay(projected_mins, row, column, games_left, decay_factor, actual_gd):
-                        fraction = (1 - (72 / games_left)) / decay_factor
-                        projected_mins.loc[row, f'{int(column)}'] = projected_mins.loc[row, f'{int(column)}'] * (1 - fraction) ** actual_gd
+                    def mins_decay(projected_mins, row, column, decay_factor, actual_gd):
+                        fraction = (1 - (75 / 82)) / decay_factor
+                        projected_mins.loc[row, f'{int(column)}'] = projected_mins.loc[row, f'{int(column)}'] * (1 - fraction) ** (actual_gd-1)
                         return projected_mins
                     
                     # Define the back-to-back decay function
@@ -761,7 +760,7 @@ class NBAOptimizerGUI:
                                     xmins_df = back_to_back_decay(xmins_df, row_index, gd, next_gd)
 
                             # Apply normal decay for single games
-                            xmins_df = mins_decay(xmins_df, row=row_index, column=gd, games_left=games_left, decay_factor=decay_factor, actual_gd=actual_gd)
+                            xmins_df = mins_decay(xmins_df, row=row_index, column=gd, decay_factor=decay_factor, actual_gd=actual_gd)
                             actual_gd += 1
 
                 else:
