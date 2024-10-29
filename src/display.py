@@ -55,7 +55,7 @@ class NBAOptimizerGUI:
         self.threshold_var = ctk.DoubleVar(value=solver_options.get('threshold_value'))
         self.no_sols_var = ctk.IntVar(value=solver_options.get('no_sols'))
         self.alternative_solution_var = ctk.StringVar()
-        alternative_list = ["1gd_buy","1week_buy"]
+        alternative_list = ["1gd_buy","1week_buy","2week_buy"]
         self.alternative_solution_var.set(value=solver_options.get('alternative_solution'))
 
         # Forced Decisions
@@ -259,7 +259,8 @@ class NBAOptimizerGUI:
             'threshold_value': self.threshold_var.get(),
             'alternative_solution': self.alternative_solution_var.get(),
             'preseason': self.preseason_var.get(),
-            'team_id': self.team_id_var.get()
+            'team_id': self.team_id_var.get(),
+            'solver': solver_options.get('solver')
         }
 
         # Run the optimizer
@@ -726,14 +727,7 @@ class NBAOptimizerGUI:
                     with open('solver_settings.json') as f:
                         solver_options = json.load(f)
 
-                    decay_factor = solver_options.get('mins_decay')
                     b2b_decay = solver_options.get('b2b_decay')
-
-                    # Define the mins_decay function with decay for normal games
-                    def mins_decay(projected_mins, row, column, decay_factor, actual_gd):
-                        fraction = (1 - (75 / 82)) / decay_factor
-                        projected_mins.loc[row, f'{int(column)}'] = projected_mins.loc[row, f'{int(column)}'] * (1 - fraction) ** (actual_gd-1)
-                        return projected_mins
                     
                     # Define the back-to-back decay function
                     def back_to_back_decay(projected_mins, row, first_game, second_game):
@@ -742,9 +736,9 @@ class NBAOptimizerGUI:
                         # Reduce minutes for the second game
                         projected_mins.loc[row, f'{int(second_game)}'] *= b2b_decay[1]
                         return projected_mins
+                    
                     xmins_df = xmins_df.fillna(0)
-                    # Apply decay only on game days where the player will play
-                    actual_gd = 1
+
                     for i, gd in enumerate(gds):
                         if xmins_df.loc[row_index,f'{int(gd)}'] != 0:
                             # Check for consecutive games
@@ -758,10 +752,6 @@ class NBAOptimizerGUI:
                                 if (next_date - current_date).days == 1 and xmins_df.loc[row_index, f'{int(next_gd)}'] != 0:  
                                     # Apply back-to-back minute reductions
                                     xmins_df = back_to_back_decay(xmins_df, row_index, gd, next_gd)
-
-                            # Apply normal decay for single games
-                            xmins_df = mins_decay(xmins_df, row=row_index, column=gd, decay_factor=decay_factor, actual_gd=actual_gd)
-                            actual_gd += 1
 
                 else:
                     fixture_info_dict = fixture_info.set_index('code')['id'].to_dict()

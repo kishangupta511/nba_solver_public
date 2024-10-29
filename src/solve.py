@@ -4,6 +4,9 @@ import random
 import string
 from subprocess import Popen, DEVNULL
 import os
+import time
+import subprocess
+import threading
 
 pd.set_option('future.no_silent_downcasting', True)
 
@@ -113,7 +116,8 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     columns_to_sum = [str(day) for day in range(next_gd, next_gd + horizon)]
     all_data = all_data.loc[:, first_five_columns + columns_to_sum]
     all_data['total'] = (all_data[columns_to_sum].sum(axis=1)).round(2)
-    all_data = all_data.sort_values(by='total', ascending=False)
+    all_data['value'] = round((all_data['total'] / all_data['price'])/horizon,2)
+    all_data = all_data.sort_values(by='value', ascending=False)
     
     # Keep players who may not meet the threshold
     keep_players = (
@@ -124,7 +128,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     keep_players = all_data[keep_players]
     
     # Filtering players who meet the threshold or are in the keep_players list
-    all_data = all_data[(all_data['total'] > threshold_value * len(all_gd))]
+    all_data = all_data[(all_data['value'] > threshold_value)]
     all_data = pd.concat([all_data, keep_players])
    
     # Removing duplicates by keeping the first occurrence of each player
@@ -252,42 +256,106 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         os.makedirs('solution_files')
 
     # Location for solution files
-    location_problem = f'solution_files/{problem_name}'
+    location_problem = f'solution_files/{problem_name}.mps'
     location_solution = f'solution_files/{problem_name}_sp.txt'
+    opt_file_name = f'solution_files/{problem_name}_opt.txt'
 
     results = []
 
+    solver = options.get('solver', 'cbc')
+
     for it in range(number_solutions):
-
         print(f'Solving iteration {it+1}/{number_solutions}')
-
-        # Solve
         model.export_mps(location_problem)
-        command = ['cbc', location_problem, 
-            'ratio','1', 'cost', 'column', 'solve', 'solu', location_solution]
-        process = Popen(command, shell=False).wait()
 
-        print(f'Solving iteration {it+1}/{number_solutions}')
-
-        command = ['/opt/miniconda3/envs/optimisation/bin/cbc', location_problem,
-            'mips',location_solution,'sec',f'{solve_time}', 'cost', 'column', 'solve', 'solu', location_solution]
-        process = Popen(command, shell=False).wait()
-
-        # Parsing
-        for v in model.get_variables():
-            v.set_value(0)
-
-        with open(location_solution, 'r') as f:
-            for line in f:
-                if 'objective value' in line:
-                    continue
-                words = line.split()
-                var = model.get_variable(words[1])
-                if var is not None:
-                    var.set_value(float(words[2]))
-                else:
-                    print(f"Warning: Variable {words[1]} not found in the model.")
+        t0 = time.time()
         
+        if solver == 'cbc':
+            
+            # Solve
+            command = ['cbc', location_problem, 
+                'ratio','1', 'cost', 'column', 'solve', 'solu', location_solution]
+            process = Popen(command, shell=False).wait()
+
+            print(f'Solving iteration {it+1}/{number_solutions}')
+
+            command = ['/opt/miniconda3/envs/optimisation/bin/cbc', location_problem,
+                'mips',location_solution,'sec',f'{solve_time}', 'cost', 'column', 'solve', 'solu', location_solution]
+            process = Popen(command, shell=False).wait()
+
+            # Parsing
+            for v in model.get_variables():
+                v.set_value(0)
+
+            with open(location_solution, 'r') as f:
+                for line in f:
+                    if 'objective value' in line:
+                        continue
+                    words = line.split()
+                    var = model.get_variable(words[1])
+                    if var is not None:
+                        var.set_value(float(words[2]))
+                    else:
+                        print(f"Warning: Variable {words[1]} not found in the model.")
+        
+        elif solver == 'highs':
+
+            highs_exec = "/opt/miniconda3/envs/optimisation/bin/highs"
+
+            secs = options.get('solve_time', 20*60)
+            presolve = options.get('presolve', 'on')
+            gap = options.get('gap', 0)
+            random_seed = options.get('random_seed', 0)
+
+            with open(opt_file_name, 'w') as f:
+                f.write(f'''mip_rel_gap = {gap}''')
+                # mip_improving_solution_file="tmp/{problem_id}_incumbent.sol"
+
+            command = f'{highs_exec} --parallel on --options_file {opt_file_name} --random_seed {random_seed} --presolve {presolve} --model_file {location_problem} --time_limit {secs} --solution_file {location_solution}'
+            def print_output(process):
+                while True:
+                    output = process.stdout.readline()
+                    if 'Solving report' in output:
+                        time.sleep(2)
+                        process.kill()
+                    elif output == '' and process.poll() is not None:
+                        break
+                    elif output:
+                        print(output.strip())
+
+            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            output_thread = threading.Thread(target=print_output, args=(process,))
+            output_thread.start()
+            output_thread.join()
+
+            # Parsing
+            with open(location_solution, 'r') as f:
+                for v in model.get_variables():
+                    v.set_value(0)
+                cols_started = False
+                for line in f:
+                    if not cols_started and "# Columns" not in line:
+                        continue
+                    elif "# Columns" in line:
+                        cols_started = True
+                        continue
+                    elif cols_started and line[0] != "#":
+                        words = line.split()
+                        v = model.get_variable(words[0])
+                        try:
+                            if v.get_type() == so.INT:
+                                v.set_value(round(float(words[1])))
+                            elif v.get_type() == so.BIN:
+                                v.set_value(round(float(words[1])))
+                            elif v.get_type() == so.CONT:
+                                v.set_value(round(float(words[1]),3))
+                        except:
+                            print("Error", words[0], line)
+                    elif line[0] == "#":
+                        break
+        t1 = time.time()
+        print("\n", round(t1-t0,1), "seconds passed")
+
         # DataFrame generation
         picks = []
         for d in gamedays:
@@ -363,10 +431,16 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
                 gw_range = [gameweeks[0]]
                 actions = so.expr_sum(transfer_in[p,d] for p in players for d in gamedays if transfer_in[p,d].get_value() > 0.5 and gameday_data.loc[d-1,'week'] == gw_range) +\
                     so.expr_sum(transfer_out[p,d] for p in players for d in gamedays if transfer_out[p,d].get_value() > 0.5 and gameday_data.loc[d-1,'week'] == gw_range)
+            elif alternative_solution == '2week_buy':
+                gw_range = [gameweeks[1]]
+                actions = so.expr_sum(transfer_in[p,d] for p in players for d in gamedays if transfer_in[p,d].get_value() > 0.5 and gameday_data.loc[d+5,'week'] == gw_range) +\
+                    so.expr_sum(transfer_out[p,d] for p in players for d in gamedays if transfer_out[p,d].get_value() > 0.5 and gameday_data.loc[d+5,'week'] == gw_range)
                 
             if actions.get_value() != 0:
                 model.add_constraint(actions <= actions.get_value()-1, name = f'cutoff_{it}')
             elif actions.get_value() == 0 and alternative_solution == '1week_buy':
+                model.add_constraint(so.expr_sum(transfer_count[w] for w in gw_range) >= 1, name=f'cutoff_{it}')
+            elif actions.get_value() == 0 and alternative_solution == '2week_buy':
                 model.add_constraint(so.expr_sum(transfer_count[w] for w in gw_range) >= 1, name=f'cutoff_{it}')
             else:
                 model.add_constraint(so.expr_sum(number_of_transfers_day[d] for d in gd_range) >= 1, name=f'cutoff_{it}')
@@ -381,7 +455,7 @@ if __name__ == '__main__':
 
     options = {
 
-        'horizon': 12,
+        'horizon': 19,
         'ft': 2,
         'tm': 0,
         'itb_overwrite': None,
@@ -393,14 +467,16 @@ if __name__ == '__main__':
         'solve_time': 3000,
         'banned_players': [],
         'forced_players': [],
-        'no_sols': 2,
-        'alternative_solution': '1week_buy',
-        'threshold_value': 0,
+        'no_sols': 1,
+        'alternative_solution': '2week_buy',
+        'threshold_value': 1.3,
         'preseason': False,
-        'trf_last_gw': 2
+        'trf_last_gw': 2,
+        'solver': 'highs'
 
         }
 
     r = solve_multi_period_NBA(squad=["Anthony Davis", "Anthony Edwards", "Karl-Anthony Towns", "Jaylen Brown", "Josh Giddey", "Rob Dillingham", "Matas Buzelis", "Zach Edey", "Davion Mitchell", "Kyle Filipowski"], sell_prices=[17.0, 16.0, 14.0, 14.0, 11.0, 6.5, 6.0, 6.0, 5.0, 4.5], options=options, 
-                               gd=1.2, itb=0.5)
+                               gd=2.1, itb=0.5)
     res = r['results']
+    
