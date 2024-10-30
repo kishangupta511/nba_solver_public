@@ -27,10 +27,10 @@ def refresh_data():
         projections_available = False
         print("Public solver does not allow projections updates, please pull the latest projections from the Github before solver execution")
     
-    projected_stats = pd.read_csv('data/rotowire-nba-projections.csv', skiprows=1)
     get_players()
     get_fixtures()
     if projections_available:
+        projected_stats = pd.read_csv('data/rotowire-nba-projections.csv', skiprows=1)
         xmins = mins_projection(projected_stats)
         player_projection(projected_stats, xmins)
         print('Data Successfully Updated\n')

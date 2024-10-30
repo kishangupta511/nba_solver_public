@@ -2,7 +2,7 @@
     "gd_overwrite": null,
     "horizon": 12,
     "ft": 2,
-    "tm": 0,
+    "tm": 1,
     "itb_overwrite": null,
     "decay_base": 0.97,
     "bench_weight": 0.1,
@@ -22,5 +22,5 @@
     "current_season": "2024-25",
     "fixture_weight": "low",
 
-    "solver": "highs"
+    "solver": "cbc"
 }
