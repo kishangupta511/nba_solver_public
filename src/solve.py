@@ -30,7 +30,6 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     horizon = options.get('horizon', 6)
     ft = options.get('ft', 2)
     tm = options.get('tm', 0)
-    itb = options.get('itb', 0)
     decay_base = options.get('decay_base', 0.87)
     bench_weight = options.get('bench_weight', 0.2)
     ft_value = options.get('ft_value',30)
@@ -42,6 +41,8 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     alternative_solution = options.get('alternative_solution','1week_buy')
     threshold_value = options.get('threshold_value',0)
     trf_last_gw = options.get('trf_last_gw', 2)
+
+    print(itb)
 
     if options.get('gd_overwrite') != None:
         gd = options.get('gd_overwrite')

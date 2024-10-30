@@ -263,8 +263,18 @@ class NBAOptimizerGUI:
             'solver': solver_options.get('solver')
         }
 
+        if self.gd_entry.get() is None:
+            print("Game day not found")
+        else:
+            print(self.gd_entry.get())
+            
+        if self.itb_entry.get() is None: 
+            print("ITB not found")
+        else:
+            print(self.itb_entry.get())
+
         # Run the optimizer
-        r = solve_multi_period_NBA(squad=players, sell_prices=prices, gd=self.gd_entry.get(), itb=self.itb_entry.get(), options=new_options)
+        r = solve_multi_period_NBA(squad=players, sell_prices=prices, gd=self.gd_entry.get(), itb=float(self.itb_entry.get()), options=new_options)
         print()
 
         # Display result in a new window
