@@ -275,7 +275,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         if solver == 'cbc':
             cbc_path = options.get('cbc_path')
             # Solve
-            command = ['cbc', location_problem, 
+            command = [cbc_path, location_problem, 
                 'ratio','1', 'cost', 'column', 'solve', 'solu', location_solution]
             process = Popen(command, shell=False).wait()
 
