@@ -7,6 +7,7 @@ import os
 import time
 import subprocess
 import threading
+import json
 
 pd.set_option('future.no_silent_downcasting', True)
 
@@ -265,7 +266,6 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
 
     solver = options.get('solver', 'cbc')
     
-
     for it in range(number_solutions):
         print(f'Solving iteration {it+1}/{number_solutions}')
         model.export_mps(location_problem)
@@ -453,31 +453,12 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
 
 if __name__ == '__main__':
 
+    # Read options from the file
+    with open('solver_settings.json') as f:
+        
+        solver_options = json.load(f)
 
-    options = {
-
-        'horizon': 19,
-        'ft': 2,
-        'tm': 0,
-        'itb_overwrite': None,
-        'gd_overwrite': None,
-        'decay_base': 0.97,
-        'bench_weight': 0.15,
-        'ft_value':20,
-        'wc_day':0,   
-        'solve_time': 3000,
-        'banned_players': [],
-        'forced_players': [],
-        'no_sols': 1,
-        'alternative_solution': '2week_buy',
-        'threshold_value': 1.3,
-        'preseason': False,
-        'trf_last_gw': 2,
-        'solver': 'highs'
-
-        }
-
-    r = solve_multi_period_NBA(squad=["Anthony Davis", "Anthony Edwards", "Karl-Anthony Towns", "Jaylen Brown", "Josh Giddey", "Rob Dillingham", "Matas Buzelis", "Zach Edey", "Davion Mitchell", "Kyle Filipowski"], sell_prices=[17.0, 16.0, 14.0, 14.0, 11.0, 6.5, 6.0, 6.0, 5.0, 4.5], options=options, 
+    r = solve_multi_period_NBA(squad=["Anthony Davis", "Anthony Edwards", "Karl-Anthony Towns", "Jaylen Brown", "Josh Giddey", "Rob Dillingham", "Matas Buzelis", "Zach Edey", "Davion Mitchell", "Kyle Filipowski"], sell_prices=[17.0, 16.0, 14.0, 14.0, 11.0, 6.5, 6.0, 6.0, 5.0, 4.5], options=solver_options, 
                                gd=2.1, itb=0.5)
     res = r['results']
     
