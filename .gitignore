@@ -6,4 +6,4 @@ data/fixture_info.csv
 data/fixture_ticker.csv
 data/teams.csv
 data/players.csv
-
+solver_settings.json

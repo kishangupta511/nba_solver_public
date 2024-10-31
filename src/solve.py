@@ -264,6 +264,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     results = []
 
     solver = options.get('solver', 'cbc')
+    
 
     for it in range(number_solutions):
         print(f'Solving iteration {it+1}/{number_solutions}')
@@ -272,7 +273,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         t0 = time.time()
         
         if solver == 'cbc':
-            
+            cbc_path = options.get('cbc_path')
             # Solve
             command = ['cbc', location_problem, 
                 'ratio','1', 'cost', 'column', 'solve', 'solu', location_solution]
@@ -280,7 +281,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
 
             print(f'Solving iteration {it+1}/{number_solutions}')
 
-            command = ['/opt/miniconda3/envs/optimisation/bin/cbc', location_problem,
+            command = [cbc_path, location_problem,
                 'mips',location_solution,'sec',f'{solve_time}', 'cost', 'column', 'solve', 'solu', location_solution]
             process = Popen(command, shell=False).wait()
 
@@ -300,8 +301,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
                         print(f"Warning: Variable {words[1]} not found in the model.")
         
         elif solver == 'highs':
-
-            highs_exec = "/opt/miniconda3/envs/optimisation/bin/highs"
+            highs_path = options.get('highs_path')
 
             secs = options.get('solve_time', 20*60)
             presolve = options.get('presolve', 'on')
@@ -312,7 +312,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
                 f.write(f'''mip_rel_gap = {gap}''')
                 # mip_improving_solution_file="tmp/{problem_id}_incumbent.sol"
 
-            command = f'{highs_exec} --parallel on --options_file {opt_file_name} --random_seed {random_seed} --presolve {presolve} --model_file {location_problem} --time_limit {secs} --solution_file {location_solution}'
+            command = f'{highs_path} --parallel on --options_file {opt_file_name} --random_seed {random_seed} --presolve {presolve} --model_file {location_problem} --time_limit {secs} --solution_file {location_solution}'
             def print_output(process):
                 while True:
                     output = process.stdout.readline()
