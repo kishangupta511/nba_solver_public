@@ -260,7 +260,9 @@ class NBAOptimizerGUI:
             'alternative_solution': self.alternative_solution_var.get(),
             'preseason': self.preseason_var.get(),
             'team_id': self.team_id_var.get(),
-            'solver': solver_options.get('solver')
+            'solver': solver_options.get('solver'),
+            'cbc_path': solver_options.get('cbc_path'),
+            'highs_path': solver_options.get('highs_path')
         }
 
         if self.gd_entry.get() is None:
