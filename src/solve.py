@@ -43,7 +43,10 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     threshold_value = options.get('threshold_value',0)
     trf_last_gw = options.get('trf_last_gw', 2)
 
-    print(itb)
+    if options.get('captain_played') == None:
+        KeyError('captain_played not found in options, please add captain_played to the solver settings json as shown in the template')
+    else:
+        captain_played = options.get('captain_played')
 
     if options.get('gd_overwrite') != None:
         gd = options.get('gd_overwrite')
@@ -205,6 +208,10 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     model.add_constraints((squad[p, next_gd-1] == 0 for p in players if p not in initial_squad), name='initial_squad_others')
     model.add_constraint(in_the_bank[next_gd-1] == itb, name='initial_itb')
     model.add_constraint(free_transfers[gameweek_start-1] == ft, name='initial_ft')
+    if captain_played == False:
+        model.add_constraint(captains_week[gameweek_start] == 1, name='initial_captain')
+    else:
+        model.add_constraint(captains_week[gameweek_start] == 0, name='initial_captain')
     transfer_count[gameweek_start-1] = 2
 
     # Squad and lineup constraints
@@ -223,7 +230,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
    
     # Captain constraints
     model.add_constraints((so.expr_sum(captain[p,d] for p in players) <= 1 for d in gamedays), name='captain_count_gd')
-    model.add_constraints((captains_week[w] == 1 for w in gameweeks), name='captain_count_gw')
+    model.add_constraints((captains_week[w] <= 1 for w in gameweeks), name='captain_count_gw')
 
     model.add_constraints((captain[p,d] <= lineup[p,d] for p in players for d in gamedays), name='captain_lineup_rel')
     
@@ -251,7 +258,6 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     gw_total = {w: so.expr_sum(gd_total[d] if gameday_data.loc[d-1,"week"] == w else 0 for d in gamedays)- 100 * penalized_transfers[w] for w in gameweeks}
     decay_objective = so.expr_sum((gw_total[w] - ft_value * (transfer_count[w] - penalized_transfers[w])) * pow(decay_base, w-gameweek_start)  for w in gameweeks)
     model.set_objective(-decay_objective, sense='N', name='tdxp')
-
     
     # Ensure the 'data' folder exists
     if not os.path.exists('solution_files'):
@@ -455,10 +461,9 @@ if __name__ == '__main__':
 
     # Read options from the file
     with open('solver_settings.json') as f:
-        
         solver_options = json.load(f)
 
     r = solve_multi_period_NBA(squad=["Anthony Davis", "Anthony Edwards", "Karl-Anthony Towns", "Jaylen Brown", "Josh Giddey", "Rob Dillingham", "Matas Buzelis", "Zach Edey", "Davion Mitchell", "Kyle Filipowski"], sell_prices=[17.0, 16.0, 14.0, 14.0, 11.0, 6.5, 6.0, 6.0, 5.0, 4.5], options=solver_options, 
-                               gd=2.1, itb=0.5)
+                               gd=2.4, itb=0.5)
     res = r['results']
     

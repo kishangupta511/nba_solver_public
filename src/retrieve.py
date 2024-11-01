@@ -154,7 +154,7 @@ def get_fixtures():
     return {'fixture_info': fixture_info, 'fixture_ticker': pivot_df}
 
 def get_team(team_id):
-    try:
+  #  try:
         # Reteiving fixtures info for gameday id
         info_api = requests.get("https://nbafantasy.nba.com/api/bootstrap-static/")
 
@@ -169,6 +169,7 @@ def get_team(team_id):
         # Calling team info
         team = requests.get("https://nbafantasy.nba.com/api/entry/"+str(team_id)+"/event/"+str(gd-1)+"/picks")
         transfer_history = requests.get("https://nbafantasy.nba.com/api/entry/"+str(team_id)+"/transfers/")
+        gameday_history = requests.get("https://nbafantasy.nba.com/api/entry/"+str(team_id)+"/history/")
 
         # Extracting basic info
         itb = team.json()["entry_history"]["bank"]
@@ -176,6 +177,7 @@ def get_team(team_id):
         team_value = team.json()["entry_history"]["value"]
         overall_rank = team.json()["entry_history"]["overall_rank"]
         
+        # Extracting squad and price info
         team_list = ""
         price_list = ""
 
@@ -201,16 +203,49 @@ def get_team(team_id):
         team_list = team_list[:-2]
         price_list = price_list[:-2]
 
-        return {'initial_squad': team_list, 'sell_prices': price_list, 'gd': gd, 'itb': itb}
+        # Extracting captain info
+        captain_list =[]
+        for i in gameday_history.json()["chips"]:
+            if i["name"] == "phcapt":
+                captain_list.append(i["event"])
+        fixture_info = pd.read_csv('data/fixture_info.csv')
+        captain_week = fixture_info.loc[fixture_info['id'].isin(captain_list), 'week'].values
+        current_week = fixture_info.loc[fixture_info['id'] == gd-1, 'week'].values
+        if len(captain_week) > 0:
+            if captain_week[-1] == current_week:
+                captain_played = True
+            else:
+                captain_played = False
+        else:
+            captain_played = False
+        
+        # Getting transfer history
+        transfer_gds = []
+        for i in gameday_history.json()["current"]:
+            if i["event_transfers"] > 0:
+                for _ in range(i["event_transfers"]):
+                    transfer_gds.append(i["event"])
+        
+        tr_weeks = []
+        for f in transfer_gds:
+            week = fixture_info.loc[fixture_info['id'] == f, 'week'].values
+            if week.size > 0:
+                tr_weeks.append(week[0])
+        tm = 0
+        for i in tr_weeks:
+            if i == current_week:
+                tm = tm + 1
+        
+        return {'initial_squad': team_list, 'sell_prices': price_list, 'gd': gd, 'itb': itb, 'captain': captain_played, 'transfers_made': tm}
     
-    except Exception as e:
-        print(f"Error: Team {team_id} could not be retrieved\n")
+   # except Exception as e:
+       # print(f"Error: Team {team_id} could not be retrieved\n")
         return {'initial_squad': [], 'sell_prices': [], 'gd': 1.1, 'itb': 0}
 
 if __name__ == '__main__':
-    players = get_players()
-    fixtures = get_fixtures()
-    team = get_team(148)
+    # players = get_players()
+    # fixtures = get_fixtures()
+    team = get_team(15926)
 
 
 

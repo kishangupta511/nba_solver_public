@@ -16,6 +16,7 @@ import pytz
 
 
 class NBAOptimizerGUI:
+
     def __init__(self, root):
         self.root = root
         self.root.title("NBA Fantasy Optimizer")
@@ -52,6 +53,7 @@ class NBAOptimizerGUI:
         self.wc_day_var = ctk.DoubleVar(value=solver_options.get('wc_day'))
         self.solve_time_var = ctk.IntVar(value=solver_options.get('solve_time'))
         self.preseason_var = ctk.BooleanVar(value=solver_options.get('preseason'))
+        self.captain_played = ctk.BooleanVar(value=solver_options.get('captain_played'))
         self.threshold_var = ctk.DoubleVar(value=solver_options.get('threshold_value'))
         self.no_sols_var = ctk.IntVar(value=solver_options.get('no_sols'))
         self.alternative_solution_var = ctk.StringVar()
@@ -105,6 +107,8 @@ class NBAOptimizerGUI:
         solve_time_entry = ctk.CTkEntry(root, textvariable=self.solve_time_var, width=50)
         preseason_label = ctk.CTkLabel(root, text="Preseason:")
         preseason_checkbox = ctk.CTkCheckBox(root, variable=self.preseason_var, text="")
+        captain_played_label = ctk.CTkLabel(root, text="Captain Played:")
+        self.captain_played_checkbox = ctk.CTkCheckBox(root, variable=self.captain_played, text="")
         threshold_label = ctk.CTkLabel(root, text= "Threshold:")
         threshold_entry = ctk.CTkEntry(root, textvariable=self.threshold_var, width=50)
         alternative_solution_label = ctk.CTkLabel(root, text="Alt Solution:")
@@ -148,14 +152,16 @@ class NBAOptimizerGUI:
         horizon_entry.grid(row=4, column=3, pady=5, padx=0, sticky="w")
         itb_label.grid(row=4, column=4, pady=5, padx=(20,10), sticky="w")
         self.itb_entry.grid(row=4, column=5, pady=5, padx=0, sticky="w")
-        preseason_label.grid(row=4, column=6, pady=5, padx=(20,10), sticky="w")
-        preseason_checkbox.grid(row=4, column=7, pady=5, padx=(0,20), sticky="w")
+        captain_played_label.grid(row=4, column=6, pady=5, padx=(20,10), sticky="w")
+        self.captain_played_checkbox.grid(row=4, column=7, pady=5, padx=(0,20), sticky="w")
         ft_label.grid(row=5, column=0, pady=5, padx=(40,10), sticky="w")
         ft_entry.grid(row=5, column=1, pady=5, padx=0,sticky="w")
         tm_label.grid(row=5, column=2, pady=5, padx=(20,10), sticky="w")
         tm_entry.grid(row=5, column=3, pady=5, padx=0, sticky="w")
         wc_day_label.grid(row=5, column=4, pady=5, padx=(20,10), sticky="w")
         wc_day_entry.grid(row=5, column=5, pady=5, padx=0, sticky="w")
+        preseason_label.grid(row=5, column=6, pady=5, padx=(20,10), sticky="w")
+        preseason_checkbox.grid(row=5, column=7, pady=5, padx=(0,20), sticky="w")
 
         # Forced options grid
         forced_options_label.grid(row=6, column=0, pady=(40,10), padx=60, columnspan = 2, sticky="w")
@@ -186,6 +192,8 @@ class NBAOptimizerGUI:
         # Create a button to run the optimizer
         run_button.grid(row=13, column=3, pady=(10,30), columnspan = 2, sticky="ew" )
 
+        self.get_data()
+
     def get_data(self):
 
         # Destroy existing widgets
@@ -193,6 +201,7 @@ class NBAOptimizerGUI:
         self.prices_entry.destroy()
         self.gd_entry.destroy()
         self.itb_entry.destroy()
+        self.captain_played_checkbox.destroy()
         
         # Read the team ID from the entry widget
         gameday_data = pd.read_csv('data/fixture_info.csv')
@@ -225,6 +234,16 @@ class NBAOptimizerGUI:
     
         self.gd_entry = ctk.CTkEntry(root, textvariable=self.gd_var, width=50)
         self.gd_entry.grid(row=4, column=1, pady=5, padx=0, sticky="w")
+
+        # Create entry for captain played
+        self.captain_played_var = ctk.BooleanVar(value=squad['captain'])
+        self.captain_played_checkbox = ctk.CTkCheckBox(root, variable=self.captain_played_var, text="")
+        self.captain_played_checkbox.grid(row=4, column=7, pady=5, padx=(0,20), sticky="w")
+
+        # Create entry for transfers made
+        self.tm_var = ctk.IntVar(value=squad['transfers_made'])
+        self.tm_entry = ctk.CTkEntry(root, textvariable=self.tm_var, width=50)
+        self.tm_entry.grid(row=5, column=3, pady=5, padx=0, sticky="w")
 
     def refresh_data(self):
         refresh_data()
@@ -259,6 +278,7 @@ class NBAOptimizerGUI:
             'threshold_value': self.threshold_var.get(),
             'alternative_solution': self.alternative_solution_var.get(),
             'preseason': self.preseason_var.get(),
+            'captain_played': self.captain_played_var.get(),
             'team_id': self.team_id_var.get(),
             'solver': solver_options.get('solver'),
             'cbc_path': solver_options.get('cbc_path'),
@@ -267,13 +287,9 @@ class NBAOptimizerGUI:
 
         if self.gd_entry.get() is None:
             print("Game day not found")
-        else:
-            print(self.gd_entry.get())
             
         if self.itb_entry.get() is None: 
             print("ITB not found")
-        else:
-            print(self.itb_entry.get())
 
         # Run the optimizer
         r = solve_multi_period_NBA(squad=players, sell_prices=prices, gd=self.gd_entry.get(), itb=float(self.itb_entry.get()), options=new_options)
@@ -974,3 +990,4 @@ if __name__ == "__main__":
     root = ctk.CTk()
     app = NBAOptimizerGUI(root)
     root.mainloop()
+    
