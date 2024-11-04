@@ -440,8 +440,8 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
                     so.expr_sum(transfer_out[p,d] for p in players for d in gamedays if transfer_out[p,d].get_value() > 0.5 and gameday_data.loc[d-1,'week'] == gw_range)
             elif alternative_solution == '2week_buy':
                 gw_range = [gameweeks[1]]
-                actions = so.expr_sum(transfer_in[p,d] for p in players for d in gamedays if transfer_in[p,d].get_value() > 0.5 and gameday_data.loc[d+5,'week'] == gw_range) +\
-                    so.expr_sum(transfer_out[p,d] for p in players for d in gamedays if transfer_out[p,d].get_value() > 0.5 and gameday_data.loc[d+5,'week'] == gw_range)
+                actions = so.expr_sum(transfer_in[p,d] for p in players for d in gamedays if transfer_in[p,d].get_value() > 0.5 and gameday_data.loc[d+1,'week'] == gw_range) +\
+                    so.expr_sum(transfer_out[p,d] for p in players for d in gamedays if transfer_out[p,d].get_value() > 0.5 and gameday_data.loc[d+1,'week'] == gw_range)
                 
             if actions.get_value() != 0:
                 model.add_constraint(actions <= actions.get_value()-1, name = f'cutoff_{it}')

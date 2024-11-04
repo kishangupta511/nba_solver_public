@@ -210,7 +210,7 @@ def get_team(team_id):
                 captain_list.append(i["event"])
         fixture_info = pd.read_csv('data/fixture_info.csv')
         captain_week = fixture_info.loc[fixture_info['id'].isin(captain_list), 'week'].values
-        current_week = fixture_info.loc[fixture_info['id'] == gd-1, 'week'].values
+        current_week = fixture_info.loc[fixture_info['id'] == gd, 'week'].values
         if len(captain_week) > 0:
             if captain_week[-1] == current_week:
                 captain_played = True
