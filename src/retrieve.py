@@ -243,9 +243,9 @@ def get_team(team_id):
         return {'initial_squad': [], 'sell_prices': [], 'gd': 1.1, 'itb': 0}
 
 if __name__ == '__main__':
-    # players = get_players()
-    # fixtures = get_fixtures()
-    team = get_team(15926)
+    players = get_players()
+    fixtures = get_fixtures()
+    team = get_team(148)
 
 
 
