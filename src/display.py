@@ -37,37 +37,60 @@ class NBAOptimizerGUI:
         with open('solver_settings.json') as f:
             solver_options = json.load(f)
 
-        # Team ID input
+        # Team ID Variable
         self.team_id_var = ctk.IntVar(value=solver_options.get('team_id'))
 
-        # Options input variables with default values
+        # Main Options Variables
         self.horizon_var = ctk.IntVar(value=solver_options.get('horizon'))
-        self.ft_var = ctk.IntVar(value=solver_options.get('ft'))
         self.tm_var = ctk.IntVar(value=solver_options.get('tm'))
+        self.preseason_var = ctk.BooleanVar(value=solver_options.get('preseason'))
+        self.captain_played = ctk.BooleanVar(value=solver_options.get('captain_played'))
+
+        # Chip Options Variables
+        self.wc_day_var = ctk.DoubleVar(value=solver_options.get('wc_day'))
+        wc_days_text = ""
+        for i in solver_options.get('wc_days'):
+            wc_days_text += str(i) + ", "
+        wc_days_text = wc_days_text[:-2]
+        self.wc_days_var = ctk.StringVar(value=wc_days_text)
+        wc_range_text = ""
+        for i in solver_options.get('wc_range'):
+            wc_range_text += str(i) + ", "
+        wc_range_text = wc_range_text[:-2]
+        self.wc_range_var = ctk.StringVar(value=wc_range_text)
+        self.all_star_day_var = ctk.DoubleVar(value=solver_options.get('all_star_day'))
+        all_star_days_text = ""
+        for i in solver_options.get('all_star_days'):
+            all_star_days_text += str(i) + ", "
+        all_star_days_text = all_star_days_text[:-2]
+        self.all_star_days_var = ctk.StringVar(value=all_star_days_text)
+        all_star_range_text = ""
+        for i in solver_options.get('all_star_range'):
+            all_star_range_text += str(i) + ", "
+        all_star_range_text = all_star_range_text[:-2]
+        self.all_star_range_var = ctk.StringVar(value=all_star_range_text)
+
+        # Forced Decisions Variables
+        banned_player_text = ', '.join(solver_options.get('banned_players'))
+        self.banned_players_var = ctk.StringVar(value=banned_player_text)
+        forced_player_text = ', '.join(solver_options.get('forced_players'))
+        self.forced_players_var = ctk.StringVar(value=forced_player_text)
+
+        # Advanced Options Variables
         self.decay_base_var = ctk.DoubleVar(
             value=solver_options.get('decay_base'))
         self.bench_weight_var = ctk.DoubleVar(
             value=solver_options.get('bench_weight'))
         self.trf_last_var = ctk.IntVar(value=solver_options.get('trf_last_gw'))
         self.ft_value_var = ctk.DoubleVar(value=solver_options.get('ft_value'))
-        self.wc_day_var = ctk.DoubleVar(value=solver_options.get('wc_day'))
         self.solve_time_var = ctk.IntVar(value=solver_options.get('solve_time'))
-        self.preseason_var = ctk.BooleanVar(value=solver_options.get('preseason'))
-        self.captain_played = ctk.BooleanVar(value=solver_options.get('captain_played'))
         self.threshold_var = ctk.DoubleVar(value=solver_options.get('threshold_value'))
         self.no_sols_var = ctk.IntVar(value=solver_options.get('no_sols'))
         self.alternative_solution_var = ctk.StringVar()
         alternative_list = ["1gd_buy","1week_buy","2week_buy"]
         self.alternative_solution_var.set(value=solver_options.get('alternative_solution'))
-
-        # Forced Decisions
-        banned_player_text = ', '.join(solver_options.get('banned_players'))
-        self.banned_players_var = ctk.StringVar(
-            value=banned_player_text)
-        forced_player_text = ', '.join(solver_options.get('forced_players'))
-        self.forced_players_var = ctk.StringVar(
-            value=forced_player_text)
-
+        
+        # Entry widget and label for team ID
         team_id_entry = ctk.CTkEntry(root, textvariable=self.team_id_var,
                                      width=50)
         team_id_entry.grid(row=0, column=3, pady=(30,20),
@@ -76,23 +99,53 @@ class NBAOptimizerGUI:
         team_id_label.grid(row=0, column=2, pady=(30,20), padx = 10,
                            columnspan = 1, sticky="e" ) 
 
-        # Create labels and entry widgets for player input
+        # Entry widget and label for squad inputs
         players_label = ctk.CTkLabel(root, text="Initial Squad:")
         self.players_entry = ctk.CTkEntry(root, placeholder_text="Retrieve squad or enter player names here")
         prices_label = ctk.CTkLabel(root, text="Sell Prices:")
         self.prices_entry = ctk.CTkEntry(root, placeholder_text="Retrieve squad or enter player prices here")
 
-        # Create labels and entry widgets for options input
+        # Labels and entry widgets for main options
         gd_label = ctk.CTkLabel(root, text="Game Day:")
         self.gd_entry = ctk.CTkEntry(root, placeholder_text=1.1, width=50)
         horizon_label = ctk.CTkLabel(root, text="Horizon:")
         horizon_entry = ctk.CTkEntry(root, textvariable=self.horizon_var, width=50)
-        ft_label = ctk.CTkLabel(root, text="Free Transfers:")
-        ft_entry = ctk.CTkEntry(root, textvariable=self.ft_var, width=50)
         tm_label = ctk.CTkLabel(root, text="Transfers Made:")
         tm_entry = ctk.CTkEntry(root, textvariable=self.tm_var, width=50)
         itb_label = ctk.CTkLabel(root, text="Initial ITB:")
         self.itb_entry = ctk.CTkEntry(root, placeholder_text=0, width=50)
+        preseason_label = ctk.CTkLabel(root, text="Preseason:")
+        preseason_checkbox = ctk.CTkCheckBox(root, variable=self.preseason_var, text="")
+        captain_played_label = ctk.CTkLabel(root, text="Captain Played:")
+        self.captain_played_checkbox = ctk.CTkCheckBox(root, variable=self.captain_played, text="")
+
+        # Labels and entry widgets for chip options
+        wc_day_label = ctk.CTkLabel(root, text="Wildcard Day:")
+        wc_day_entry = ctk.CTkEntry(root, textvariable=self.wc_day_var, width=50)
+        wc_days_label = ctk.CTkLabel(root, text="Wildcard Days:")
+        wc_days_entry = ctk.CTkEntry(root, textvariable=self.wc_days_var, width=250)
+        wc_range_label = ctk.CTkLabel(root, text="Wildcard Range:")
+        wc_range_entry = ctk.CTkEntry(root, textvariable=self.wc_range_var)
+        all_star_day_label = ctk.CTkLabel(root, text="All Star Day:")
+        all_star_day_entry = ctk.CTkEntry(root, textvariable=self.all_star_day_var, width=50)
+        all_star_days_label = ctk.CTkLabel(root, text="All Star Days:")
+        all_star_days_entry = ctk.CTkEntry(root, textvariable=self.all_star_days_var, width=250)
+        all_star_range_label = ctk.CTkLabel(root, text="All Star Range:")
+        all_star_range_entry = ctk.CTkEntry(root, textvariable=self.all_star_range_var)
+
+        # Labels and entry widgets for forced decisions
+        forced_players_label = ctk.CTkLabel(root, text="Forced Players:")
+        if solver_options.get('forced_players') == []:
+            self.forced_players_entry = ctk.CTkEntry(root, placeholder_text="Enter forced players here")
+        else:
+            self.forced_players_entry = ctk.CTkEntry(root, textvariable=self.forced_players_var)
+        banned_players_label = ctk.CTkLabel(root, text="Banned Players:")
+        if solver_options.get('banned_players') == []:
+            self.banned_players_entry = ctk.CTkEntry(root, placeholder_text="Enter banned players here")
+        else:
+            self.banned_players_entry = ctk.CTkEntry(root, textvariable=self.banned_players_var)
+        
+        # Labels and entry widgets for advanced options
         decay_base_label = ctk.CTkLabel(root, text="Decay Base:")
         decay_base_entry = ctk.CTkEntry(root, textvariable=self.decay_base_var, width=50)
         bench_weight_label = ctk.CTkLabel(root, text="Bench Weight:")
@@ -101,14 +154,8 @@ class NBAOptimizerGUI:
         tf_last_entry = ctk.CTkEntry(root, textvariable=self.trf_last_var, width=50)
         ft_value_label = ctk.CTkLabel(root, text="FT Value:")
         ft_value_entry = ctk.CTkEntry(root, textvariable=self.ft_value_var, width=50)
-        wc_day_label = ctk.CTkLabel(root, text="Wildcard Day:")
-        wc_day_entry = ctk.CTkEntry(root, textvariable=self.wc_day_var, width=50)
         solve_time_label = ctk.CTkLabel(root, text="Solver Limit:")
         solve_time_entry = ctk.CTkEntry(root, textvariable=self.solve_time_var, width=50)
-        preseason_label = ctk.CTkLabel(root, text="Preseason:")
-        preseason_checkbox = ctk.CTkCheckBox(root, variable=self.preseason_var, text="")
-        captain_played_label = ctk.CTkLabel(root, text="Captain Played:")
-        self.captain_played_checkbox = ctk.CTkCheckBox(root, variable=self.captain_played, text="")
         threshold_label = ctk.CTkLabel(root, text= "Threshold:")
         threshold_entry = ctk.CTkEntry(root, textvariable=self.threshold_var, width=50)
         alternative_solution_label = ctk.CTkLabel(root, text="Alt Solution:")
@@ -117,21 +164,9 @@ class NBAOptimizerGUI:
         no_sols_label = ctk.CTkLabel(root, text="No. Solutions:")
         no_sols_entry = ctk.CTkEntry(root, textvariable=self.no_sols_var, width=50)
         
-        forced_players_label = ctk.CTkLabel(root, text="Forced Players:")
-        if solver_options.get('forced_players') == []:
-            self.forced_players_entry = ctk.CTkEntry(root, placeholder_text="Enter forced players here")
-        else:
-            self.forced_players_entry = ctk.CTkEntry(root, textvariable=self.forced_players_var)
-
-        banned_players_label = ctk.CTkLabel(root, text="Banned Players:")
-        if solver_options.get('banned_players') == []:
-            self.banned_players_entry = ctk.CTkEntry(root, placeholder_text="Enter banned players here")
-        else:
-            self.banned_players_entry = ctk.CTkEntry(root, textvariable=self.banned_players_var)
-
         # Labels for the different sections
-        # make the labels bold
         main_options_label = ctk.CTkLabel(root, text="Main Options:", font=("Helvetica", 16, "bold"))
+        chip_options_label = ctk.CTkLabel(root, text="Chip Options:", font=("Helvetica", 16, "bold"))
         forced_options_label = ctk.CTkLabel(root, text="Forced Options:", font=("Helvetica", 16, "bold"))
         advanced_options_label = ctk.CTkLabel(root, text="Advanced Options:", font=("Helvetica", 16, "bold"))
     
@@ -139,8 +174,8 @@ class NBAOptimizerGUI:
         run_button = ctk.CTkButton(root, text="Run Solver", command=self.run_optimizer,fg_color="red", width=50)
 
         # Layout widgets using grid
-        players_label.grid(row=1, column=0, pady=30, padx=40, sticky="w")
-        self.players_entry.grid(row=1, column=1, pady=30, padx=(0,40), columnspan=7, sticky="ew")
+        players_label.grid(row=1, column=0, pady=5, padx=40, sticky="w")
+        self.players_entry.grid(row=1, column=1, pady=5, padx=(0,40), columnspan=7, sticky="ew")
         prices_label.grid(row=2, column=0, pady=5, padx=40, sticky="w")
         self.prices_entry.grid(row=2, column=1, pady=5, columnspan = 4, sticky="ew")
 
@@ -148,49 +183,60 @@ class NBAOptimizerGUI:
         main_options_label.grid(row=3, column=0, pady=(40,10), padx=60, columnspan = 2, sticky="w")
         gd_label.grid(row=4, column=0, pady=5, padx=40, sticky="w")
         self.gd_entry.grid(row=4, column=1, pady=5, padx=0, sticky="w")
-        horizon_label.grid(row=4, column=2, pady=5, padx=(20,10), sticky="w")
-        horizon_entry.grid(row=4, column=3, pady=5, padx=0, sticky="w")
-        itb_label.grid(row=4, column=4, pady=5, padx=(20,10), sticky="w")
-        self.itb_entry.grid(row=4, column=5, pady=5, padx=0, sticky="w")
-        captain_played_label.grid(row=4, column=6, pady=5, padx=(20,10), sticky="w")
-        self.captain_played_checkbox.grid(row=4, column=7, pady=5, padx=(0,20), sticky="w")
-        ft_label.grid(row=5, column=0, pady=5, padx=(40,10), sticky="w")
-        ft_entry.grid(row=5, column=1, pady=5, padx=0,sticky="w")
+        itb_label.grid(row=4, column=2, pady=5, padx=(20,10), sticky="w")
+        self.itb_entry.grid(row=4, column=3, pady=5, padx=0, sticky="w")
+        captain_played_label.grid(row=4, column=4, pady=5, padx=(20,10), sticky="w")
+        self.captain_played_checkbox.grid(row=4, column=5, pady=5, padx=0, sticky="w")
+        horizon_label.grid(row=5, column=0, pady=5, padx=40, sticky="w")
+        horizon_entry.grid(row=5, column=1, pady=5, padx=0, sticky="w")
         tm_label.grid(row=5, column=2, pady=5, padx=(20,10), sticky="w")
         tm_entry.grid(row=5, column=3, pady=5, padx=0, sticky="w")
-        wc_day_label.grid(row=5, column=4, pady=5, padx=(20,10), sticky="w")
-        wc_day_entry.grid(row=5, column=5, pady=5, padx=0, sticky="w")
-        preseason_label.grid(row=5, column=6, pady=5, padx=(20,10), sticky="w")
-        preseason_checkbox.grid(row=5, column=7, pady=5, padx=(0,20), sticky="w")
+        preseason_label.grid(row=5, column=4, pady=5, padx=(20,10), sticky="w")
+        preseason_checkbox.grid(row=5, column=5, pady=5, padx=0, sticky="w")
+
+        # Chip options grid
+        chip_options_label.grid(row=6, column=0, pady=(40,10), padx=60, columnspan = 2, sticky="w")
+        wc_day_label.grid(row=7, column=0, pady=5, padx=40, sticky="w")
+        wc_day_entry.grid(row=7, column=1, pady=5, padx=0, sticky="w")
+        wc_days_label.grid(row=7, column=2, pady=5, padx=(20,10), sticky="w")
+        wc_days_entry.grid(row=7, column=3, columnspan=4, pady=5, padx=0, sticky="w")
+        wc_range_label.grid(row=7, column=6, pady=5, padx=(20,10), sticky="w")
+        wc_range_entry.grid(row=7, column=7, pady=5, padx=(0,40), sticky="w")
+        all_star_day_label.grid(row=8, column=0, pady=5, padx=40, sticky="w")
+        all_star_day_entry.grid(row=8, column=1, pady=5, padx=0, sticky="w")
+        all_star_days_label.grid(row=8, column=2, pady=5, padx=(20,10), sticky="w")
+        all_star_days_entry.grid(row=8, column=3, columnspan=4, pady=5, padx=0, sticky="w")
+        all_star_range_label.grid(row=8, column=6, pady=5, padx=(20,10), sticky="w")
+        all_star_range_entry.grid(row=8, column=7, pady=5, padx=(0,40), sticky="w")
 
         # Forced options grid
-        forced_options_label.grid(row=6, column=0, pady=(40,10), padx=60, columnspan = 2, sticky="w")
-        banned_players_label.grid(row=7, column=0, pady=5, padx=(40,10), sticky="w")
-        self.banned_players_entry.grid(row=7, column=1, pady=10, padx=0, columnspan = 6, sticky="ew")
-        forced_players_label.grid(row=8, column=0, pady=10, padx=(40,10), sticky="w")
-        self.forced_players_entry.grid(row=8, column=1, pady=10, padx=0, columnspan = 6, sticky="ew")
+        forced_options_label.grid(row=9, column=0, pady=(40,10), padx=60, columnspan = 2, sticky="w")
+        banned_players_label.grid(row=10, column=0, pady=5, padx=(40,10), sticky="w")
+        self.banned_players_entry.grid(row=10, column=1, pady=5, padx=0, columnspan = 6, sticky="ew")
+        forced_players_label.grid(row=11, column=0, pady=5, padx=(40,10), sticky="w")
+        self.forced_players_entry.grid(row=11, column=1, pady=5, padx=0, columnspan = 6, sticky="ew")
 
         # Advanced options grid
-        advanced_options_label.grid(row=9, column=0, pady=(40,10), padx=60, columnspan = 2, sticky="w")
-        decay_base_label.grid(row=10, column=0, pady=5, padx=(40,10), sticky="w")
-        decay_base_entry.grid(row=10, column=1, pady=10, padx=0, sticky="w")
-        bench_weight_label.grid(row=10, column=2, pady=10, padx=(20,10), sticky="w")
-        bench_weight_entry.grid(row=10, column=3, pady=10, padx=0, sticky="w")
-        tf_last_label.grid(row=10, column=4, pady=5, padx=(20,10), sticky="w")
-        tf_last_entry.grid(row=10, column=5, pady=5, padx=0, sticky="w")
-        alternative_solution_label.grid(row=10, column=6, pady=5, padx=(20,10), sticky="w")
-        self.alternative_menu.grid(row=10, column=7, pady=5, padx=(0,40), sticky="w")
-        ft_value_label.grid(row=11, column=0, pady=(5,60), padx=(40,10), sticky="w")
-        ft_value_entry.grid(row=11, column=1, pady=(5,60), padx=0, sticky="w")
-        solve_time_label.grid(row=11, column=2, pady=(5,60), padx=(20,10), sticky="w")
-        solve_time_entry.grid(row=11, column=3, pady=(5,60), padx=0, sticky="w")
-        threshold_label.grid(row=11, column=4, pady=(5,60), padx=(20,10), sticky="w")
-        threshold_entry.grid(row=11, column=5, pady=(5,60), padx=0, sticky="w")
-        no_sols_label.grid(row=11, column=6, pady=(5,60), padx=(20,10), sticky="w")
-        no_sols_entry.grid(row=11, column=7, pady=(5,60), padx=(0,40), sticky="w")
+        advanced_options_label.grid(row=12, column=0, pady=(40,10), padx=60, columnspan = 2, sticky="w")
+        decay_base_label.grid(row=13, column=0, pady=5, padx=(40,10), sticky="w")
+        decay_base_entry.grid(row=13, column=1, pady=10, padx=0, sticky="w")
+        bench_weight_label.grid(row=13, column=2, pady=10, padx=(20,10), sticky="w")
+        bench_weight_entry.grid(row=13, column=3, pady=10, padx=0, sticky="w")
+        tf_last_label.grid(row=13, column=4, pady=5, padx=(20,10), sticky="w")
+        tf_last_entry.grid(row=13, column=5, pady=5, padx=0, sticky="w")
+        alternative_solution_label.grid(row=13, column=6, pady=5, padx=(20,10), sticky="w")
+        self.alternative_menu.grid(row=13, column=7, pady=5, padx=(0,40), sticky="w")
+        ft_value_label.grid(row=14, column=0, pady=(5,60), padx=(40,10), sticky="w")
+        ft_value_entry.grid(row=14, column=1, pady=(5,60), padx=0, sticky="w")
+        solve_time_label.grid(row=14, column=2, pady=(5,60), padx=(20,10), sticky="w")
+        solve_time_entry.grid(row=14, column=3, pady=(5,60), padx=0, sticky="w")
+        threshold_label.grid(row=14, column=4, pady=(5,60), padx=(20,10), sticky="w")
+        threshold_entry.grid(row=14, column=5, pady=(5,60), padx=0, sticky="w")
+        no_sols_label.grid(row=14, column=6, pady=(5,60), padx=(20,10), sticky="w")
+        no_sols_entry.grid(row=14, column=7, pady=(5,60), padx=(0,40), sticky="w")
        
         # Create a button to run the optimizer
-        run_button.grid(row=13, column=3, pady=(10,30), columnspan = 2, sticky="ew" )
+        run_button.grid(row=16, column=3, pady=(10,30), columnspan = 2, sticky="ew" )
 
         self.get_data()
 
@@ -220,7 +266,7 @@ class NBAOptimizerGUI:
         # Create entry for in the bank value
         self.itb_var = ctk.DoubleVar(value=squad['itb'])
         self.itb_entry = ctk.CTkEntry(root, textvariable=self.itb_var, width=50)
-        self.itb_entry.grid(row=4, column=5, pady=5, padx=0, sticky="w")
+        self.itb_entry.grid(row=4, column=3, pady=5, padx=0, sticky="w")
 
         # Create entry for the game day
         try:
@@ -238,7 +284,7 @@ class NBAOptimizerGUI:
         # Create entry for captain played
         self.captain_played_var = ctk.BooleanVar(value=squad['captain'])
         self.captain_played_checkbox = ctk.CTkCheckBox(root, variable=self.captain_played_var, text="")
-        self.captain_played_checkbox.grid(row=4, column=7, pady=5, padx=(0,20), sticky="w")
+        self.captain_played_checkbox.grid(row=4, column=5, pady=5, padx=0, sticky="w")
 
         # Create entry for transfers made
         self.tm_var = ctk.IntVar(value=squad['transfers_made'])
@@ -261,16 +307,37 @@ class NBAOptimizerGUI:
         banned_players = self.banned_players_entry.get().split(', ')
         forced_players = self.forced_players_entry.get().split(', ')
 
+        if self.wc_days_var.get() == "":
+            wc_days_value = []
+        else:
+            wc_days_value = [float(day) for day in self.wc_days_var.get().split(', ')]
+        if self.wc_range_var.get() == "":
+            wc_range_value = []
+        else:
+            wc_range_value = [float(day) for day in self.wc_range_var.get().split(', ')]
+        if self.all_star_days_var.get() == "":
+            all_star_days_value = []
+        else:
+            all_star_days_value = [float(day) for day in self.all_star_days_var.get().split(', ')]
+        if self.all_star_range_var.get() == "":
+            all_star_range_value = []
+        else:
+            all_star_range_value = [float(day) for day in self.all_star_range_var.get().split(', ')]
+
         # Get options input
         new_options = {
             'horizon': self.horizon_var.get(),
-            'ft': self.ft_var.get(),
             'tm': self.tm_var.get(),
             'decay_base': self.decay_base_var.get(),
             'bench_weight': self.bench_weight_var.get(),
             'trf_last_gw': self.trf_last_var.get(),
             'ft_value': self.ft_value_var.get(),
             'wc_day': self.wc_day_var.get(),
+            'wc_days': wc_days_value,
+            'wc_range': wc_range_value,
+            'all_star_day': self.all_star_day_var.get(),
+            'all_star_days': all_star_days_value,
+            'all_star_range': all_star_range_value,
             'solve_time': self.solve_time_var.get(),
             'banned_players': banned_players,
             'forced_players': forced_players,
