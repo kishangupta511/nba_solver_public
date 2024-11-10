@@ -1,31 +1,38 @@
 {
+    "team_id": 148,
     "solver": "cbc",
     "gd_overwrite": null,
-    "horizon": 12,
-    "ft": 2,
-    "tm": 2,
+    "horizon": 4,
+    "tm": 0,
     "itb_overwrite": null,
-    "decay_base": 0.97,
+    "decay_base": 0.98,
     "bench_weight": 0.1,
     "ft_value":15,
-    "wc_day":0,   
-    "solve_time": 300,
-    "banned_players": [],
+    "solve_time": 30000,
+    "trf_last_gw": 2,
+    "threshold_value": 1.3,
+    
+    "banned_players": ["Jalyin Williams", "Joel Embiid", "Terance Mann", "Zion Williamson"],
     "forced_players": [],
+    
     "no_sols": 1,
     "alternative_solution": "1week_buy",
-    "threshold_value": 1.3,
-    "preseason": false,
-    "trf_last_gw": 1,
-    "team_id": 148,
+    
+    "captain_played": false,
+    "wc_day": 0,
+    "wc_days": [],
+    "wc_range": [],
+    "all_star_day": 0, 
+    "all_star_days": [],
+    "all_star_range": [],
 
     "b2b_decay": [0.975,0.95],
     "current_season": "2024-25",
     "fixture_weight": "low",
 
     "cbc_path": "/opt/miniconda3/envs/optimisation/bin/cbc",
-    "highs_path": "/opt/miniconda3/envs/optimisation/bin/highs"
+    "highs_path": "/opt/miniconda3/envs/optimisation/bin/highs",
 
-
+    "preseason": false
 
 }

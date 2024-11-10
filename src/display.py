@@ -38,42 +38,42 @@ class NBAOptimizerGUI:
             solver_options = json.load(f)
 
         # Team ID Variable
-        self.team_id_var = ctk.IntVar(value=solver_options.get('team_id'))
+        self.team_id_var = ctk.IntVar(value=solver_options.get('team_id', 148))
 
         # Main Options Variables
-        self.horizon_var = ctk.IntVar(value=solver_options.get('horizon'))
-        self.tm_var = ctk.IntVar(value=solver_options.get('tm'))
-        self.preseason_var = ctk.BooleanVar(value=solver_options.get('preseason'))
-        self.captain_played = ctk.BooleanVar(value=solver_options.get('captain_played'))
+        self.horizon_var = ctk.IntVar(value=solver_options.get('horizon', 5))
+        self.tm_var = ctk.IntVar(value=solver_options.get('tm', 0))
+        self.preseason_var = ctk.BooleanVar(value=solver_options.get('preseason', False))
+        self.captain_played = ctk.BooleanVar(value=solver_options.get('captain_played', False))
 
         # Chip Options Variables
-        self.wc_day_var = ctk.DoubleVar(value=solver_options.get('wc_day'))
+        self.wc_day_var = ctk.DoubleVar(value=solver_options.get('wc_day', 0))
         wc_days_text = ""
-        for i in solver_options.get('wc_days'):
+        for i in solver_options.get('wc_days', []):
             wc_days_text += str(i) + ", "
         wc_days_text = wc_days_text[:-2]
         self.wc_days_var = ctk.StringVar(value=wc_days_text)
         wc_range_text = ""
-        for i in solver_options.get('wc_range'):
+        for i in solver_options.get('wc_range', []):
             wc_range_text += str(i) + ", "
         wc_range_text = wc_range_text[:-2]
         self.wc_range_var = ctk.StringVar(value=wc_range_text)
-        self.all_star_day_var = ctk.DoubleVar(value=solver_options.get('all_star_day'))
+        self.all_star_day_var = ctk.DoubleVar(value=solver_options.get('all_star_day', 0))
         all_star_days_text = ""
-        for i in solver_options.get('all_star_days'):
+        for i in solver_options.get('all_star_days', []):
             all_star_days_text += str(i) + ", "
         all_star_days_text = all_star_days_text[:-2]
         self.all_star_days_var = ctk.StringVar(value=all_star_days_text)
         all_star_range_text = ""
-        for i in solver_options.get('all_star_range'):
+        for i in solver_options.get('all_star_range', []):
             all_star_range_text += str(i) + ", "
         all_star_range_text = all_star_range_text[:-2]
         self.all_star_range_var = ctk.StringVar(value=all_star_range_text)
 
         # Forced Decisions Variables
-        banned_player_text = ', '.join(solver_options.get('banned_players'))
+        banned_player_text = ', '.join(solver_options.get('banned_players', []))
         self.banned_players_var = ctk.StringVar(value=banned_player_text)
-        forced_player_text = ', '.join(solver_options.get('forced_players'))
+        forced_player_text = ', '.join(solver_options.get('forced_players', []))
         self.forced_players_var = ctk.StringVar(value=forced_player_text)
 
         # Advanced Options Variables
@@ -81,14 +81,14 @@ class NBAOptimizerGUI:
             value=solver_options.get('decay_base'))
         self.bench_weight_var = ctk.DoubleVar(
             value=solver_options.get('bench_weight'))
-        self.trf_last_var = ctk.IntVar(value=solver_options.get('trf_last_gw'))
-        self.ft_value_var = ctk.DoubleVar(value=solver_options.get('ft_value'))
-        self.solve_time_var = ctk.IntVar(value=solver_options.get('solve_time'))
-        self.threshold_var = ctk.DoubleVar(value=solver_options.get('threshold_value'))
-        self.no_sols_var = ctk.IntVar(value=solver_options.get('no_sols'))
+        self.trf_last_var = ctk.IntVar(value=solver_options.get('trf_last_gw', 2))
+        self.ft_value_var = ctk.DoubleVar(value=solver_options.get('ft_value', 15))
+        self.solve_time_var = ctk.IntVar(value=solver_options.get('solve_time', 300))
+        self.threshold_var = ctk.DoubleVar(value=solver_options.get('threshold_value', 1.3))
+        self.no_sols_var = ctk.IntVar(value=solver_options.get('no_sols', 1))
         self.alternative_solution_var = ctk.StringVar()
         alternative_list = ["1gd_buy","1week_buy","2week_buy"]
-        self.alternative_solution_var.set(value=solver_options.get('alternative_solution'))
+        self.alternative_solution_var.set(value=solver_options.get('alternative_solution','1gd_buy'))
         
         # Entry widget and label for team ID
         team_id_entry = ctk.CTkEntry(root, textvariable=self.team_id_var,
@@ -123,24 +123,36 @@ class NBAOptimizerGUI:
         wc_day_label = ctk.CTkLabel(root, text="Wildcard Day:")
         wc_day_entry = ctk.CTkEntry(root, textvariable=self.wc_day_var, width=50)
         wc_days_label = ctk.CTkLabel(root, text="Wildcard Days:")
-        wc_days_entry = ctk.CTkEntry(root, textvariable=self.wc_days_var, width=250)
+        if solver_options.get('wc_days', []) == []:
+            self.wc_days_entry = ctk.CTkEntry(root, placeholder_text="eg. 1.1, 1.3, 1.5", width=250)
+        else:
+            self.wc_days_entry = ctk.CTkEntry(root, textvariable=self.wc_days_var, width=250)
         wc_range_label = ctk.CTkLabel(root, text="Wildcard Range:")
-        wc_range_entry = ctk.CTkEntry(root, textvariable=self.wc_range_var)
+        if solver_options.get('wc_range', []) == []:
+            self.wc_range_entry = ctk.CTkEntry(root, placeholder_text="eg. 1.1, 1.5")
+        else:
+            self.wc_range_entry = ctk.CTkEntry(root, textvariable=self.wc_range_var)
         all_star_day_label = ctk.CTkLabel(root, text="All Star Day:")
         all_star_day_entry = ctk.CTkEntry(root, textvariable=self.all_star_day_var, width=50)
         all_star_days_label = ctk.CTkLabel(root, text="All Star Days:")
-        all_star_days_entry = ctk.CTkEntry(root, textvariable=self.all_star_days_var, width=250)
+        if solver_options.get('all_star_days', []) == []:
+            self.all_star_days_entry = ctk.CTkEntry(root, placeholder_text="eg. 1.1, 1.3, 1.5", width=250)
+        else:
+            self.all_star_days_entry = ctk.CTkEntry(root, textvariable=self.all_star_days_var, width=250)
         all_star_range_label = ctk.CTkLabel(root, text="All Star Range:")
-        all_star_range_entry = ctk.CTkEntry(root, textvariable=self.all_star_range_var)
+        if solver_options.get('all_star_range', []) == []:
+            self.all_star_range_entry = ctk.CTkEntry(root, placeholder_text="eg. 1.1, 1.5")
+        else:
+            self.all_star_range_entry = ctk.CTkEntry(root, textvariable=self.all_star_range_var)
 
         # Labels and entry widgets for forced decisions
         forced_players_label = ctk.CTkLabel(root, text="Forced Players:")
-        if solver_options.get('forced_players') == []:
+        if solver_options.get('forced_players', []) == []:
             self.forced_players_entry = ctk.CTkEntry(root, placeholder_text="Enter forced players here")
         else:
             self.forced_players_entry = ctk.CTkEntry(root, textvariable=self.forced_players_var)
         banned_players_label = ctk.CTkLabel(root, text="Banned Players:")
-        if solver_options.get('banned_players') == []:
+        if solver_options.get('banned_players', []) == []:
             self.banned_players_entry = ctk.CTkEntry(root, placeholder_text="Enter banned players here")
         else:
             self.banned_players_entry = ctk.CTkEntry(root, textvariable=self.banned_players_var)
@@ -199,15 +211,15 @@ class NBAOptimizerGUI:
         wc_day_label.grid(row=7, column=0, pady=5, padx=40, sticky="w")
         wc_day_entry.grid(row=7, column=1, pady=5, padx=0, sticky="w")
         wc_days_label.grid(row=7, column=2, pady=5, padx=(20,10), sticky="w")
-        wc_days_entry.grid(row=7, column=3, columnspan=4, pady=5, padx=0, sticky="w")
+        self.wc_days_entry.grid(row=7, column=3, columnspan=4, pady=5, padx=0, sticky="w")
         wc_range_label.grid(row=7, column=6, pady=5, padx=(20,10), sticky="w")
-        wc_range_entry.grid(row=7, column=7, pady=5, padx=(0,40), sticky="w")
+        self.wc_range_entry.grid(row=7, column=7, pady=5, padx=(0,40), sticky="w")
         all_star_day_label.grid(row=8, column=0, pady=5, padx=40, sticky="w")
         all_star_day_entry.grid(row=8, column=1, pady=5, padx=0, sticky="w")
         all_star_days_label.grid(row=8, column=2, pady=5, padx=(20,10), sticky="w")
-        all_star_days_entry.grid(row=8, column=3, columnspan=4, pady=5, padx=0, sticky="w")
+        self.all_star_days_entry.grid(row=8, column=3, columnspan=4, pady=5, padx=0, sticky="w")
         all_star_range_label.grid(row=8, column=6, pady=5, padx=(20,10), sticky="w")
-        all_star_range_entry.grid(row=8, column=7, pady=5, padx=(0,40), sticky="w")
+        self.all_star_range_entry.grid(row=8, column=7, pady=5, padx=(0,40), sticky="w")
 
         # Forced options grid
         forced_options_label.grid(row=9, column=0, pady=(40,10), padx=60, columnspan = 2, sticky="w")
@@ -307,22 +319,22 @@ class NBAOptimizerGUI:
         banned_players = self.banned_players_entry.get().split(', ')
         forced_players = self.forced_players_entry.get().split(', ')
 
-        if self.wc_days_var.get() == "":
+        if self.wc_days_entry.get() == "":
             wc_days_value = []
         else:
-            wc_days_value = [float(day) for day in self.wc_days_var.get().split(', ')]
-        if self.wc_range_var.get() == "":
+            wc_days_value = [float(day) for day in self.wc_days_entry.get().split(', ')]
+        if self.wc_range_entry.get() == "":
             wc_range_value = []
         else:
-            wc_range_value = [float(day) for day in self.wc_range_var.get().split(', ')]
-        if self.all_star_days_var.get() == "":
+            wc_range_value = [float(day) for day in self.wc_range_entry.get().split(', ')]
+        if self.all_star_days_entry.get() == "":
             all_star_days_value = []
         else:
-            all_star_days_value = [float(day) for day in self.all_star_days_var.get().split(', ')]
-        if self.all_star_range_var.get() == "":
+            all_star_days_value = [float(day) for day in self.all_star_days_entry.get().split(', ')]
+        if self.all_star_range_entry.get() == "":
             all_star_range_value = []
         else:
-            all_star_range_value = [float(day) for day in self.all_star_range_var.get().split(', ')]
+            all_star_range_value = [float(day) for day in self.all_star_range_entry.get().split(', ')]
 
         # Get options input
         new_options = {
@@ -413,6 +425,9 @@ class NBAOptimizerGUI:
             # Insert the last line to the left of the text widget
             weekly_summary_text.insert(tk.END, f'\n {last_summary_line}')
 
+            # Chips used
+            chips_used = result['chips_used']
+
             # Iterate through unique weeks
             for i, week in enumerate(unique_weeks):
                 
@@ -447,8 +462,13 @@ class NBAOptimizerGUI:
                     # Check if there are picks for the current gameday and squad
                     if not squad_picks.empty:
                         # Gameday header
-                        gameday_header = f'{gameday:.1f}'
-                        header_line = gameday_header.center(34)
+                        if gameday in chips_used.keys():
+                            chip_used = chips_used[gameday]
+                            gameday_header = f'{gameday:.1f}' + f'{chip_used}'
+                            header_line = gameday_header.center(34)
+                        else:
+                            gameday_header = f'{gameday:.1f}'
+                            header_line = gameday_header.center(34)
 
                         # Create a text widget for each gameday column
                         text_widget = tk.Text(frame_widget, height=15, width=34, bg='#242424', fg='white', highlightbackground='#4a4a4a')
