@@ -2,6 +2,8 @@ import requests
 import pandas as pd
 import os
 import time
+from collections import Counter
+import csv
 
 def get_players():
     
@@ -242,10 +244,99 @@ def get_team(team_id):
        # print(f"Error: Team {team_id} could not be retrieved\n")
         return {'initial_squad': [], 'sell_prices': [], 'gd': 1.1, 'itb': 0}
 
+def get_player_ownership(gameday):
+ 
+    # Define URLs
+    standings_url = "https://nbafantasy.nba.com/api/leagues-classic/429/standings/"
+    picks_url = "https://nbafantasy.nba.com/api/entry/{entry}/event/"+f"{gameday-1}"+"/picks/"
+
+    # Step 1: Load player data from CSV
+    element_to_player = {}
+
+    with open("data/players.csv", "r") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            element_to_player[int(row['id'])] = row['name']
+
+    # Step 2: Collect participant IDs
+    participant_ids = []
+    for page in range(1, 5):  # Fetch first 4 pages (200 participants)
+        response = requests.get(f"{standings_url}?page_standings={page}")
+        if response.status_code == 200:
+            data = response.json()
+            results = data.get('standings', {}).get('results', [])
+            for result in results:
+                participant_ids.append(result['entry'])  # Collect entry IDs
+        else:
+            print(f"Error: Failed to fetch standings page {page}. Status code {response.status_code}")
+            return
+
+    # Step 3: Fetch picks for each participant
+    element_counts = Counter()
+    chip_counts = Counter()
+    dead_teams_counts = Counter()
+    for entry_id in participant_ids:
+        response = requests.get(picks_url.format(entry=entry_id))
+        if response.status_code == 200:
+            picks_data = response.json()
+            picks = picks_data.get('picks', [])
+            for pick in picks:
+                element_counts[pick['element']] += 1  # Count each picked element
+        else:
+            print(f"Warning: Failed to fetch picks for entry {entry_id}. Status code {response.status_code}")
+        response = requests.get(f"https://nbafantasy.nba.com/api/entry/{entry_id}/history/")
+        if response.status_code == 200:
+            chips_data = response.json()
+            chips = chips_data.get('chips', [])
+            current_gd = chips_data.get('current', [])
+            event_transfers = 0
+            for event in current_gd:
+                event_transfers += event['event_transfers']
+            dead_teams_counts[entry_id] = event_transfers
+            for chip in chips:
+                if chip['name'] != 'phcapt':
+                    chip_counts[chip['name']] += 1
+        else:
+            print(f"Warning: Failed to fetch chips for entry {entry_id}. Status code {response.status_code}")
+
+    # Step 4: Calculate percentages
+    total_participants = len(participant_ids)
+    element_percentages = [
+        {
+            "player_name": element_to_player.get(element, f"Unknown Player ({element})"),
+            "element": element,
+            "percentage": (count / total_participants) * 100,
+        }
+        for element, count in element_counts.items()
+    ]
+    chip_percentages = [
+        {
+            "chip_name": chip,
+            "percentage": (count / total_participants) * 100,
+        }
+        for chip, count in chip_counts.items()
+    ]
+
+    # Filter dead teams by number of transfers if they have made less than 9 transfers
+    dead_teams = [entry_id for entry_id, transfers in dead_teams_counts.items() if transfers < 10]
+
+    # Step 5: Sort by percentage in descending order
+    sorted_percentages = sorted(element_percentages, key=lambda x: x['percentage'], reverse=True)
+
+    # Step 6: Display results
+    if not sorted_percentages:
+        print("No picks data found.")
+    for entry in sorted_percentages:
+        print(f"{entry['player_name']} - {entry['percentage']:.2f}%")
+    for entry in chip_percentages:
+        print(f"{entry['chip_name']} - {entry['percentage']:.2f}%")
+    print(f"Dead teams: {len(dead_teams)/total_participants*100:.2f}%")
+
 if __name__ == '__main__':
     players = get_players()
     fixtures = get_fixtures()
     team = get_team(148)
+    get_player_ownership(team['gd'])
 
 
 

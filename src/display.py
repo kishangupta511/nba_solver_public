@@ -1016,17 +1016,42 @@ class NBAOptimizerGUI:
         # Change the first letter of the column names to uppercase
         data.columns = data.columns.str.capitalize()
 
+        # Import fixture info
+        fixture_info = pd.read_csv('data/fixture_info.csv')
+        
+        # Create a mapping from fixture_info 'id' to 'code'
+        id_to_code_mapping = fixture_info.set_index('id')['code'].to_dict()
+
+        # Rename the columns in projections_df that correspond to game days using the mapping
+        data.rename(columns=lambda x: id_to_code_mapping[int(x)] if x.isdigit() and int(x) in id_to_code_mapping else x, inplace=True)
+        
+        # Replace NaN values with an empty string for display purposes
+        data.fillna("", inplace=True)
+
+        self.data = data
+
         # Extract column names and row data
         headers = list(data.columns)
-        rows = data.values.tolist()  
-
+        headers = headers[1:]
+        rows = data.values[:,1:].tolist()
+        
         # Create a tksheet table inside the tab
         self.sheet = Sheet(tab,
                       headers=headers,
                       data=rows,
                       header_font= ("Calibri", 13, "bold"),
                       show_row_index=True,
+                      row_index=data.values[:,0].tolist(),
                       default_column_width=40,
+                      top_left_bg =  "#242424",
+                      top_left_fg =  "#242424",
+                      table_grid_fg = "#242424",
+                      table_bg = "#2E5984",
+                      table_fg = "white",
+                      header_bg = "#242424",
+                      index_bg = "#242424",
+                      header_fg = "white",
+                      index_fg = "white",
                       align = 'c',
                       width=2000,
                       height=790)
@@ -1034,6 +1059,19 @@ class NBAOptimizerGUI:
 
         self.sheet.align(self.sheet.span('A'),align="w")
         self.sheet.set_options(grid_vert_lines=True, grid_horiz_lines=True)
+
+        # Style the cells based on their content
+        for r_idx, row in enumerate(data.values[:,1:]):
+            for c_idx, cell in enumerate(row):
+                if cell == "":
+                    self.sheet.highlight_cells(row = r_idx, column = c_idx, bg ="red")
+                else:
+                    self.sheet.highlight_cells(row = r_idx, column = c_idx, bg ="green")
+        # Freeze the index column
+        self.sheet.frozen_columns = 2
+
+        # Set options for appearance (optional)
+        self.sheet.enable_bindings()
 
     def apply_conditional_formatting(self, data, numeric_columns,sheet_name):
         """Apply conditional formatting to numeric columns: red for low values, yellow for middle, green for high"""
