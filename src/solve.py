@@ -74,10 +74,10 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     gameday_data = pd.read_csv('data/fixture_info.csv')
     players_data = pd.read_csv('data/players.csv')
    
-    #players_data['PRICE'] = players_data['price']
-    #all_data = all_data.merge(players_data[['name','PRICE']], on='name', #how='left')
-    #all_data['price'] = all_data['PRICE']
-    #all_data = all_data.drop(columns=['PRICE'])
+    players_data['PRICE'] = players_data['price']
+    all_data = all_data.merge(players_data[['name','PRICE']], on='name', how='left')
+    all_data['price'] = all_data['PRICE']
+    all_data = all_data.drop(columns=['PRICE'])
     
     initial_squad = all_data[all_data['name'].isin(squad)].index.tolist()
     
