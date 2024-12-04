@@ -138,6 +138,8 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         all_star_index = gameday_data[gameday_data['code'] == asr].index.tolist()
         all_star_index = list(map(int, all_star_index))
         all_star_ranges += gameday_data.loc[all_star_index,'id'].astype(int).tolist()
+        if all_star_range != []:
+            all_star_range = range(all_star_ranges[0], all_star_ranges[1]+1)
 
     # Sets
     element_types = ["FRONT","BACK"]
