@@ -74,10 +74,10 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     gameday_data = pd.read_csv('data/fixture_info.csv')
     players_data = pd.read_csv('data/players.csv')
    
-    players_data['PRICE'] = players_data['price']
-    all_data = all_data.merge(players_data[['name','PRICE']], on='name', how='left')
-    all_data['price'] = all_data['PRICE']
-    all_data = all_data.drop(columns=['PRICE'])
+    #players_data['PRICE'] = players_data['price']
+    #all_data = all_data.merge(players_data[['name','PRICE']], on='name', #how='left')
+    #all_data['price'] = all_data['PRICE']
+    #all_data = all_data.drop(columns=['PRICE'])
     
     initial_squad = all_data[all_data['name'].isin(squad)].index.tolist()
     
@@ -138,8 +138,8 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         all_star_index = gameday_data[gameday_data['code'] == asr].index.tolist()
         all_star_index = list(map(int, all_star_index))
         all_star_ranges += gameday_data.loc[all_star_index,'id'].astype(int).tolist()
-        if all_star_range != []:
-            all_star_range = range(all_star_ranges[0], all_star_ranges[1]+1)
+    if all_star_range != []:
+        all_star_range = range(all_star_ranges[0], all_star_ranges[1]+1)
 
     # Sets
     element_types = ["FRONT","BACK"]
@@ -283,7 +283,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     model.add_constraints((transfer_in[p,d] <= 1 - use_all_star[d] for p in players for d in gamedays), name='no_transfer_on_as')
 
     ## Banned players constraints
-    model.add_constraints((squad[p, d] == 0 for p in banned_players_indices for d in gamedays), name='banned_players')
+    model.add_constraints((squad[p, d]== 0 for p in banned_players_indices for d in gamedays), name='banned_players')
 
     ## Forced players constraints
     model.add_constraints((squad[p, d] == 1 for p in forced_players_indices for d in gamedays), name='forced_players')
@@ -300,7 +300,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     else:
         model.add_constraints((use_wc[d] == 0 for d in gamedays), name='no_wc')
     
-    # Free Hit Constraints
+    # All Star Constraints
     if all_star_day > 0:
         model.add_constraints((use_all_star[d] == 0 for d in gamedays if d != all_star_gameday[0]), name='no_as_day')
     elif all_star_days != []:
