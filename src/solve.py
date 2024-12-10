@@ -181,6 +181,8 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     # Get the index of the final players list
     players = all_data.index.to_list()
 
+    print(f"Number of players after filtering: {len(all_data)}")
+
     # Adding player sell prices
     try:
         indices = range(len(squad))
@@ -553,7 +555,6 @@ if __name__ == '__main__':
     with open('solver_settings.json') as f:
         solver_options = json.load(f)
 
-    r = solve_multi_period_NBA(squad=["Anthony Davis", "Anthony Edwards", "Karl-Anthony Towns", "Jaylen Brown", "Josh Giddey", "Rob Dillingham", "Matas Buzelis", "Zach Edey", "Davion Mitchell", "Kyle Filipowski"], sell_prices=[17.0, 16.0, 14.0, 14.0, 11.0, 6.5, 6.0, 6.0, 5.0, 4.5], options=solver_options, 
-                               gd=3.6, itb=0.5)
+    r = solve_multi_period_NBA(squad=["Anthony Davis", "Anthony Edwards", "Karl-Anthony Towns", "Jaylen Brown", "Josh Giddey", "Rob Dillingham", "Matas Buzelis", "Zach Edey", "Davion Mitchell", "Kyle Filipowski"], sell_prices=[17.0, 16.0, 14.0, 14.0, 11.0, 6.5, 6.0, 6.0, 5.0, 4.5], options=solver_options, gd=3.6, itb=0.5)
     res = r['results']
     
