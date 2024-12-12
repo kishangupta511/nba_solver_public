@@ -336,7 +336,7 @@ if __name__ == '__main__':
     players = get_players()
     fixtures = get_fixtures()
     team = get_team(148)
-    get_player_ownership(team['gd'])
+    #get_player_ownership(team['gd'])
 
 
 
