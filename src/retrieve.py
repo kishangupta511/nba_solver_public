@@ -156,7 +156,7 @@ def get_fixtures():
     return {'fixture_info': fixture_info, 'fixture_ticker': pivot_df}
 
 def get_team(team_id):
-  #  try:
+    try:
         # Reteiving fixtures info for gameday id
         info_api = requests.get("https://nbafantasy.nba.com/api/bootstrap-static/")
 
@@ -240,8 +240,8 @@ def get_team(team_id):
         
         return {'initial_squad': team_list, 'sell_prices': price_list, 'gd': gd, 'itb': itb, 'captain': captain_played, 'transfers_made': tm}
     
-   # except Exception as e:
-       # print(f"Error: Team {team_id} could not be retrieved\n")
+    except Exception as e:
+        print(f"Error: Team {team_id} could not be retrieved\n")
         return {'initial_squad': [], 'sell_prices': [], 'gd': 1.1, 'itb': 0}
 
 def get_player_ownership(gameday):
@@ -260,7 +260,7 @@ def get_player_ownership(gameday):
 
     # Step 2: Collect participant IDs
     participant_ids = []
-    for page in range(1, 5):  # Fetch first 4 pages (200 participants)
+    for page in range(1, 3):  # Fetch first 3 pages (100 participants)
         response = requests.get(f"{standings_url}?page_standings={page}")
         if response.status_code == 200:
             data = response.json()
@@ -336,7 +336,7 @@ if __name__ == '__main__':
     players = get_players()
     fixtures = get_fixtures()
     team = get_team(148)
-    #get_player_ownership(team['gd'])
+    get_player_ownership(team['gd'])
 
 
 

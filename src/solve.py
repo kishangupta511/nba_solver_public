@@ -153,11 +153,9 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     gameweeks = list(range(gameweek_start,gameweek_end+1))
 
     # Filtering Data
-    first_five_columns = ['id', 'name', 'team', 'price', 'position']
-    columns_to_sum = [str(day) for day in range(next_gd, next_gd + horizon)]
-    all_data = all_data.loc[:, first_five_columns + columns_to_sum]
-    all_data['total'] = (all_data[columns_to_sum].sum(axis=1)).round(2)
-    all_data['value'] = round((all_data['total'] / all_data['price'])/horizon,2)
+    gameday_columns = [str(day) for day in range(next_gd, next_gd + horizon)]
+    all_data['max'] = (all_data[gameday_columns].max(axis=1)).round(2)
+    all_data['value'] = round(all_data['max'] / (all_data['price']),2)
     all_data = all_data.sort_values(by='value', ascending=False)
     
     # Keep players who may not meet the threshold

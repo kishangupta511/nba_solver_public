@@ -374,7 +374,7 @@ class NBAOptimizerGUI:
         r = solve_multi_period_NBA(squad=players, sell_prices=prices, gd=self.gd_entry.get(), itb=float(self.itb_entry.get()), options=new_options)
         print()
 
-        # Display result in a new window
+        # Display result in a new windowz
         result_window = ctk.CTkToplevel(self.root)
         result_window.title("Plan")
         
@@ -747,6 +747,7 @@ class NBAOptimizerGUI:
         getattr(self, f"position_dropdown_{sheet_name}").bind("<<ComboboxSelected>>", lambda event: self.filter_table(sheet_name))
         getattr(self, f"price_dropdown_{sheet_name}").bind("<<ComboboxSelected>>", lambda event: self.filter_table(sheet_name))
 
+
         if sheet_name == 'xmins_sheet':
             getattr(self,sheet_name)['E:'].format(int_formatter())
             header_data = getattr(self,sheet_name)["A:"].options(table=False, header=True).data
@@ -765,6 +766,17 @@ class NBAOptimizerGUI:
             # Add the Delete Custom xMins button
             delete_button = ctk.CTkButton(getattr(self, f"search_frame_{sheet_name}"), text="Delete Custom xMins", command=self.delete_custom_xmins)
             delete_button.grid(row=0, column=9, pady=5, padx=(10, 0), sticky="w")
+        
+        # Hiding past gds
+        gameday_value = self.gd_entry.get()
+        header_data_hide = getattr(self,sheet_name)["A:"].options(table=False, header=True).data
+        gameday_index = header_data_hide.index(gameday_value)
+        if sheet_name == 'xmins_sheet':
+            columns_to_hide = list(range(5, gameday_index))
+            getattr(self, sheet_name).hide_columns(columns_to_hide)
+        else:
+            columns_to_hide = list(range(4, gameday_index))
+            getattr(self, sheet_name).hide_columns(columns_to_hide)
 
     def xmins_overwrite(self, row_final, column):
         # Paths to the input CSV and changes log JSON
@@ -1072,6 +1084,13 @@ class NBAOptimizerGUI:
 
         # Set options for appearance (optional)
         self.sheet.enable_bindings()
+
+        # Hiding past gds
+        gameday_value = self.gd_entry.get()
+        header_data_hide = self.sheet["A:"].options(table=False, header=True).data
+        gameday_index = header_data_hide.index(gameday_value)
+        columns_to_hide = list(range(0, gameday_index))
+        self.sheet.hide_columns(columns_to_hide)
 
     def apply_conditional_formatting(self, data, numeric_columns,sheet_name):
         """Apply conditional formatting to numeric columns: red for low values, yellow for middle, green for high"""
