@@ -14,23 +14,24 @@ import os
 from datetime import datetime
 import pytz
 
-
 class NBAOptimizerGUI:
 
     def __init__(self, root):
         self.root = root
         self.root.title("NBA Fantasy Optimizer")
 
+        ctk.set_default_color_theme("dark-blue")
+
         # Create a button to retrieve the squad
         get_id_button = ctk.CTkButton(root, text="Retrieve Squad", command= self.get_data, height=30, width=100)
         get_id_button.grid(row=0, column=4, pady=(30,20), padx = 5, columnspan = 1, sticky="w" ) 
 
         # Create a button to update the data
-        update_button = ctk.CTkButton(root, text="Update data", command= self.refresh_data, fg_color="green", height=30, width=75)
+        update_button = ctk.CTkButton(root, text="Update data", command= self.refresh_data, height=30, width=75)
         update_button.grid(row=0, column=0, pady=(30,20), padx = 40, columnspan = 1, sticky="w") 
 
         # Button to open projections window
-        projections_button = ctk.CTkButton(root, text="View Projections", command=self.open_projections_window, fg_color="orange", height=30, width=100)
+        projections_button = ctk.CTkButton(root, text="View Projections", command=self.open_projections_window, height=30, width=100)
         projections_button.grid(row=0, column=7, padx=(0,40), pady=(30,20))
 
         # Read options from the file
@@ -183,7 +184,7 @@ class NBAOptimizerGUI:
         advanced_options_label = ctk.CTkLabel(root, text="Advanced Options:", font=("Helvetica", 16, "bold"))
     
         # Create button to run the optimizer
-        run_button = ctk.CTkButton(root, text="Run Solver", command=self.run_optimizer,fg_color="red", width=50)
+        run_button = ctk.CTkButton(root, text="Run Solver", command=self.run_optimizer, width=50)
 
         # Layout widgets using grid
         players_label.grid(row=1, column=0, pady=5, padx=40, sticky="w")
