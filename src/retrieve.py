@@ -112,12 +112,12 @@ def get_fixtures():
 
     fixture_ticker = []
     for i in fixture_ticker_api.json():
+        if i["event"] != None:
+            fixture_id = i["event"]
+            fixture_h = i["team_h"]
+            fixture_a = i["team_a"]
 
-        fixture_id = i["event"]
-        fixture_h = i["team_h"]
-        fixture_a = i["team_a"]
-    
-        fixture_ticker.append([fixture_id, fixture_h, fixture_a])
+            fixture_ticker.append([fixture_id, fixture_h, fixture_a])
     fixture_ticker = pd.DataFrame(fixture_ticker, columns=['event_id', 'home', 'away'])
     
     # Assuming teams.csv is in the same directory and has columns 'id' and 'code'
