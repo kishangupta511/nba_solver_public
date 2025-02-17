@@ -13,6 +13,7 @@ from matplotlib import colors as mcolors
 import os
 from datetime import datetime
 import pytz
+from tkinter import font
 
 class NBAOptimizerGUI:
 
@@ -46,6 +47,7 @@ class NBAOptimizerGUI:
         self.tm_var = ctk.IntVar(value=solver_options.get('tm', 0))
         self.preseason_var = ctk.BooleanVar(value=solver_options.get('preseason', False))
         self.captain_played = ctk.BooleanVar(value=solver_options.get('captain_played', False))
+        self.solve_time_var = ctk.IntVar(value=solver_options.get('solve_time', 300))
 
         # Chip Options Variables
         self.wc_day_var = ctk.DoubleVar(value=solver_options.get('wc_day', 0))
@@ -84,7 +86,7 @@ class NBAOptimizerGUI:
             value=solver_options.get('bench_weight'))
         self.trf_last_var = ctk.IntVar(value=solver_options.get('trf_last_gw', 2))
         self.ft_value_var = ctk.DoubleVar(value=solver_options.get('ft_value', 15))
-        self.solve_time_var = ctk.IntVar(value=solver_options.get('solve_time', 300))
+        self.ft_increment_var = ctk.DoubleVar(value=solver_options.get('ft_increment', 3))
         self.threshold_var = ctk.DoubleVar(value=solver_options.get('threshold_value', 1.3))
         self.no_sols_var = ctk.IntVar(value=solver_options.get('no_sols', 1))
         self.alternative_solution_var = ctk.StringVar()
@@ -119,6 +121,8 @@ class NBAOptimizerGUI:
         preseason_checkbox = ctk.CTkCheckBox(root, variable=self.preseason_var, text="")
         captain_played_label = ctk.CTkLabel(root, text="Captain Played:")
         self.captain_played_checkbox = ctk.CTkCheckBox(root, variable=self.captain_played, text="")
+        solve_time_label = ctk.CTkLabel(root, text="Solver Limit:")
+        solve_time_entry = ctk.CTkEntry(root, textvariable=self.solve_time_var, width=100)
 
         # Labels and entry widgets for chip options
         wc_day_label = ctk.CTkLabel(root, text="Wildcard Day:")
@@ -167,8 +171,8 @@ class NBAOptimizerGUI:
         tf_last_entry = ctk.CTkEntry(root, textvariable=self.trf_last_var, width=50)
         ft_value_label = ctk.CTkLabel(root, text="FT Value:")
         ft_value_entry = ctk.CTkEntry(root, textvariable=self.ft_value_var, width=50)
-        solve_time_label = ctk.CTkLabel(root, text="Solver Limit:")
-        solve_time_entry = ctk.CTkEntry(root, textvariable=self.solve_time_var, width=50)
+        ft_increment_label = ctk.CTkLabel(root, text="FT Increment:")
+        ft_increment_entry = ctk.CTkEntry(root, textvariable=self.ft_increment_var, width=50)
         threshold_label = ctk.CTkLabel(root, text= "Threshold:")
         threshold_entry = ctk.CTkEntry(root, textvariable=self.threshold_var, width=50)
         alternative_solution_label = ctk.CTkLabel(root, text="Alt Solution:")
@@ -200,6 +204,8 @@ class NBAOptimizerGUI:
         self.itb_entry.grid(row=4, column=3, pady=5, padx=0, sticky="w")
         captain_played_label.grid(row=4, column=4, pady=5, padx=(20,10), sticky="w")
         self.captain_played_checkbox.grid(row=4, column=5, pady=5, padx=0, sticky="w")
+        solve_time_label.grid(row=4, column=6, pady=5, padx=(20,10), sticky="w")
+        solve_time_entry.grid(row=4, column=7, pady=5, padx=0, sticky="w")
         horizon_label.grid(row=5, column=0, pady=5, padx=40, sticky="w")
         horizon_entry.grid(row=5, column=1, pady=5, padx=0, sticky="w")
         tm_label.grid(row=5, column=2, pady=5, padx=(20,10), sticky="w")
@@ -241,8 +247,8 @@ class NBAOptimizerGUI:
         self.alternative_menu.grid(row=13, column=7, pady=5, padx=(0,40), sticky="w")
         ft_value_label.grid(row=14, column=0, pady=(5,60), padx=(40,10), sticky="w")
         ft_value_entry.grid(row=14, column=1, pady=(5,60), padx=0, sticky="w")
-        solve_time_label.grid(row=14, column=2, pady=(5,60), padx=(20,10), sticky="w")
-        solve_time_entry.grid(row=14, column=3, pady=(5,60), padx=0, sticky="w")
+        ft_increment_label.grid(row=14, column=2, pady=(5,60), padx=(20,10), sticky="w")
+        ft_increment_entry.grid(row=14, column=3, pady=(5,60), padx=0, sticky="w")
         threshold_label.grid(row=14, column=4, pady=(5,60), padx=(20,10), sticky="w")
         threshold_entry.grid(row=14, column=5, pady=(5,60), padx=0, sticky="w")
         no_sols_label.grid(row=14, column=6, pady=(5,60), padx=(20,10), sticky="w")
@@ -345,6 +351,7 @@ class NBAOptimizerGUI:
             'bench_weight': self.bench_weight_var.get(),
             'trf_last_gw': self.trf_last_var.get(),
             'ft_value': self.ft_value_var.get(),
+            "ft_increment": self.ft_increment_var.get(),
             'wc_day': self.wc_day_var.get(),
             'wc_days': wc_days_value,
             'wc_range': wc_range_value,
@@ -417,14 +424,15 @@ class NBAOptimizerGUI:
             my_frame.grid(row=0, column=0, sticky="nsew")
             
             # Create a single text widget for the weekly summary
-            weekly_summary_text = tk.Text(my_frame, height=3, width=25, bg='#242424', fg='white', highlightbackground='#4a4a4a')
-            weekly_summary_text.grid(row=0, column=0, pady=(5, 5), padx=35, sticky="w")
+            weekly_summary_text = tk.Text(my_frame, height=4, width=20, bg='#242424', fg='white', highlightbackground='#4a4a4a', font=('.AppleSystemUIFont', 13))
+            weekly_summary_text.grid(row=0, column=0, pady=(5, 20), padx=35, sticky="w")
 
             # Get the last line of the summary
             last_summary_line = result['weekly_summary'].splitlines()[-1]
+            second_last_summary_line = result['weekly_summary'].splitlines()[-2]
 
             # Insert the last line to the left of the text widget
-            weekly_summary_text.insert(tk.END, f'\n {last_summary_line}')
+            weekly_summary_text.insert(tk.END, f'\n    {second_last_summary_line}\n    {last_summary_line}\n')
 
             # Chips used
             chips_used = result['chips_used']
