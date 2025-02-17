@@ -27,6 +27,22 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         dictionary of all options for solver
     """
 
+    # List of required option keys
+    required_keys = [
+    "horizon", "tm", "decay_base", "bench_weight", "ft_value",
+    "wc_day", "wc_days", "wc_range", "all_star_day", "all_star_days",
+    "all_star_range", "solve_time", "banned_players", "forced_players",
+    "no_sols", "alternative_solution", "threshold_value", "trf_last_gw",
+    "ft_increment"
+    ]
+
+    # Check if all required keys exist in the dictionary
+    missing_keys = [key for key in required_keys if key not in options]
+
+    # Raise an error if any keys are missing
+    if missing_keys:
+        raise ValueError(f"Error: Missing required options: {missing_keys}, please add {missing_keys} to the solver settings json as shown in the template")
+
     # Arguments
     horizon = options.get('horizon', 6)
     tm = options.get('tm', 0)
@@ -46,6 +62,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     alternative_solution = options.get('alternative_solution','1week_buy')
     threshold_value = options.get('threshold_value',0)
     trf_last_gw = options.get('trf_last_gw', 2)
+    ft_increment = options.get('ft_increment', 3)
 
     if options.get('captain_played') == None:
         KeyError('captain_played not found in options, please add captain_played to the solver settings json as shown in the template')
@@ -80,7 +97,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     all_data = all_data.drop(columns=['PRICE'])
     
     initial_squad = all_data[all_data['name'].isin(squad)].index.tolist()
-    
+
     print('\nInitialising Problem\n')
 
     # Change gd to float if it is not already
@@ -179,6 +196,20 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     # Get the index of the final players list
     players = all_data.index.to_list()
 
+    # Identify the last game day for each week
+    last_game_days = gameday_data.loc[gameday_data.groupby("week")["code"].idxmax(), ["id", "week"]].set_index("week")
+
+    # Create FT_Value dictionary
+    ft_value_dict = {}
+
+    # Assign FT_Value based on last game day and increments
+    for week, last_game_id in last_game_days["id"].items():
+        mask = gameday_data["week"] == week
+        days_in_week = gameday_data.loc[mask].sort_values("code", ascending=False)
+        
+        for i, row in enumerate(days_in_week.itertuples()):
+            ft_value_dict[row.id] = ft_value + i * ft_increment
+    
     print(f"Number of players after filtering: {len(all_data)}")
 
     # Adding player sell prices
@@ -318,10 +349,10 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
 
     # Objectives
     gd_xp = {d: so.expr_sum(points_player_day[p,d] * (lineup[p,d] + captain[p,d]) for p in players) for d in gamedays}
-    gd_total = {d: so.expr_sum((points_player_day[p,d] * (lineup[p,d] + captain[p,d]+ bench_weight*bench[p,d]))* pow(decay_base, d-next_gd) for p in players) for d in gamedays}
+    gd_total = {d: so.expr_sum((points_player_day[p,d] * (lineup[p,d] + captain[p,d]+ bench_weight*bench[p,d]))* pow(decay_base, d-next_gd) for p in players) - ft_value_dict[d]*number_of_transfers_day[d] for d in gamedays}
     gw_xp = {w: so.expr_sum(gd_xp[d] if gameday_data.loc[d-1,"week"] == w else 0 for d in gamedays)- 100 * penalized_transfers[w] for w in gameweeks }
     gw_total = {w: so.expr_sum(gd_total[d] if gameday_data.loc[d-1,"week"] == w else 0 for d in gamedays)- 100 * penalized_transfers[w] for w in gameweeks}
-    decay_objective = so.expr_sum((gw_total[w] - ft_value * (transfer_count[w] - penalized_transfers[w])) for w in gameweeks)
+    decay_objective = so.expr_sum((gw_total[w]) for w in gameweeks)
     model.set_objective(-decay_objective, sense='N', name='tdxp')
     
     # Ensure the 'data' folder exists
@@ -500,9 +531,11 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         for w in gameweeks:
             weekly_summary += f"GW{w} - xP: {round(gw_xp[w].get_value(),0)}, "
             weekly_summary +=  f"TC: {transfer_count[w].get_value()}, PT: {penalized_transfers[w].get_value()}\n"
-        weekly_summary += f"Total xPoints = {round(sum(gw_xp[w].get_value() for w in gameweeks),0)}\n"
 
         objective = -round(model.get_objective_value(),2)
+        weekly_summary += f"Objective: {objective}\n"
+
+        weekly_summary += f"Total xPoints: {round(sum(gw_xp[w].get_value() for w in gameweeks),0)}\n"
 
         print(summary_of_actions)
         print(weekly_summary)
@@ -515,7 +548,8 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
             'chips_used': chip_used,
             'summary': summary_of_actions,
             'weekly_summary': weekly_summary,
-            'total_xp': total_xp
+            'total_xp': total_xp,
+            'objective': objective
 
         })
 
