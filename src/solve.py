@@ -247,7 +247,10 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     }
     in_the_bank = model.add_variables(all_gd, name='itb', vartype=so.continuous, lb=0)
     number_of_transfers_day = model.add_variables(gamedays, name='nt', vartype=so.continuous, lb=0)
-    penalized_transfers = model.add_variables(gameweeks, name='pt', vartype=so.integer, lb=0)
+    running_transfer_count = model.add_variables(gamedays, name='rtc', vartype=so.continuous, lb=0)
+    penalized_transfers = model.add_variables(gamedays, name='pt', vartype=so.
+    integer, lb=0)
+    auxillary = model.add_variables(all_gd, name='aux', vartype=so.integer, lb=0)
     use_wc = model.add_variables(gamedays, name='use_wc', vartype=so.binary)
     use_all_star = model.add_variables(gamedays, name='use_all_star', vartype=so.binary)
 
@@ -270,7 +273,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     for w in gameweeks[1:]:    
         transfer_count = {w: so.expr_sum(number_of_transfers_day[d] for d in gamedays if gameday_data.loc[d-1,'week'] == w) for w in gameweeks}
     transfer_count[gameweeks[0]] = so.expr_sum(number_of_transfers_day[d] for d in gamedays if gameday_data.loc[d-1,'week'] == gameweeks[0]) + tm
-
+    
     # Initial conditions
     model.add_constraints((squad[p, next_gd-1] == 1 for p in initial_squad), name='initial_squad_players')
     model.add_constraints((squad[p, next_gd-1] == 0 for p in players if p not in initial_squad), name='initial_squad_others')
@@ -279,6 +282,8 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         model.add_constraint(captains_week[gameweek_start] == 1, name='initial_captain')
     else:
         model.add_constraint(captains_week[gameweek_start] == 0, name='initial_captain')
+    inital_aux_value = max(0, tm - 2)
+    model.add_constraint(auxillary[next_gd-1] == inital_aux_value, name='initial_aux')
 
     # Squad and lineup constraints
     model.add_constraints((squad_count[d] == 10 for d in gamedays), name='squad_count')
@@ -304,13 +309,16 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     # Transfer constraints
     model.add_constraints((squad[p,d] == squad[p,d-1] + transfer_in[p,d] - transfer_out[p,d] for p in players for d in gamedays), name='squad_transfer_rel')
     model.add_constraints((number_of_transfers_day[d] >= so.expr_sum(transfer_out[p,d] for p in players) - (10 * use_wc[d]) for d in gamedays), 'day_transfer_rel')
-    model.add_constraints((penalized_transfers[w] >= transfer_count[w] - 2 for w in gameweeks), name='pen_transfer_rel')
+    model.add_constraints((running_transfer_count[d] == (tm if gameday_data.loc[d-1,'week'] == gameweek_start else 0) + so.expr_sum(number_of_transfers_day[dd] for dd in gamedays if (dd <= d) and (gameday_data.loc[d-1,'week'] == gameday_data.loc[dd-1,'week'])) for d in gamedays), name='running_transfer_rel')
+    model.add_constraints((auxillary[d] >= running_transfer_count[d] - 2 for d in gamedays), name='aux_transfer_rel')
+    model.add_constraints((penalized_transfers[d] >= (auxillary[d] - auxillary[d-1])  for d in gamedays), name='aux_transfer_rel2')
+    model.add_constraints((penalized_transfers[d] <= number_of_transfers_day[d] for d in gamedays), name='penalized_transfers_rel')
     model.add_constraints((in_the_bank[d] == in_the_bank[d-1] + sold_amount[d] - bought_amount[d] for d in gamedays), name='cont_budget')
     model.add_constraints((transfer_out_first[p,d]+transfer_out_regular[p,d] <= 1 for p in initial_squad for d in gamedays), name='multi_sell_1')
     model.add_constraints((
         horizon * so.expr_sum(transfer_out_first[p,d] for d in gamedays if d <= dbar) >= so.expr_sum(transfer_out_regular[p,d] for d in gamedays if d >= dbar) for p in initial_squad for dbar in gamedays), name='multi_sell_2')
     model.add_constraints((so.expr_sum(transfer_out_first[p,d] for d in gamedays) <= 1 for p in initial_squad), name='multi_sell_3')
-    model.add_constraint((transfer_count[gameweeks[-1]] == trf_last_gw), name='no_transfers_last_gw')
+    model.add_constraint((transfer_count[gameweeks[-1]] <= trf_last_gw), name='transfers_last_gw')
     model.add_constraints((transfer_in[p,d] <= 1 - use_all_star[d] for p in players for d in gamedays), name='no_transfer_on_as')
 
     ## Banned players constraints
@@ -348,10 +356,10 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     model.add_constraints((so.expr_sum(captain[p,d] for p in players) + use_wc[d] + use_all_star[d] <= 1 for d in gamedays), name='one_chip_per_gd')
 
     # Objectives
-    gd_xp = {d: so.expr_sum(points_player_day[p,d] * (lineup[p,d] + captain[p,d]) for p in players) for d in gamedays}
-    gd_total = {d: so.expr_sum((points_player_day[p,d] * (lineup[p,d] + captain[p,d]+ bench_weight*bench[p,d]))* pow(decay_base, d-next_gd) for p in players) - ft_value_dict[d]*number_of_transfers_day[d] for d in gamedays}
-    gw_xp = {w: so.expr_sum(gd_xp[d] if gameday_data.loc[d-1,"week"] == w else 0 for d in gamedays)- 100 * penalized_transfers[w] for w in gameweeks }
-    gw_total = {w: so.expr_sum(gd_total[d] if gameday_data.loc[d-1,"week"] == w else 0 for d in gamedays)- 100 * penalized_transfers[w] for w in gameweeks}
+    gd_xp = {d: so.expr_sum(points_player_day[p,d] * (lineup[p,d] + captain[p,d]) for p in players) - 100*penalized_transfers[d] for d in gamedays}
+    gd_total = {d: (gd_xp[d] + 100*penalized_transfers[d]) * pow(decay_base, d-next_gd) - ft_value_dict[d]*(number_of_transfers_day[d] - penalized_transfers[d]) - 100*penalized_transfers[d] for d in gamedays}
+    gw_xp = {w: so.expr_sum(gd_xp[d] if gameday_data.loc[d-1,"week"] == w else 0 for d in gamedays) for w in gameweeks}
+    gw_total = {w: so.expr_sum(gd_total[d] if gameday_data.loc[d-1,"week"] == w else 0 for d in gamedays) for w in gameweeks}
     decay_objective = so.expr_sum((gw_total[w]) for w in gameweeks)
     model.set_objective(-decay_objective, sense='N', name='tdxp')
     
@@ -513,8 +521,6 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
                 summary_of_actions += f"CHIP: ALL STAR\n"
                 chip_used[new_gd] = " - ALL STAR"
             summary_of_actions += f"ITB: {in_the_bank[d].get_value()}\n"
-            summary_of_actions += f"SOLD: {sold_amount[d].get_value()}\n"
-            summary_of_actions += f"BOUGHT: {bought_amount[d].get_value()}\n"
 
             for p in players:
                 if transfer_in[p,d].get_value() > 0.5:
@@ -529,8 +535,9 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         # Weekly summary
         weekly_summary = ""
         for w in gameweeks:
+            pen_tfs = sum(penalized_transfers[d].get_value() for d in gamedays if gameday_data.loc[d-1,'week'] == w)
             weekly_summary += f"GW{w} - xP: {round(gw_xp[w].get_value(),0)}, "
-            weekly_summary +=  f"TC: {transfer_count[w].get_value()}, PT: {penalized_transfers[w].get_value()}\n"
+            weekly_summary +=  f"TC: {transfer_count[w].get_value()}, PT: {pen_tfs}\n"
 
         objective = -round(model.get_objective_value(),2)
         weekly_summary += f"Objective: {objective}\n"
