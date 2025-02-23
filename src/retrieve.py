@@ -247,7 +247,7 @@ def get_team(team_id):
 def get_player_ownership(gameday):
  
     # Define URLs
-    standings_url = "https://nbafantasy.nba.com/api/leagues-classic/429/standings/"
+    standings_url = "https://nbafantasy.nba.com/api/leagues-classic/432/standings/"
     picks_url = "https://nbafantasy.nba.com/api/entry/{entry}/event/"+f"{gameday-1}"+"/picks/"
 
     # Step 1: Load player data from CSV
@@ -260,7 +260,8 @@ def get_player_ownership(gameday):
 
     # Step 2: Collect participant IDs
     participant_ids = []
-    for page in range(1, 3):  # Fetch first 3 pages (100 participants)
+    for page in range(1, 2):  # Fetch first page (50 participants)
+        print(f"Fetching standings page {page}")
         response = requests.get(f"{standings_url}?page_standings={page}")
         if response.status_code == 200:
             data = response.json()
