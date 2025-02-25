@@ -237,7 +237,6 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     squad_all_star = model.add_variables(players, gamedays, name='squad_all_star', vartype=so.binary)
     lineup = model.add_variables(players, gamedays, name='lineup', vartype=so.binary)
     captain = model.add_variables(players, gamedays, name='captain', vartype=so.binary)
-    bench = model.add_variables(players, gamedays, name='bench', vartype=so.binary)
     transfer_in = model.add_variables(players, gamedays, name='transfer_in', vartype=so.binary)
     transfer_out_first = model.add_variables(initial_squad, gamedays, name='transfer_out_first', vartype=so.binary)
     transfer_out_regular = model.add_variables(players, gamedays, name='transfer_out_regular', vartype=so.binary)
@@ -289,12 +288,8 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
     model.add_constraints((squad_count[d] == 10 for d in gamedays), name='squad_count')
     model.add_constraints((squad_as_count[d] == 10 * use_all_star[d] for d in gamedays), name='squad_as_count')
     model.add_constraints((so.expr_sum(lineup[p,d] for p in players) == 5 for d in gamedays), name='lineup_count')
-    model.add_constraints((so.expr_sum(bench[p,d] for p in players) == 1 for d in gamedays), name='bench_count')
     model.add_constraints((lineup[p,d] <= squad[p,d] + use_all_star[d] for p in players for d in gamedays), name='lineup_squad_rel')
-    model.add_constraints((bench[p,d] <= squad[p,d] + use_all_star[d] for p in players for d in gamedays), name='bench_squad_rel')
     model.add_constraints((lineup[p,d] <= squad_all_star[p,d] + 1 - use_all_star[d] for p in players for d in gamedays), name='lineup_squad_as_rel')
-    model.add_constraints((bench[p,d] <= squad_all_star[p,d] + 1 - use_all_star[d] for p in players for d in gamedays), name='bench_squad_as_rel')
-    model.add_constraints((lineup[p,d] + bench[p,d] <= 1 for p in players for d in gamedays), name='lineup_bench_rel')
     model.add_constraints((lineup_type_count[t,d] == [2,3] for t in element_types for d in gamedays), name='valid_formation')
     model.add_constraints((squad_type_count[t,d] == 5 for t in element_types for d in gamedays), name='valid_squad')
     model.add_constraints((squad_as_type_count[t,d] == 5 * use_all_star[d] for t in element_types for d in gamedays), name='valid_squad_as')
@@ -357,8 +352,11 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
 
     # Objectives
     gd_xp = {d: so.expr_sum(points_player_day[p,d] * (lineup[p,d] + captain[p,d]) for p in players) - 100*penalized_transfers[d] for d in gamedays}
-    gd_total = {d: (gd_xp[d] + 100*penalized_transfers[d]) * pow(decay_base, d-next_gd) - ft_value_dict[d]*(number_of_transfers_day[d] - penalized_transfers[d]) - 100*penalized_transfers[d] for d in gamedays}
+    
+    gd_total = {d: (gd_xp[d] + 100*penalized_transfers[d] + so.expr_sum(bench_weight*(points_player_day[p,d]*(squad[p,d] - lineup[p,d])) for p in players)) * pow(decay_base, d-next_gd) - ft_value_dict[d]*(number_of_transfers_day[d] - penalized_transfers[d]) - 100*penalized_transfers[d] for d in gamedays}
+
     gw_xp = {w: so.expr_sum(gd_xp[d] if gameday_data.loc[d-1,"week"] == w else 0 for d in gamedays) for w in gameweeks}
+    
     gw_total = {w: so.expr_sum(gd_total[d] if gameday_data.loc[d-1,"week"] == w else 0 for d in gamedays) for w in gameweeks}
     decay_objective = so.expr_sum((gw_total[w]) for w in gameweeks)
     model.set_objective(-decay_objective, sense='N', name='tdxp')
@@ -480,21 +478,19 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
                         lp = all_data.loc[p]
                         is_captain = 1 if captain[p,d].get_value() > 0.5 else 0
                         is_lineup = 1 if lineup[p,d].get_value() > 0.5 else 0
-                        is_bench = 1 if bench[p,d].get_value() > 0.5 else 0
                         is_transfer_in = 1 if transfer_in[p,d].get_value() > 0.5 else 0
                         is_transfer_out = 1 if transfer_out[p,d].get_value() > 0.5 else 0
                         picks.append([
-                            new_gd, lp['name'], lp['position'], lp['team'], buy_price[p], round(points_player_day[p,d],2), is_lineup, is_captain, is_bench, is_transfer_in, is_transfer_out ])
+                            new_gd, lp['name'], lp['position'], lp['team'], buy_price[p], round(points_player_day[p,d],2), is_lineup, is_captain, is_transfer_in, is_transfer_out ])
                 else:
                     if squad[p,d].get_value() + transfer_out[p,d].get_value() > 0.5:
                         lp = all_data.loc[p]
                         is_captain = 1 if captain[p,d].get_value() > 0.5 else 0
                         is_lineup = 1 if lineup[p,d].get_value() > 0.5 else 0
-                        is_bench = 1 if bench[p,d].get_value() > 0.5 else 0
                         is_transfer_in = 1 if transfer_in[p,d].get_value() > 0.5 else 0
                         is_transfer_out = 1 if transfer_out[p,d].get_value() > 0.5 else 0
                         picks.append([
-                            new_gd, lp['name'], lp['position'], lp['team'], buy_price[p], round(points_player_day[p,d],2), is_lineup, is_captain, is_bench, is_transfer_in, is_transfer_out ])
+                            new_gd, lp['name'], lp['position'], lp['team'], buy_price[p], round(points_player_day[p,d],2), is_lineup, is_captain, is_transfer_in, is_transfer_out ])
         
         total_xp = sum(gw_xp[w].get_value() for w in gameweeks)
         # Additional information you want to include in the result
@@ -503,7 +499,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
             # Add more information as needed
         }
 
-        picks_df = pd.DataFrame(picks, columns=['gameday', 'name', 'pos', 'team', 'price', 'xP', 'lineup', 'captain', 'bench', 'transfer_in', 'transfer_out']).sort_values(by=['gameday', 'price', 'xP'], ascending=[True, False, False])
+        picks_df = pd.DataFrame(picks, columns=['gameday', 'name', 'pos', 'team', 'price', 'xP', 'lineup', 'captain', 'transfer_in', 'transfer_out']).sort_values(by=['gameday', 'price', 'xP'], ascending=[True, False, False])
 
         # Writing summary
         summary_of_actions = f""
@@ -520,7 +516,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
             if use_all_star[d].get_value() > 0.5:
                 summary_of_actions += f"CHIP: ALL STAR\n"
                 chip_used[new_gd] = " - ALL STAR"
-            summary_of_actions += f"ITB: {in_the_bank[d].get_value()}\n"
+            summary_of_actions += f"xPTS: {round(gd_xp[d].get_value(),1)}, ITB: {in_the_bank[d].get_value()}\n"
 
             for p in players:
                 if transfer_in[p,d].get_value() > 0.5:
