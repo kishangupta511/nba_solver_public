@@ -106,6 +106,8 @@ def get_fixtures():
 
     # Outputting data to csv
     fixture_info.to_csv('data/fixture_info.csv', index=False)
+    if os.path.exists('/Users/kishangupta/dev/nba_fantasy/nba_supercoach/data'):
+        fixture_info.to_csv('/Users/kishangupta/dev/nba_fantasy/nba_supercoach/data/fixture_info.csv', index=False)
 
     # Create fixture ticker for teams
     fixture_ticker_api = requests.get("https://nbafantasy.nba.com/api/fixtures")
