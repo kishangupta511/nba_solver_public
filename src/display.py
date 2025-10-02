@@ -42,6 +42,12 @@ class NBAOptimizerGUI:
         # Team ID Variable
         self.team_id_var = ctk.IntVar(value=solver_options.get('team_id', 148))
 
+        # Game Day and ITB Variables
+        if solver_options.get('preseason', False):
+            self.gd_var = ctk.DoubleVar(value=1.1)
+            self.itb_var = ctk.DoubleVar(value=0)
+            self.captain_played_var = ctk.BooleanVar(value=False)
+
         # Main Options Variables
         self.horizon_var = ctk.IntVar(value=solver_options.get('horizon', 5))
         self.tm_var = ctk.IntVar(value=solver_options.get('tm', 0))
@@ -110,13 +116,19 @@ class NBAOptimizerGUI:
 
         # Labels and entry widgets for main options
         gd_label = ctk.CTkLabel(root, text="Game Day:")
-        self.gd_entry = ctk.CTkEntry(root, placeholder_text=1.1, width=50)
+        if solver_options.get('preseason', False):
+            self.gd_entry = ctk.CTkEntry(root, textvariable=self.gd_var, width=50)
+        else:
+            self.gd_entry = ctk.CTkEntry(root, placeholder_text=1.1, width=50)
         horizon_label = ctk.CTkLabel(root, text="Horizon:")
         horizon_entry = ctk.CTkEntry(root, textvariable=self.horizon_var, width=50)
         tm_label = ctk.CTkLabel(root, text="Transfers Made:")
         tm_entry = ctk.CTkEntry(root, textvariable=self.tm_var, width=50)
         itb_label = ctk.CTkLabel(root, text="Initial ITB:")
-        self.itb_entry = ctk.CTkEntry(root, placeholder_text=0, width=50)
+        if solver_options.get('preseason', False):
+            self.itb_entry = ctk.CTkEntry(root, textvariable=self.itb_var, width=50)
+        else:
+            self.itb_entry = ctk.CTkEntry(root, placeholder_text=0, width=50)
         preseason_label = ctk.CTkLabel(root, text="Preseason:")
         preseason_checkbox = ctk.CTkCheckBox(root, variable=self.preseason_var, text="")
         captain_played_label = ctk.CTkLabel(root, text="Captain Played:")
@@ -261,54 +273,57 @@ class NBAOptimizerGUI:
 
     def get_data(self):
 
-        # Destroy existing widgets
-        self.players_entry.destroy()
-        self.prices_entry.destroy()
-        self.gd_entry.destroy()
-        self.itb_entry.destroy()
-        self.captain_played_checkbox.destroy()
+        if self.preseason_var.get() == False:
+
+            # Destroy existing widgets
+            self.players_entry.destroy()
+            self.prices_entry.destroy()
+            self.gd_entry.destroy()
+            self.itb_entry.destroy()
+            self.captain_played_checkbox.destroy()
+            
+            # Read the team ID from the entry widget
+            gameday_data = pd.read_csv('data/fixture_info.csv')
+            squad = get_team(self.team_id_var.get())
+
+            # Create entry for squad
+            if squad['initial_squad']:
+                self.players_var = ctk.StringVar(value=squad['initial_squad'])
+                self.players_entry = ctk.CTkEntry(root, textvariable=self.players_var)
+                self.players_entry.grid(row=1, column=1, pady=5, padx=(0,40), columnspan = 7, sticky="ew")
+
+            # Create entry for sell prices
+            self.prices_var = ctk.StringVar(value=squad['sell_prices'])
+            self.prices_entry = ctk.CTkEntry(root, textvariable=self.prices_var)
+            self.prices_entry.grid(row=2, column=1, pady=5, columnspan = 4, sticky="ew")
+
+            # Create entry for in the bank value
+            self.itb_var = ctk.DoubleVar(value=squad['itb'])
+            self.itb_entry = ctk.CTkEntry(root, textvariable=self.itb_var, width=50)
+            self.itb_entry.grid(row=4, column=3, pady=5, padx=0, sticky="w")
+
+            # Create entry for the game day
+            try:
+                period_index = gameday_data[gameday_data['id'] == (squad['gd'])].index.tolist()
+                period_index = list(map(int, period_index))
+                new_gd = gameday_data.loc[period_index, 'code'].astype(float).tolist()
+                new_gd = new_gd[0]
+                self.gd_var = ctk.DoubleVar(value=new_gd)
+            except Exception as e:
+                self.gd_var = ctk.DoubleVar(value=None)
         
-        # Read the team ID from the entry widget
-        gameday_data = pd.read_csv('data/fixture_info.csv')
-        squad = get_team(self.team_id_var.get())
+            self.gd_entry = ctk.CTkEntry(root, textvariable=self.gd_var, width=50)
+            self.gd_entry.grid(row=4, column=1, pady=5, padx=0, sticky="w")
 
-        # Create entry for squad
-        self.players_var = ctk.StringVar(value=squad['initial_squad'])
-        self.players_entry = ctk.CTkEntry(root, textvariable=self.players_var)
-        self.players_entry.grid(row=1, column=1, pady=5, padx=(0,40), columnspan = 7, sticky="ew")
+            # Create entry for captain played
+            self.captain_played_var = ctk.BooleanVar(value=squad['captain'])
+            self.captain_played_checkbox = ctk.CTkCheckBox(root, variable=self.captain_played_var, text="")
+            self.captain_played_checkbox.grid(row=4, column=5, pady=5, padx=0, sticky="w")
 
-        # Create entry for sell prices
-        self.prices_var = ctk.StringVar(value=squad['sell_prices'])
-        self.prices_entry = ctk.CTkEntry(root, textvariable=self.prices_var)
-        self.prices_entry.grid(row=2, column=1, pady=5, columnspan = 4, sticky="ew")
-
-        # Create entry for in the bank value
-        self.itb_var = ctk.DoubleVar(value=squad['itb'])
-        self.itb_entry = ctk.CTkEntry(root, textvariable=self.itb_var, width=50)
-        self.itb_entry.grid(row=4, column=3, pady=5, padx=0, sticky="w")
-
-        # Create entry for the game day
-        try:
-            period_index = gameday_data[gameday_data['id'] == (squad['gd'])].index.tolist()
-            period_index = list(map(int, period_index))
-            new_gd = gameday_data.loc[period_index, 'code'].astype(float).tolist()
-            new_gd = new_gd[0]
-            self.gd_var = ctk.DoubleVar(value=new_gd)
-        except Exception as e:
-            self.gd_var = ctk.DoubleVar(value=None)
-    
-        self.gd_entry = ctk.CTkEntry(root, textvariable=self.gd_var, width=50)
-        self.gd_entry.grid(row=4, column=1, pady=5, padx=0, sticky="w")
-
-        # Create entry for captain played
-        self.captain_played_var = ctk.BooleanVar(value=squad['captain'])
-        self.captain_played_checkbox = ctk.CTkCheckBox(root, variable=self.captain_played_var, text="")
-        self.captain_played_checkbox.grid(row=4, column=5, pady=5, padx=0, sticky="w")
-
-        # Create entry for transfers made
-        self.tm_var = ctk.IntVar(value=squad['transfers_made'])
-        self.tm_entry = ctk.CTkEntry(root, textvariable=self.tm_var, width=50)
-        self.tm_entry.grid(row=5, column=3, pady=5, padx=0, sticky="w")
+            # Create entry for transfers made
+            self.tm_var = ctk.IntVar(value=squad['transfers_made'])
+            self.tm_entry = ctk.CTkEntry(root, textvariable=self.tm_var, width=50)
+            self.tm_entry.grid(row=5, column=3, pady=5, padx=0, sticky="w")
 
     def refresh_data(self):
         refresh_data()
@@ -320,8 +335,12 @@ class NBAOptimizerGUI:
         with open('solver_settings.json') as f:
             solver_options = json.load(f)
 
-        players = self.players_entry.get().split(', ')
-        prices = [float(price) for price in self.prices_entry.get().split(', ')]
+        if self.preseason_var.get():
+            players = []
+            prices = []
+        else:
+            players = self.players_entry.get().split(', ')
+            prices = [float(price) for price in self.prices_entry.get().split(', ')]
 
         banned_players = self.banned_players_entry.get().split(', ')
         forced_players = self.forced_players_entry.get().split(', ')
@@ -777,15 +796,16 @@ class NBAOptimizerGUI:
             delete_button.grid(row=0, column=9, pady=5, padx=(10, 0), sticky="w")
         
         # Hiding past gds
-        gameday_value = self.gd_entry.get()
-        header_data_hide = getattr(self,sheet_name)["A:"].options(table=False, header=True).data
-        gameday_index = header_data_hide.index(gameday_value)
-        if sheet_name == 'xmins_sheet':
-            columns_to_hide = list(range(5, gameday_index))
-            getattr(self, sheet_name).hide_columns(columns_to_hide)
-        else:
-            columns_to_hide = list(range(4, gameday_index))
-            getattr(self, sheet_name).hide_columns(columns_to_hide)
+        if float(self.gd_entry.get()) != 1.1:
+            gameday_value = self.gd_entry.get()
+            header_data_hide = getattr(self,sheet_name)["A:"].options(table=False, header=True).data
+            gameday_index = header_data_hide.index(gameday_value)
+            if sheet_name == 'xmins_sheet':
+                columns_to_hide = list(range(5, gameday_index))
+                getattr(self, sheet_name).hide_columns(columns_to_hide)
+            else:
+                columns_to_hide = list(range(4, gameday_index))
+                getattr(self, sheet_name).hide_columns(columns_to_hide)
 
     def xmins_overwrite(self, row_final, column):
         # Paths to the input CSV and changes log JSON

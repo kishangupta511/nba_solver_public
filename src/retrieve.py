@@ -336,7 +336,7 @@ def get_player_ownership(gameday):
 if __name__ == '__main__':
     players = get_players()
     fixtures = get_fixtures()
-    team = get_team(148)
+    team = get_team(212)
     get_player_ownership(team['gd'])
 
 

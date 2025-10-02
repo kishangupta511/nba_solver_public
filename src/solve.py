@@ -77,7 +77,7 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
 
     if options.get("preseason") == True:
         gd = 1.1
-        tm - 0
+        tm = 0
         itb = 100
         squad = []
         sell_prices = []
