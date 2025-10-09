@@ -621,6 +621,8 @@ class NBAOptimizerGUI:
 
         # Read the data from CSV
         data = pd.read_csv(csv_file)
+        if 'G' in data.columns:
+            data = data.drop(columns=['G'])
         data = data.reset_index(drop=True)
         mins_exceptions_path = "data/mins_changes.json"
         projections_custom_path = "data/projections_overwrite.csv"
