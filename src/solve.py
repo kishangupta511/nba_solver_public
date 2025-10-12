@@ -14,7 +14,7 @@ pd.set_option('future.no_silent_downcasting', True)
 def get_random_id(n):
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(n))
 
-def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
+def solve_multi_period_NBA(all_data, squad, sell_prices, gd, itb, options):
     """
     Solves multi-objective NBA problem with transfers
     Parameters
@@ -82,11 +82,6 @@ def solve_multi_period_NBA(squad, sell_prices, gd, itb, options):
         squad = []
         sell_prices = []
 
-    # Importing Data
-    if os.path.exists('data/projections_overwrite.csv'):
-        all_data = pd.read_csv('data/projections_overwrite.csv')
-    else:    
-        all_data = pd.read_csv('data/projections.csv')
     team_data = pd.read_csv('data/teams.csv')
     gameday_data = pd.read_csv('data/fixture_info.csv')
     players_data = pd.read_csv('data/players.csv')
@@ -589,7 +584,13 @@ if __name__ == '__main__':
     # Read options from the file
     with open('solver_settings.json') as f:
         solver_options = json.load(f)
+    
+    # Importing Data
+    if os.path.exists('data/projections_overwrite.csv'):
+        all_data = pd.read_csv('data/projections_overwrite.csv')
+    else:    
+        all_data = pd.read_csv('data/projections.csv')
 
-    r = solve_multi_period_NBA(squad=["Anthony Davis", "Anthony Edwards", "Karl-Anthony Towns", "Jaylen Brown", "Josh Giddey", "Rob Dillingham", "Matas Buzelis", "Zach Edey", "Davion Mitchell", "Kyle Filipowski"], sell_prices=[17.0, 16.0, 14.0, 14.0, 11.0, 6.5, 6.0, 6.0, 5.0, 4.5], options=solver_options, gd=3.6, itb=0.5)
+    r = solve_multi_period_NBA(all_data=all_data, squad=["Anthony Davis", "Anthony Edwards", "Karl-Anthony Towns", "Jaylen Brown", "Josh Giddey", "Rob Dillingham", "Matas Buzelis", "Zach Edey", "Davion Mitchell", "Kyle Filipowski"], sell_prices=[17.0, 16.0, 14.0, 14.0, 11.0, 6.5, 6.0, 6.0, 5.0, 4.5], options=solver_options, gd=3.6, itb=0.5)
     res = r['results']
     

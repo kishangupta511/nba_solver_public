@@ -19,7 +19,7 @@ def refresh_data():
         sys.path.append("/Users/kishangupta/dev/nba_fantasy/nba_solver/src")
         projections_available = True
         try:
-            from project import mins_projection, player_projection 
+            from project import mins_projection, player_projection, hashtagbb_retrieve
         except ImportError:
             projections_available = False
             print("Could not import from project.py")
@@ -30,7 +30,10 @@ def refresh_data():
     get_players()
     get_fixtures()
     if projections_available:
-        projected_stats = pd.read_csv('data/rotowire-nba-projections.csv', skiprows=1)
+        if solver_options.get('data_source') == 'hashtagbb':
+            projected_stats = hashtagbb_retrieve()
+        else:
+            projected_stats = pd.read_csv('data/rotowire-nba-projections.csv', skiprows=1)
         xmins = mins_projection(projected_stats)
         player_projection(projected_stats, xmins)
         print('Data Successfully Updated\n')
@@ -39,10 +42,15 @@ def run_optimisation():
     # Refresh the data
     refresh_data()
 
+    # Importing Data
+    if os.path.exists('data/projections_overwrite.csv'):
+        all_data = pd.read_csv('data/projections_overwrite.csv')
+    else:    
+        all_data = pd.read_csv('data/projections.csv')
     fantasy_team = get_team(solver_options.get('team_id'))
 
     # Solve the NBA problem
-    solve_multi_period_NBA(squad=fantasy_team['initial_squad'],
+    solve_multi_period_NBA(all_data=all_data, squad=fantasy_team['initial_squad'],
                         sell_prices=fantasy_team['sell_prices'], 
                         gd=fantasy_team['gd'], itb=fantasy_team['itb'], options=solver_options)
     

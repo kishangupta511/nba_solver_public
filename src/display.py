@@ -396,9 +396,15 @@ class NBAOptimizerGUI:
             
         if self.itb_entry.get() is None: 
             print("ITB not found")
+        
+        # Importing Data
+        if os.path.exists('data/projections_overwrite.csv'):
+            all_data = pd.read_csv('data/projections_overwrite.csv')
+        else:    
+            all_data = pd.read_csv('data/projections.csv')
 
         # Run the optimizer
-        r = solve_multi_period_NBA(squad=players, sell_prices=prices, gd=self.gd_entry.get(), itb=float(self.itb_entry.get()), options=new_options)
+        r = solve_multi_period_NBA(all_data=all_data, squad=players, sell_prices=prices, gd=self.gd_entry.get(), itb=float(self.itb_entry.get()), options=new_options)
         print()
 
         # Display result in a new windowz
