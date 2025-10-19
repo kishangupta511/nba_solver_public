@@ -380,6 +380,7 @@ class NBAOptimizerGUI:
             'solve_time': self.solve_time_var.get(),
             'banned_players': banned_players,
             'forced_players': forced_players,
+            'forced_players_days': solver_options.get('forced_players_days', {}),
             'no_sols': self.no_sols_var.get(),
             'threshold_value': self.threshold_var.get(),
             'alternative_solution': self.alternative_solution_var.get(),
@@ -390,7 +391,7 @@ class NBAOptimizerGUI:
             'cbc_path': solver_options.get('cbc_path'),
             'highs_path': solver_options.get('highs_path')
         }
-
+        
         if self.gd_entry.get() is None:
             print("Game day not found")
             

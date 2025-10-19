@@ -58,6 +58,7 @@ def solve_multi_period_NBA(all_data, squad, sell_prices, gd, itb, options):
     solve_time = options.get('solve_time',300)
     banned_players = options.get('banned_players',[])
     forced_players = options.get('forced_players',[])
+    forced_players_days = options.get('forced_players_days',{})
     number_solutions = options.get('no_sols', 1)
     alternative_solution = options.get('alternative_solution','1week_buy')
     threshold_value = options.get('threshold_value',0)
@@ -112,7 +113,26 @@ def solve_multi_period_NBA(all_data, squad, sell_prices, gd, itb, options):
     # Forced players
     forced_players_indices = all_data[all_data['name'].isin(forced_players)].index.tolist()
     forced_players_indices = list(map(int, forced_players_indices))
-    
+    forced_players_days_indices = {}
+    for player in forced_players_days:
+        player_index_list = all_data[all_data['name'] == player].index.tolist()
+        if not player_index_list:
+            print(f"⚠️ Player '{player}' not found in all_data — skipping.")
+            continue
+        player_index = player_index_list[0]
+        forced_players_days_indices[player_index] = []
+        for gd in forced_players_days[player]:
+            gd = float(gd)
+            if gd > next_gd + horizon or gd < next_gd:
+                print(f"⚠️ Warning: Gameday {gd} for player '{player}' is not valid and will be ignored")
+                continue
+            gd_index = gameday_data[gameday_data['code'] == gd].index.tolist()
+            if not gd_index:
+                print(f"⚠️ Gameday code {gd} not found in gameday_data — skipping.")
+                continue
+            gd_ids = gameday_data.loc[gd_index, 'id'].astype(int).tolist()
+            forced_players_days_indices[player_index] += gd_ids
+
     # Wildcard
     if wc_day > 0:
         wc_index = gameday_data[gameday_data['code'] == wc_day].index.tolist()
@@ -174,7 +194,8 @@ def solve_multi_period_NBA(all_data, squad, sell_prices, gd, itb, options):
     keep_players = (
         all_data['name'].isin(squad) | 
         all_data['name'].isin(banned_players) | 
-        all_data['name'].isin(forced_players)
+        all_data['name'].isin(forced_players) |
+        all_data['name'].isin(forced_players_days.keys())
     )
     keep_players = all_data[keep_players]
     
@@ -316,6 +337,11 @@ def solve_multi_period_NBA(all_data, squad, sell_prices, gd, itb, options):
 
     ## Forced players constraints
     model.add_constraints((squad[p, d] == 1 for p in forced_players_indices for d in gamedays), name='forced_players')
+    for p in forced_players_days_indices:
+        print(p, forced_players_days_indices[p])
+        for d in forced_players_days_indices[p]:
+            print(d)
+            model.add_constraint((squad[p, d] == 1), name=f'forced_player_{p}_{d}')
 
     # Wildcard Constraints
     if wc_day > 0:
