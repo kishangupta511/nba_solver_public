@@ -1,0 +1,2554 @@
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+ERROR:   No coefficient given for column "cont_budget[146]"
+ERROR:   Parser error reading solution_files/mp_h17_w0.0_7JHpM.mps
+Error loading file
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+ERROR:   No coefficient given for column "cont_budget[146]"
+ERROR:   Parser error reading solution_files/mp_h7_w0.0_hWY1z.mps
+Error loading file
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+ERROR:   No coefficient given for column "cont_budget[146]"
+ERROR:   Parser error reading solution_files/mp_h17_w0.0_QSp4V.mps
+Error loading file
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+ERROR:   No coefficient given for column "cont_budget[146]"
+ERROR:   Parser error reading solution_files/mp_h7_w0.0_ks5xV.mps
+Error loading file
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 35
+Number of BV entries in BOUNDS section is 25130
+MIP  mp_h17_w0_Tr41v has 26830 rows; 25217 cols; 130293 nonzeros; 25165 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+11720 rows, 18897 cols, 74243 nonzeros  0s
+10363 rows, 16294 cols, 59408 nonzeros  0s
+
+Solving MIP model with:
+   10363 rows
+   16294 cols (16244 binary, 24 integer, 13 implied int., 13 continuous)
+   59408 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -47910.854805   inf                  inf        0      0      0         0     0.4s
+
+Solving report
+  Status            Time limit reached
+  Primal bound      inf
+  Dual bound        -47910.854805
+  Gap               inf
+  Solution status   -
+  Timing            1.60 (total)
+                    0.29 (presolve)
+                    0.00 (postsolve)
+  Nodes             0
+  LP iterations     5107 (total)
+                    0 (strong br.)
+                    0 (separation)
+                    0 (heuristics)
+Writing the solution to solution_files/mp_h17_w0_Tr41v_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 10146
+MIP  mp_h7_w0.0_QS4Qy has 10855 rows; 10183 cols; 52208 nonzeros; 10161 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+5095 rows, 7931 cols, 31586 nonzeros  0s
+4474 rows, 6636 cols, 22088 nonzeros  0s
+
+Solving MIP model with:
+   4474 rows
+   6636 cols (6613 binary, 11 integer, 6 implied int., 6 continuous)
+   22088 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -20723.949235   inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1339.858729    inf                  inf        0      0      0      1451     0.4s
+ C       0       0         0   0.00%   -1335.817304    -1233.836071       8.27%       22      6     10      1557     1.2s
+ L       0       0         0   0.00%   -1335.686925    -1322.298444       1.01%       24      8     10      1699     2.0s
+
+96.5% inactive integer columns, restarting
+Model after restart has 112 rows, 118 cols (114 bin., 2 int., 2 impl., 0 cont.), and 411 nonzeros
+
+         0       0         0   0.00%   -1335.544006    -1322.298444       1.00%        5      0      0      2339     2.1s
+         0       0         0   0.00%   -1335.515953    -1322.298444       1.00%        5      5      2      2366     2.1s
+
+30.2% inactive integer columns, restarting
+Model after restart has 79 rows, 79 cols (76 bin., 2 int., 1 impl., 0 cont.), and 281 nonzeros
+
+         0       0         0   0.00%   -1328.985904    -1322.298444       0.51%        4      0      0      2410     2.1s
+         0       0         0   0.00%   -1328.985904    -1322.298444       0.51%        4      4      2      2435     2.1s
+
+11.5% inactive integer columns, restarting
+Model after restart has 70 rows, 68 cols (65 bin., 2 int., 1 impl., 0 cont.), and 244 nonzeros
+
+         0       0         0   0.00%   -1324.436021    -1322.298444       0.16%        5      0      0      2594     2.2s
+         0       0         0   0.00%   -1324.415253    -1322.298444       0.16%        5      4      3      2609     2.2s
+
+7.5% inactive integer columns, restarting
+
+Solving report
+  Status            Optimal
+  Primal bound      -1322.298444
+  Dual bound        -1322.298444
+  Gap               0%
+  Solution status   feasible
+                    -1322.298444 (objective)
+                    0 (bound viol.)
+                    2.67152730198e-13 (int. viol.)
+                    0 (row viol.)
+  Timing            2.18 (total)
+                    0.12 (presolve)
+                    0.00 (postsolve)
+  Nodes             0
+  LP iterations     2738 (total)
+                    0 (strong br.)
+                    397 (separation)
+                    805 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_QS4Qy_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 10146
+MIP  mp_h7_w0.0_nhheC has 10855 rows; 10183 cols; 52208 nonzeros; 10161 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+5095 rows, 7931 cols, 31586 nonzeros  0s
+4474 rows, 6636 cols, 22088 nonzeros  0s
+
+Solving MIP model with:
+   4474 rows
+   6636 cols (6613 binary, 11 integer, 6 implied int., 6 continuous)
+   22088 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -20723.949235   inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1339.858729    inf                  inf        0      0      0      1451     0.4s
+ C       0       0         0   0.00%   -1335.817304    -1233.836071       8.27%       22      6     10      1557     1.2s
+ L       0       0         0   0.00%   -1335.686925    -1322.298444       1.01%       24      8     10      1699     2.0s
+
+96.5% inactive integer columns, restarting
+Model after restart has 112 rows, 118 cols (114 bin., 2 int., 2 impl., 0 cont.), and 411 nonzeros
+
+         0       0         0   0.00%   -1335.544006    -1322.298444       1.00%        5      0      0      2339     2.1s
+         0       0         0   0.00%   -1335.515953    -1322.298444       1.00%        5      5      2      2366     2.1s
+
+30.2% inactive integer columns, restarting
+Model after restart has 79 rows, 79 cols (76 bin., 2 int., 1 impl., 0 cont.), and 281 nonzeros
+
+         0       0         0   0.00%   -1328.985904    -1322.298444       0.51%        4      0      0      2410     2.1s
+         0       0         0   0.00%   -1328.985904    -1322.298444       0.51%        4      4      2      2435     2.1s
+
+11.5% inactive integer columns, restarting
+Model after restart has 70 rows, 68 cols (65 bin., 2 int., 1 impl., 0 cont.), and 244 nonzeros
+
+         0       0         0   0.00%   -1324.436021    -1322.298444       0.16%        5      0      0      2594     2.2s
+         0       0         0   0.00%   -1324.415253    -1322.298444       0.16%        5      4      3      2609     2.2s
+
+7.5% inactive integer columns, restarting
+
+Solving report
+  Status            Optimal
+  Primal bound      -1322.298444
+  Dual bound        -1322.298444
+  Gap               0%
+  Solution status   feasible
+                    -1322.298444 (objective)
+                    0 (bound viol.)
+                    2.67152730198e-13 (int. viol.)
+                    0 (row viol.)
+  Timing            2.19 (total)
+                    0.12 (presolve)
+                    0.00 (postsolve)
+  Nodes             0
+  LP iterations     2738 (total)
+                    0 (strong br.)
+                    397 (separation)
+                    805 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_nhheC_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 10146
+MIP  mp_h7_w0.0_nhheC has 10856 rows; 10183 cols; 52214 nonzeros; 10161 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+5096 rows, 7931 cols, 31592 nonzeros  0s
+4475 rows, 6636 cols, 22094 nonzeros  0s
+
+Solving MIP model with:
+   4475 rows
+   6636 cols (6613 binary, 11 integer, 6 implied int., 6 continuous)
+   22094 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -20723.949235   inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1339.858729    inf                  inf        0      0      3      1287     0.3s
+ R       0       0         0   0.00%   -1337.629348    -1274.845893       4.92%       16      1      3      1300     0.6s
+ L       0       0         0   0.00%   -1333.03581     -1318.422659       1.11%       47      9    120      1541     2.2s
+
+92.2% inactive integer columns, restarting
+Model after restart has 290 rows, 344 cols (337 bin., 0 int., 7 impl., 0 cont.), and 1433 nonzeros
+
+         0       0         0   0.00%   -1332.996123    -1318.422659       1.11%        4      0      0      2320     2.3s
+
+25.2% inactive integer columns, restarting
+Model after restart has 216 rows, 248 cols (241 bin., 0 int., 7 impl., 0 cont.), and 985 nonzeros
+
+         0       0         0   0.00%   -1332.996123    -1318.422659       1.11%        4      0      0      2423     2.3s
+
+32.0% inactive integer columns, restarting
+Model after restart has 148 rows, 156 cols (152 bin., 0 int., 4 impl., 0 cont.), and 591 nonzeros
+
+         0       0         0   0.00%   -1332.996123    -1318.422659       1.11%        4      0      0      2488     2.3s
+         0       0         0   0.00%   -1332.996123    -1318.422659       1.11%        4      4      4      2540     2.3s
+
+31.6% inactive integer columns, restarting
+Model after restart has 105 rows, 105 cols (104 bin., 0 int., 1 impl., 0 cont.), and 365 nonzeros
+
+         0       0         0   0.00%   -1329.423057    -1318.422659       0.83%        4      0      0      2644     2.4s
+         0       0         0   0.00%   -1329.423057    -1318.422659       0.83%        4      4      4      2667     2.4s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1318.422659
+  Dual bound        -1318.422659
+  Gap               0%
+  Solution status   feasible
+                    -1318.422659 (objective)
+                    0 (bound viol.)
+                    6.40489226601e-15 (int. viol.)
+                    0 (row viol.)
+  Timing            2.37 (total)
+                    0.13 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     2714 (total)
+                    0 (strong br.)
+                    353 (separation)
+                    816 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_nhheC_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 10146
+MIP  mp_h7_w0.0_bWx0D has 10855 rows; 10183 cols; 52208 nonzeros; 10161 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+5095 rows, 7931 cols, 31586 nonzeros  0s
+4474 rows, 6636 cols, 22088 nonzeros  0s
+
+Solving MIP model with:
+   4474 rows
+   6636 cols (6613 binary, 11 integer, 6 implied int., 6 continuous)
+   22088 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -20723.949235   inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1339.858729    inf                  inf        0      0      0      1451     0.4s
+ C       0       0         0   0.00%   -1335.817304    -1233.836071       8.27%       22      6     10      1557     1.2s
+ L       0       0         0   0.00%   -1335.686925    -1322.298444       1.01%       24      8     10      1699     2.0s
+
+96.5% inactive integer columns, restarting
+Model after restart has 112 rows, 118 cols (114 bin., 2 int., 2 impl., 0 cont.), and 411 nonzeros
+
+         0       0         0   0.00%   -1335.544006    -1322.298444       1.00%        5      0      0      2339     2.1s
+         0       0         0   0.00%   -1335.515953    -1322.298444       1.00%        5      5      2      2366     2.1s
+
+30.2% inactive integer columns, restarting
+Model after restart has 79 rows, 79 cols (76 bin., 2 int., 1 impl., 0 cont.), and 281 nonzeros
+
+         0       0         0   0.00%   -1328.985904    -1322.298444       0.51%        4      0      0      2410     2.1s
+         0       0         0   0.00%   -1328.985904    -1322.298444       0.51%        4      4      2      2435     2.1s
+
+11.5% inactive integer columns, restarting
+Model after restart has 70 rows, 68 cols (65 bin., 2 int., 1 impl., 0 cont.), and 244 nonzeros
+
+         0       0         0   0.00%   -1324.436021    -1322.298444       0.16%        5      0      0      2594     2.1s
+         0       0         0   0.00%   -1324.415253    -1322.298444       0.16%        5      4      3      2609     2.1s
+
+7.5% inactive integer columns, restarting
+
+Solving report
+  Status            Optimal
+  Primal bound      -1322.298444
+  Dual bound        -1322.298444
+  Gap               0%
+  Solution status   feasible
+                    -1322.298444 (objective)
+                    0 (bound viol.)
+                    2.67152730198e-13 (int. viol.)
+                    0 (row viol.)
+  Timing            2.16 (total)
+                    0.12 (presolve)
+                    0.00 (postsolve)
+  Nodes             0
+  LP iterations     2738 (total)
+                    0 (strong br.)
+                    397 (separation)
+                    805 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_bWx0D_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 10146
+MIP  mp_h7_w0.0_DHEow has 10855 rows; 10183 cols; 52208 nonzeros; 10161 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+5095 rows, 7931 cols, 31586 nonzeros  0s
+4474 rows, 6636 cols, 22088 nonzeros  0s
+
+Solving MIP model with:
+   4474 rows
+   6636 cols (6613 binary, 11 integer, 6 implied int., 6 continuous)
+   22088 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -20723.949235   inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1339.858729    inf                  inf        0      0      0      1451     0.4s
+ C       0       0         0   0.00%   -1335.817304    -1233.836071       8.27%       22      6     10      1557     1.2s
+ L       0       0         0   0.00%   -1335.686925    -1322.298444       1.01%       24      8     10      1699     2.0s
+
+96.5% inactive integer columns, restarting
+Model after restart has 112 rows, 118 cols (114 bin., 2 int., 2 impl., 0 cont.), and 411 nonzeros
+
+         0       0         0   0.00%   -1335.544006    -1322.298444       1.00%        5      0      0      2339     2.1s
+         0       0         0   0.00%   -1335.515953    -1322.298444       1.00%        5      5      2      2366     2.1s
+
+30.2% inactive integer columns, restarting
+Model after restart has 79 rows, 79 cols (76 bin., 2 int., 1 impl., 0 cont.), and 281 nonzeros
+
+         0       0         0   0.00%   -1328.985904    -1322.298444       0.51%        4      0      0      2410     2.1s
+         0       0         0   0.00%   -1328.985904    -1322.298444       0.51%        4      4      2      2435     2.1s
+
+11.5% inactive integer columns, restarting
+Model after restart has 70 rows, 68 cols (65 bin., 2 int., 1 impl., 0 cont.), and 244 nonzeros
+
+         0       0         0   0.00%   -1324.436021    -1322.298444       0.16%        5      0      0      2594     2.2s
+         0       0         0   0.00%   -1324.415253    -1322.298444       0.16%        5      4      3      2609     2.2s
+
+7.5% inactive integer columns, restarting
+
+Solving report
+  Status            Optimal
+  Primal bound      -1322.298444
+  Dual bound        -1322.298444
+  Gap               0%
+  Solution status   feasible
+                    -1322.298444 (objective)
+                    0 (bound viol.)
+                    2.67152730198e-13 (int. viol.)
+                    0 (row viol.)
+  Timing            2.20 (total)
+                    0.12 (presolve)
+                    0.00 (postsolve)
+  Nodes             0
+  LP iterations     2738 (total)
+                    0 (strong br.)
+                    397 (separation)
+                    805 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_DHEow_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 21
+Number of BV entries in BOUNDS section is 14638
+MIP  mp_h10_w0.0_EA7Xs has 15644 rows; 14690 cols; 75411 nonzeros; 14659 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+7069 rows, 11206 cols, 44126 nonzeros  0s
+5958 rows, 9115 cols, 42672 nonzeros  0s
+5818 rows, 8791 cols, 33826 nonzeros  0s
+
+Solving MIP model with:
+   5818 rows
+   8791 cols (8768 binary, 11 integer, 6 implied int., 6 continuous)
+   33826 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -29201.690016   inf                  inf        0      0      0         0     0.2s
+         0       0         0   0.00%   -1820.428358    inf                  inf        0      0      6      2248     0.5s
+ R       0       0         0   0.00%   -1809.458585    -1483.158792      22.00%      226      4      6      2548     1.3s
+ L       0       0         0   0.00%   -1809.341075    -1790.657954       1.04%      248      8    157      2617     5.5s
+
+95.3% inactive integer columns, restarting
+Model after restart has 288 rows, 293 cols (273 bin., 8 int., 6 impl., 6 cont.), and 1238 nonzeros
+
+         0       0         0   0.00%   -1807.134822    -1790.657954       0.92%        7      0      0      4820     6.0s
+         0       0         0   0.00%   -1806.826551    -1790.657954       0.90%        7      7      4      4901     6.0s
+
+12.8% inactive integer columns, restarting
+Model after restart has 234 rows, 239 cols (223 bin., 6 int., 6 impl., 4 cont.), and 1021 nonzeros
+
+         0       0         0   0.00%   -1802.484505    -1790.657954       0.66%       10      0      0      5040     6.0s
+         0       0         0   0.00%   -1802.484505    -1790.657954       0.66%       10      9      3      5107     6.0s
+
+13.1% inactive integer columns, restarting
+Model after restart has 202 rows, 197 cols (186 bin., 3 int., 5 impl., 3 cont.), and 818 nonzeros
+
+         0       0         0   0.00%   -1796.250153    -1790.657954       0.31%       14      0      0      5553     6.1s
+         0       0         0   0.00%   -1796.248485    -1790.657954       0.31%       14     13     10      5636     6.1s
+
+5.3% inactive integer columns, restarting
+Model after restart has 192 rows, 184 cols (173 bin., 3 int., 5 impl., 3 cont.), and 751 nonzeros
+
+         0       0         0   0.00%   -1794.783426    -1790.657954       0.23%       15      0      0      6656     6.5s
+         0       0         0   0.00%   -1794.783426    -1790.657954       0.23%       15     14      7      6734     6.5s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1790.657954
+  Dual bound        -1790.657954
+  Gap               0%
+  Solution status   feasible
+                    -1790.657954 (objective)
+                    0 (bound viol.)
+                    7.32747196253e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            6.93 (total)
+                    0.21 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     8916 (total)
+                    1293 (strong br.)
+                    899 (separation)
+                    4073 (heuristics)
+Writing the solution to solution_files/mp_h10_w0.0_EA7Xs_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 10146
+MIP  mp_h7_w0.0_6Yix2 has 10855 rows; 10183 cols; 52208 nonzeros; 10161 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+5095 rows, 7931 cols, 31586 nonzeros  0s
+4474 rows, 6636 cols, 22088 nonzeros  0s
+
+Solving MIP model with:
+   4474 rows
+   6636 cols (6613 binary, 11 integer, 6 implied int., 6 continuous)
+   22088 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -20723.949235   inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1339.858729    inf                  inf        0      0      0      1451     0.4s
+ C       0       0         0   0.00%   -1335.817304    -1233.836071       8.27%       22      6     10      1557     1.2s
+ L       0       0         0   0.00%   -1335.686925    -1322.298444       1.01%       24      8     10      1699     2.0s
+
+96.5% inactive integer columns, restarting
+Model after restart has 112 rows, 118 cols (114 bin., 2 int., 2 impl., 0 cont.), and 411 nonzeros
+
+         0       0         0   0.00%   -1335.544006    -1322.298444       1.00%        5      0      0      2339     2.1s
+         0       0         0   0.00%   -1335.515953    -1322.298444       1.00%        5      5      2      2366     2.1s
+
+30.2% inactive integer columns, restarting
+Model after restart has 79 rows, 79 cols (76 bin., 2 int., 1 impl., 0 cont.), and 281 nonzeros
+
+         0       0         0   0.00%   -1328.985904    -1322.298444       0.51%        4      0      0      2410     2.1s
+         0       0         0   0.00%   -1328.985904    -1322.298444       0.51%        4      4      2      2435     2.1s
+
+11.5% inactive integer columns, restarting
+Model after restart has 70 rows, 68 cols (65 bin., 2 int., 1 impl., 0 cont.), and 244 nonzeros
+
+         0       0         0   0.00%   -1324.436021    -1322.298444       0.16%        5      0      0      2594     2.1s
+         0       0         0   0.00%   -1324.415253    -1322.298444       0.16%        5      4      3      2609     2.1s
+
+7.5% inactive integer columns, restarting
+
+Solving report
+  Status            Optimal
+  Primal bound      -1322.298444
+  Dual bound        -1322.298444
+  Gap               0%
+  Solution status   feasible
+                    -1322.298444 (objective)
+                    0 (bound viol.)
+                    2.67152730198e-13 (int. viol.)
+                    0 (row viol.)
+  Timing            2.15 (total)
+                    0.12 (presolve)
+                    0.00 (postsolve)
+  Nodes             0
+  LP iterations     2738 (total)
+                    0 (strong br.)
+                    397 (separation)
+                    805 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_6Yix2_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_1nSDT has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1552     0.3s
+ R       0       0         0   0.00%   -1375.109833    -1074.518042      27.97%       10      4     18      1647     0.8s
+ L       0       0         0   0.00%   -1374.945078    -1362.11123        0.94%       13      5    124      1664     2.5s
+
+95.1% inactive integer columns, restarting
+Model after restart has 170 rows, 183 cols (179 bin., 1 int., 3 impl., 0 cont.), and 774 nonzeros
+
+         0       0         0   0.00%   -1374.610039    -1362.11123        0.92%        3      0      0      2674     2.7s
+         0       0         0   0.00%   -1374.400511    -1362.11123        0.90%        3      3      6      2732     2.7s
+
+46.1% inactive integer columns, restarting
+Model after restart has 95 rows, 91 cols (88 bin., 1 int., 2 impl., 0 cont.), and 344 nonzeros
+
+         0       0         0   0.00%   -1366.111662    -1362.11123        0.29%        4      0      0      3010     2.8s
+
+10.1% inactive integer columns, restarting
+Model after restart has 81 rows, 77 cols (75 bin., 1 int., 1 impl., 0 cont.), and 282 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        4      0      0      3040     2.8s
+
+10.5% inactive integer columns, restarting
+Model after restart has 66 rows, 64 cols (62 bin., 1 int., 1 impl., 0 cont.), and 235 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      0      0      3062     2.8s
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      3      1      3083     2.8s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    1.80681132534e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            2.80 (total)
+                    0.11 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3089 (total)
+                    0 (strong br.)
+                    188 (separation)
+                    1216 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_1nSDT_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_k7elD has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1552     0.3s
+ R       0       0         0   0.00%   -1375.109833    -1074.518042      27.97%       10      4     18      1647     0.8s
+ L       0       0         0   0.00%   -1374.945078    -1362.11123        0.94%       13      5    124      1664     2.2s
+
+95.1% inactive integer columns, restarting
+Model after restart has 170 rows, 183 cols (179 bin., 1 int., 3 impl., 0 cont.), and 774 nonzeros
+
+         0       0         0   0.00%   -1374.610039    -1362.11123        0.92%        3      0      0      2674     2.5s
+         0       0         0   0.00%   -1374.400511    -1362.11123        0.90%        3      3      6      2732     2.5s
+
+46.1% inactive integer columns, restarting
+Model after restart has 95 rows, 91 cols (88 bin., 1 int., 2 impl., 0 cont.), and 344 nonzeros
+
+         0       0         0   0.00%   -1366.111662    -1362.11123        0.29%        4      0      0      3010     2.5s
+
+10.1% inactive integer columns, restarting
+Model after restart has 81 rows, 77 cols (75 bin., 1 int., 1 impl., 0 cont.), and 282 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        4      0      0      3040     2.5s
+
+10.5% inactive integer columns, restarting
+Model after restart has 66 rows, 64 cols (62 bin., 1 int., 1 impl., 0 cont.), and 235 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      0      0      3062     2.5s
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      3      1      3083     2.5s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    1.80681132534e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            2.52 (total)
+                    0.11 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3089 (total)
+                    0 (strong br.)
+                    188 (separation)
+                    1216 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_k7elD_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_x5gUe has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1552     0.3s
+ R       0       0         0   0.00%   -1375.109833    -1074.518042      27.97%       10      4     18      1647     0.8s
+ L       0       0         0   0.00%   -1374.945078    -1362.11123        0.94%       13      5    124      1664     2.2s
+
+95.1% inactive integer columns, restarting
+Model after restart has 170 rows, 183 cols (179 bin., 1 int., 3 impl., 0 cont.), and 774 nonzeros
+
+         0       0         0   0.00%   -1374.610039    -1362.11123        0.92%        3      0      0      2674     2.5s
+         0       0         0   0.00%   -1374.400511    -1362.11123        0.90%        3      3      6      2732     2.5s
+
+46.1% inactive integer columns, restarting
+Model after restart has 95 rows, 91 cols (88 bin., 1 int., 2 impl., 0 cont.), and 344 nonzeros
+
+         0       0         0   0.00%   -1366.111662    -1362.11123        0.29%        4      0      0      3010     2.5s
+
+10.1% inactive integer columns, restarting
+Model after restart has 81 rows, 77 cols (75 bin., 1 int., 1 impl., 0 cont.), and 282 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        4      0      0      3040     2.5s
+
+10.5% inactive integer columns, restarting
+Model after restart has 66 rows, 64 cols (62 bin., 1 int., 1 impl., 0 cont.), and 235 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      0      0      3062     2.5s
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      3      1      3083     2.5s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    1.80681132534e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            2.52 (total)
+                    0.11 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3089 (total)
+                    0 (strong br.)
+                    188 (separation)
+                    1216 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_x5gUe_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_JeGMj has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1552     0.3s
+ R       0       0         0   0.00%   -1375.109833    -1074.518042      27.97%       10      4     18      1647     0.8s
+ L       0       0         0   0.00%   -1374.945078    -1362.11123        0.94%       13      5    124      1664     2.2s
+
+95.1% inactive integer columns, restarting
+Model after restart has 170 rows, 183 cols (179 bin., 1 int., 3 impl., 0 cont.), and 774 nonzeros
+
+         0       0         0   0.00%   -1374.610039    -1362.11123        0.92%        3      0      0      2674     2.5s
+         0       0         0   0.00%   -1374.400511    -1362.11123        0.90%        3      3      6      2732     2.5s
+
+46.1% inactive integer columns, restarting
+Model after restart has 95 rows, 91 cols (88 bin., 1 int., 2 impl., 0 cont.), and 344 nonzeros
+
+         0       0         0   0.00%   -1366.111662    -1362.11123        0.29%        4      0      0      3010     2.5s
+
+10.1% inactive integer columns, restarting
+Model after restart has 81 rows, 77 cols (75 bin., 1 int., 1 impl., 0 cont.), and 282 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        4      0      0      3040     2.5s
+
+10.5% inactive integer columns, restarting
+Model after restart has 66 rows, 64 cols (62 bin., 1 int., 1 impl., 0 cont.), and 235 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      0      0      3062     2.5s
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      3      1      3083     2.5s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    1.80681132534e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            2.52 (total)
+                    0.12 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3089 (total)
+                    0 (strong br.)
+                    188 (separation)
+                    1216 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_JeGMj_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_GJB0H has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1552     0.3s
+ R       0       0         0   0.00%   -1375.109833    -1074.518042      27.97%       10      4     18      1647     0.8s
+ L       0       0         0   0.00%   -1374.945078    -1362.11123        0.94%       13      5    124      1664     2.2s
+
+95.1% inactive integer columns, restarting
+Model after restart has 170 rows, 183 cols (179 bin., 1 int., 3 impl., 0 cont.), and 774 nonzeros
+
+         0       0         0   0.00%   -1374.610039    -1362.11123        0.92%        3      0      0      2674     2.5s
+         0       0         0   0.00%   -1374.400511    -1362.11123        0.90%        3      3      6      2732     2.5s
+
+46.1% inactive integer columns, restarting
+Model after restart has 95 rows, 91 cols (88 bin., 1 int., 2 impl., 0 cont.), and 344 nonzeros
+
+         0       0         0   0.00%   -1366.111662    -1362.11123        0.29%        4      0      0      3010     2.5s
+
+10.1% inactive integer columns, restarting
+Model after restart has 81 rows, 77 cols (75 bin., 1 int., 1 impl., 0 cont.), and 282 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        4      0      0      3040     2.5s
+
+10.5% inactive integer columns, restarting
+Model after restart has 66 rows, 64 cols (62 bin., 1 int., 1 impl., 0 cont.), and 235 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      0      0      3062     2.5s
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      3      1      3083     2.5s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    1.80681132534e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            2.53 (total)
+                    0.11 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3089 (total)
+                    0 (strong br.)
+                    188 (separation)
+                    1216 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_GJB0H_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_i48sF has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1552     0.3s
+ R       0       0         0   0.00%   -1375.109833    -1074.518042      27.97%       10      4     18      1647     0.8s
+ L       0       0         0   0.00%   -1374.945078    -1362.11123        0.94%       13      5    124      1664     2.2s
+
+95.1% inactive integer columns, restarting
+Model after restart has 170 rows, 183 cols (179 bin., 1 int., 3 impl., 0 cont.), and 774 nonzeros
+
+         0       0         0   0.00%   -1374.610039    -1362.11123        0.92%        3      0      0      2674     2.5s
+         0       0         0   0.00%   -1374.400511    -1362.11123        0.90%        3      3      6      2732     2.5s
+
+46.1% inactive integer columns, restarting
+Model after restart has 95 rows, 91 cols (88 bin., 1 int., 2 impl., 0 cont.), and 344 nonzeros
+
+         0       0         0   0.00%   -1366.111662    -1362.11123        0.29%        4      0      0      3010     2.5s
+
+10.1% inactive integer columns, restarting
+Model after restart has 81 rows, 77 cols (75 bin., 1 int., 1 impl., 0 cont.), and 282 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        4      0      0      3040     2.5s
+
+10.5% inactive integer columns, restarting
+Model after restart has 66 rows, 64 cols (62 bin., 1 int., 1 impl., 0 cont.), and 235 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      0      0      3062     2.5s
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      3      1      3083     2.5s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    1.80681132534e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            2.53 (total)
+                    0.11 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3089 (total)
+                    0 (strong br.)
+                    188 (separation)
+                    1216 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_i48sF_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_i48sF has 10512 rows; 9839 cols; 50022 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4723 rows, 7446 cols, 29046 nonzeros  0s
+3865 rows, 5895 cols, 28722 nonzeros  0s
+3694 rows, 5533 cols, 22852 nonzeros  0s
+
+Solving MIP model with:
+   3694 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22852 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      3      1574     0.3s
+ R       0       0         0   0.00%   -1375.109833    -1181.81435       16.36%       10      4     17      1675     0.8s
+ L       0       0         0   0.00%   -1374.945078    -1359.11123        1.17%       13      5     87      1677     2.5s
+
+91.2% inactive integer columns, restarting
+Model after restart has 317 rows, 365 cols (360 bin., 0 int., 5 impl., 0 cont.), and 1535 nonzeros
+
+         0       0         0   0.00%   -1374.864837    -1359.11123        1.16%        2      0      0      3320     2.6s
+         0       0         0   0.00%   -1374.74032     -1359.11123        1.15%        2      2      4      3406     2.6s
+
+31.1% inactive integer columns, restarting
+Model after restart has 212 rows, 231 cols (225 bin., 1 int., 5 impl., 0 cont.), and 994 nonzeros
+
+         0       0         0   0.00%   -1369.175129    -1359.11123        0.74%        8      0      0      3980     2.7s
+         0       0         0   0.00%   -1369.159056    -1359.11123        0.74%        8      8      4      4010     2.7s
+
+29.2% inactive integer columns, restarting
+Model after restart has 144 rows, 151 cols (145 bin., 1 int., 5 impl., 0 cont.), and 654 nonzeros
+
+         0       0         0   0.00%   -1363.91382     -1359.11123        0.35%        9      0      0      4642     2.9s
+         0       0         0   0.00%   -1363.91382     -1359.11123        0.35%        9      9      6      4705     2.9s
+
+5.5% inactive integer columns, restarting
+Model after restart has 132 rows, 139 cols (133 bin., 1 int., 5 impl., 0 cont.), and 599 nonzeros
+
+         0       0         0   0.00%   -1361.511918    -1359.11123        0.18%       17      0      0      5140     3.2s
+         0       0         0   0.00%   -1361.511918    -1359.11123        0.18%       17     17      5      5232     3.2s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1359.11123
+  Dual bound        -1359.11123
+  Gap               0%
+  Solution status   feasible
+                    -1359.11123 (objective)
+                    0 (bound viol.)
+                    6.10622663544e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            3.36 (total)
+                    0.13 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     6151 (total)
+                    564 (strong br.)
+                    906 (separation)
+                    2779 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_i48sF_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 35
+Number of BV entries in BOUNDS section is 25645
+MIP  mp_h17_w0.0_VwxLr has 27345 rows; 25732 cols; 132386 nonzeros; 25680 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+11944 rows, 19291 cols, 75269 nonzeros  0s
+10259 rows, 16095 cols, 63347 nonzeros  0s
+10156 rows, 15784 cols, 59977 nonzeros  0s
+
+Solving MIP model with:
+   10156 rows
+   15784 cols (15742 binary, 20 integer, 11 implied int., 11 continuous)
+   59977 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -53543.569621   inf                  inf        0      0      0         0     0.4s
+         0       0         0   0.00%   -3108.118536    inf                  inf        0      0      0      6936     2.1s
+         0       0         0   0.00%   -3104.332876    inf                  inf       73     26    105      7753    27.4s
+         0       0         0   0.00%   -3103.016171    inf                  inf       90     40    125      8190    32.6s
+ L       0       0         0   0.00%   -3103.016171    -3055.983651       1.54%       90     40    128      8190    41.2s
+
+35.9% inactive integer columns, restarting
+Model after restart has 6750 rows, 9201 cols (9180 bin., 0 int., 11 impl., 10 cont.), and 35596 nonzeros
+
+         0       0         0   0.00%   -3103.016171    -3055.983651       1.54%       23      0      0     13587    44.4s
+         0       0         0   0.00%   -3103.016171    -3055.983651       1.54%       23     16      5     15832    44.9s
+         0       0         0   0.00%   -3101.683376    -3055.983651       1.50%       78     15      5     21673    56.9s
+
+7.4% inactive integer columns, restarting
+Model after restart has 6232 rows, 8358 cols (8337 bin., 0 int., 11 impl., 10 cont.), and 32895 nonzeros
+
+         0       0         0   0.00%   -3101.683376    -3055.983651       1.50%       14      0      0     21673    57.0s
+         0       0         0   0.00%   -3101.683376    -3055.983651       1.50%       14     11      5     23161    57.3s
+ L       0       0         0   0.00%   -3101.072141    -3057.294884       1.43%      174     24      5     23372    63.0s
+
+3.0% inactive integer columns, restarting
+Model after restart has 6040 rows, 8032 cols (8011 bin., 0 int., 11 impl., 10 cont.), and 32022 nonzeros
+
+         0       0         0   0.00%   -3101.06887     -3057.294884       1.43%       16      0      0     27260    63.4s
+         0       0         0   0.00%   -3101.06887     -3057.294884       1.43%       16     16      4     27977    63.6s
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_N6rk9 has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [2e+00, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19589.833753   inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1388.482367    inf                  inf        0      0      2      1606     0.3s
+ C       0       0         0   0.00%   -1379.29187     13556.953428     110.17%       70      7     57      1874     1.9s
+ L       0       0         0   0.00%   -1379.29187     -1371.111122       0.60%       70      7     57      1874     4.4s
+
+97.5% inactive integer columns, restarting
+
+Solving report
+  Status            Optimal
+  Primal bound      -1371.111122
+  Dual bound        -1371.111122
+  Gap               0%
+  Solution status   feasible
+                    -1371.111122 (objective)
+                    0 (bound viol.)
+                    2.21512001777e-13 (int. viol.)
+                    0 (row viol.)
+  Timing            4.64 (total)
+                    0.11 (presolve)
+                    0.00 (postsolve)
+  Nodes             0
+  LP iterations     4006 (total)
+                    0 (strong br.)
+                    332 (separation)
+                    2054 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_N6rk9_sp.txt
+         4       0         1  12.50%   -3101.06887     -3057.294884       1.43%       35     16    565     66551    73.2s
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_N6rk9 has 10512 rows; 9839 cols; 50022 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [2e+00, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4723 rows, 7446 cols, 29046 nonzeros  0s
+3865 rows, 5895 cols, 28722 nonzeros  0s
+3694 rows, 5533 cols, 22852 nonzeros  0s
+
+Solving MIP model with:
+   3694 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22852 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19589.833753   inf                  inf        0      0      0         0     0.2s
+         0       0         0   0.00%   -1388.482367    inf                  inf        0      0      3      1533     0.3s
+ R       0       0         0   0.00%   -1385.293757    -1224.806151      13.10%       34      5     15      1671     0.7s
+ L       0       0         0   0.00%   -1385.197955    -1368.111122       1.25%       47      8     79      1703     2.9s
+
+93.8% inactive integer columns, restarting
+Model after restart has 231 rows, 254 cols (249 bin., 0 int., 5 impl., 0 cont.), and 1085 nonzeros
+
+         0       0         0   0.00%   -1385.068353    -1368.111122       1.24%        5      0      0      3601     3.2s
+         0       0         0   0.00%   -1384.83593     -1368.111122       1.22%        5      4      3      3692     3.2s
+
+18.1% inactive integer columns, restarting
+Model after restart has 176 rows, 189 cols (184 bin., 0 int., 5 impl., 0 cont.), and 839 nonzeros
+
+         0       0         0   0.00%   -1379.650283    -1368.111122       0.84%        5      0      0      3762     3.2s
+         0       0         0   0.00%   -1379.650283    -1368.111122       0.84%        5      3      5      3827     3.2s
+
+20.7% inactive integer columns, restarting
+Model after restart has 139 rows, 143 cols (137 bin., 2 int., 4 impl., 0 cont.), and 622 nonzeros
+
+         0       0         0   0.00%   -1372.824313    -1368.111122       0.34%        5      0      0      4172     3.3s
+         0       0         0   0.00%   -1372.824313    -1368.111122       0.34%        5      5      6      4257     3.3s
+
+12.2% inactive integer columns, restarting
+Model after restart has 126 rows, 125 cols (119 bin., 2 int., 4 impl., 0 cont.), and 552 nonzeros
+
+         0       0         0   0.00%   -1370.609575    -1368.111122       0.18%        6      0      0      4305     3.3s
+         0       0         0   0.00%   -1370.609575    -1368.111122       0.18%        6      6      4      4356     3.3s
+
+21.5% inactive integer columns, restarting
+Model after restart has 73 rows, 72 cols (69 bin., 2 int., 1 impl., 0 cont.), and 256 nonzeros
+
+         0       0         0   0.00%   -1369.853255    -1368.111122       0.13%       10      0      0      4678     3.4s
+         0       0         0   0.00%   -1369.831648    -1368.111122       0.13%       10      7      5      4722     3.4s
+
+14.1% inactive integer columns, restarting
+
+Solving report
+  Status            Optimal
+  Primal bound      -1368.111122
+  Dual bound        -1368.111122
+  Gap               0%
+  Solution status   feasible
+                    -1368.111122 (objective)
+                    0 (bound viol.)
+                    5.0039922907e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            3.41 (total)
+                    0.16 (presolve)
+                    0.00 (postsolve)
+  Nodes             0
+  LP iterations     4805 (total)
+                    0 (strong br.)
+                    404 (separation)
+                    2532 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_N6rk9_sp.txt
+ B      10       0         4  40.62%   -3101.06887     -3058.8356         1.38%       71     16   1443     83074    80.0s
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_N6rk9 has 10513 rows; 9839 cols; 50028 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [2e+00, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4724 rows, 7446 cols, 29052 nonzeros  0s
+3866 rows, 5895 cols, 28728 nonzeros  0s
+3694 rows, 5533 cols, 22856 nonzeros  0s
+
+Solving MIP model with:
+   3694 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22856 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19589.833753   inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1388.482367    inf                  inf        0      0      3      1533     0.3s
+ R       0       0         0   0.00%   -1385.197955    -1193.474174      16.06%       47      8     33      1703     0.8s
+ L       0       0         0   0.00%   -1385.197955    -1365.055153       1.48%       47      8    134      1703     4.4s
+
+91.7% inactive integer columns, restarting
+Model after restart has 292 rows, 328 cols (322 bin., 0 int., 4 impl., 2 cont.), and 1398 nonzeros
+
+         0       0         0   0.00%   -1385.077845    -1365.055153       1.47%        5      0      0      4509     4.8s
+         0       0         0   0.00%   -1384.83593     -1365.055153       1.45%        5      3      4      4593     4.8s
+
+27.3% inactive integer columns, restarting
+Model after restart has 222 rows, 233 cols (227 bin., 0 int., 4 impl., 2 cont.), and 1006 nonzeros
+
+         0       0         0   0.00%   -1379.602406    -1365.055153       1.07%        4      0      0      4920     4.9s
+         0       0         0   0.00%   -1379.602406    -1365.055153       1.07%        4      4     10      4986     4.9s
+
+13.2% inactive integer columns, restarting
+Model after restart has 182 rows, 190 cols (184 bin., 0 int., 4 impl., 2 cont.), and 840 nonzeros
+
+         0       0         0   0.00%   -1373.18041     -1365.055153       0.60%        7      0      0      5337     5.0s
+         0       0         0   0.00%   -1373.18041     -1365.055153       0.60%        7      7      3      5425     5.0s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1365.055153
+  Dual bound        -1365.055153
+  Gap               0%
+  Solution status   feasible
+                    -1365.055153 (objective)
+                    0 (bound viol.)
+                    1.05249142734e-13 (int. viol.)
+                    0 (row viol.)
+  Timing            5.30 (total)
+                    0.13 (presolve)
+                    0.00 (postsolve)
+  Nodes             3
+  LP iterations     7777 (total)
+                    1771 (strong br.)
+                    487 (separation)
+                    3622 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_N6rk9_sp.txt
+        20       0         8  51.56%   -3101.06887     -3058.8356         1.38%      109     16   2613    138523    93.4s
+       110       9        51  53.09%   -3097.753195    -3058.8356         1.27%      248     26   4372    147299    99.0s
+ T     126       8        58  55.44%   -3097.753195    -3059.930769       1.24%     1186     35   4730    149869   101.8s
+       160       7        76  59.27%   -3097.753195    -3059.930769       1.24%     1254     50   5786    155164   107.0s
+       225      12       105  82.07%   -3092.076789    -3059.930769       1.05%     1337     63   7138    163772   112.1s
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+       254       9       121  83.73%   -3092.076789    -3059.930769       1.05%      613     49   8683    169162   117.8s
+
+Solving report
+  Status            Optimal
+  Primal bound      -3059.930769
+  Dual bound        -3059.930769
+  Gap               0%
+  Solution status   feasible
+                    -3059.930769 (objective)
+                    0 (bound viol.)
+                    0 (int. viol.)
+                    0 (row viol.)
+  Timing            122.64 (total)
+                    0.59 (presolve)
+                    0.00 (postsolve)
+  Nodes             297
+  LP iterations     178052 (total)
+                    120806 (strong br.)
+                    3915 (separation)
+                    14930 (heuristics)
+Writing the solution to solution_files/mp_h17_w0.0_VwxLr_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_hcixf has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1552     0.2s
+ R       0       0         0   0.00%   -1375.109833    -1074.518042      27.97%       10      4     18      1647     0.4s
+ L       0       0         0   0.00%   -1374.945078    -1362.11123        0.94%       13      5    124      1664     1.2s
+
+95.1% inactive integer columns, restarting
+Model after restart has 170 rows, 183 cols (179 bin., 1 int., 3 impl., 0 cont.), and 774 nonzeros
+
+         0       0         0   0.00%   -1374.610039    -1362.11123        0.92%        3      0      0      2674     1.4s
+         0       0         0   0.00%   -1374.400511    -1362.11123        0.90%        3      3      6      2732     1.4s
+
+46.1% inactive integer columns, restarting
+Model after restart has 95 rows, 91 cols (88 bin., 1 int., 2 impl., 0 cont.), and 344 nonzeros
+
+         0       0         0   0.00%   -1366.111662    -1362.11123        0.29%        4      0      0      3010     1.4s
+
+10.1% inactive integer columns, restarting
+Model after restart has 81 rows, 77 cols (75 bin., 1 int., 1 impl., 0 cont.), and 282 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        4      0      0      3040     1.4s
+
+10.5% inactive integer columns, restarting
+Model after restart has 66 rows, 64 cols (62 bin., 1 int., 1 impl., 0 cont.), and 235 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      0      0      3062     1.4s
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      3      1      3083     1.4s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    1.80681132534e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            1.39 (total)
+                    0.06 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3089 (total)
+                    0 (strong br.)
+                    188 (separation)
+                    1216 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_hcixf_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_hcixf has 10512 rows; 9839 cols; 50022 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4723 rows, 7446 cols, 29046 nonzeros  0s
+3865 rows, 5895 cols, 28722 nonzeros  0s
+3694 rows, 5533 cols, 22852 nonzeros  0s
+
+Solving MIP model with:
+   3694 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22852 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      3      1574     0.2s
+ R       0       0         0   0.00%   -1375.109833    -1181.81435       16.36%       10      4     17      1675     0.4s
+ L       0       0         0   0.00%   -1374.945078    -1359.11123        1.17%       13      5     87      1677     1.5s
+
+91.2% inactive integer columns, restarting
+Model after restart has 317 rows, 365 cols (360 bin., 0 int., 5 impl., 0 cont.), and 1535 nonzeros
+
+         0       0         0   0.00%   -1374.864837    -1359.11123        1.16%        2      0      0      3320     1.6s
+         0       0         0   0.00%   -1374.74032     -1359.11123        1.15%        2      2      4      3406     1.6s
+
+31.1% inactive integer columns, restarting
+Model after restart has 212 rows, 231 cols (225 bin., 1 int., 5 impl., 0 cont.), and 994 nonzeros
+
+         0       0         0   0.00%   -1369.175129    -1359.11123        0.74%        8      0      0      3980     1.6s
+         0       0         0   0.00%   -1369.159056    -1359.11123        0.74%        8      8      4      4010     1.6s
+
+29.2% inactive integer columns, restarting
+Model after restart has 144 rows, 151 cols (145 bin., 1 int., 5 impl., 0 cont.), and 654 nonzeros
+
+         0       0         0   0.00%   -1363.91382     -1359.11123        0.35%        9      0      0      4642     1.7s
+         0       0         0   0.00%   -1363.91382     -1359.11123        0.35%        9      9      6      4705     1.7s
+
+5.5% inactive integer columns, restarting
+Model after restart has 132 rows, 139 cols (133 bin., 1 int., 5 impl., 0 cont.), and 599 nonzeros
+
+         0       0         0   0.00%   -1361.511918    -1359.11123        0.18%       17      0      0      5140     1.9s
+         0       0         0   0.00%   -1361.511918    -1359.11123        0.18%       17     17      5      5232     1.9s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1359.11123
+  Dual bound        -1359.11123
+  Gap               0%
+  Solution status   feasible
+                    -1359.11123 (objective)
+                    0 (bound viol.)
+                    6.10622663544e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            1.96 (total)
+                    0.07 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     6151 (total)
+                    564 (strong br.)
+                    906 (separation)
+                    2779 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_hcixf_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_hcixf has 10513 rows; 9839 cols; 50028 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4724 rows, 7446 cols, 29052 nonzeros  0s
+3866 rows, 5895 cols, 28728 nonzeros  0s
+3694 rows, 5533 cols, 22856 nonzeros  0s
+
+Solving MIP model with:
+   3694 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22856 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      3      1574     0.2s
+ R       0       0         0   0.00%   -1374.945078    -1139.037827      20.71%       13      5     25      1677     0.4s
+ L       0       0         0   0.00%   -1374.945078    -1357.463713       1.29%       13      5    120      1677     1.9s
+
+90.7% inactive integer columns, restarting
+Model after restart has 337 rows, 392 cols (387 bin., 0 int., 5 impl., 0 cont.), and 1639 nonzeros
+
+         0       0         0   0.00%   -1374.864837    -1357.463713       1.28%        2      0      0      3483     2.0s
+         0       0         0   0.00%   -1374.74032     -1357.463713       1.27%        2      2      2      3564     2.0s
+
+34.9% inactive integer columns, restarting
+Model after restart has 225 rows, 251 cols (245 bin., 1 int., 5 impl., 0 cont.), and 1109 nonzeros
+
+         0       0         0   0.00%   -1369.660779    -1357.463713       0.90%        3      0      0      3663     2.0s
+         0       0         0   0.00%   -1369.660779    -1357.463713       0.90%        3      3      4      3719     2.0s
+
+12.2% inactive integer columns, restarting
+Model after restart has 197 rows, 219 cols (213 bin., 1 int., 5 impl., 0 cont.), and 991 nonzeros
+
+         0       0         0   0.00%   -1364.922251    -1357.463713       0.55%        8      0      0      3979     2.1s
+         0       0         0   0.00%   -1364.922251    -1357.463713       0.55%        8      7      4      4045     2.1s
+
+3.7% inactive integer columns, restarting
+Model after restart has 193 rows, 211 cols (205 bin., 1 int., 5 impl., 0 cont.), and 961 nonzeros
+
+         0       0         0   0.00%   -1363.138094    -1357.463713       0.42%       14      0      0      4928     2.5s
+         0       0         0   0.00%   -1363.138094    -1357.463713       0.42%       14     14      4      5004     2.5s
+
+2.9% inactive integer columns, restarting
+Model after restart has 188 rows, 205 cols (199 bin., 1 int., 5 impl., 0 cont.), and 936 nonzeros
+
+         0       0         0   0.00%   -1362.959953    -1357.463713       0.40%       11      0      0      5360     2.5s
+         0       0         0   0.00%   -1362.959953    -1357.463713       0.40%       11     11      4      5433     2.5s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1357.463713
+  Dual bound        -1357.463713
+  Gap               0%
+  Solution status   feasible
+                    -1357.463713 (objective)
+                    0 (bound viol.)
+                    1.22124532709e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            2.68 (total)
+                    0.07 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     7041 (total)
+                    942 (strong br.)
+                    1094 (separation)
+                    2982 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_hcixf_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_g3lys has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1552     0.2s
+ R       0       0         0   0.00%   -1375.109833    -1074.518042      27.97%       10      4     18      1647     0.4s
+ L       0       0         0   0.00%   -1374.945078    -1362.11123        0.94%       13      5    124      1664     1.3s
+
+95.1% inactive integer columns, restarting
+Model after restart has 170 rows, 183 cols (179 bin., 1 int., 3 impl., 0 cont.), and 774 nonzeros
+
+         0       0         0   0.00%   -1374.610039    -1362.11123        0.92%        3      0      0      2674     1.4s
+         0       0         0   0.00%   -1374.400511    -1362.11123        0.90%        3      3      6      2732     1.4s
+
+46.1% inactive integer columns, restarting
+Model after restart has 95 rows, 91 cols (88 bin., 1 int., 2 impl., 0 cont.), and 344 nonzeros
+
+         0       0         0   0.00%   -1366.111662    -1362.11123        0.29%        4      0      0      3010     1.4s
+
+10.1% inactive integer columns, restarting
+Model after restart has 81 rows, 77 cols (75 bin., 1 int., 1 impl., 0 cont.), and 282 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        4      0      0      3040     1.4s
+
+10.5% inactive integer columns, restarting
+Model after restart has 66 rows, 64 cols (62 bin., 1 int., 1 impl., 0 cont.), and 235 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      0      0      3062     1.4s
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      3      1      3083     1.4s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    1.80681132534e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            1.43 (total)
+                    0.06 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3089 (total)
+                    0 (strong br.)
+                    188 (separation)
+                    1216 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_g3lys_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_FvXJ2 has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1552     0.2s
+ R       0       0         0   0.00%   -1375.109833    -1074.518042      27.97%       10      4     18      1647     0.4s
+ L       0       0         0   0.00%   -1374.945078    -1362.11123        0.94%       13      5    124      1664     1.2s
+
+95.1% inactive integer columns, restarting
+Model after restart has 170 rows, 183 cols (179 bin., 1 int., 3 impl., 0 cont.), and 774 nonzeros
+
+         0       0         0   0.00%   -1374.610039    -1362.11123        0.92%        3      0      0      2674     1.4s
+         0       0         0   0.00%   -1374.400511    -1362.11123        0.90%        3      3      6      2732     1.4s
+
+46.1% inactive integer columns, restarting
+Model after restart has 95 rows, 91 cols (88 bin., 1 int., 2 impl., 0 cont.), and 344 nonzeros
+
+         0       0         0   0.00%   -1366.111662    -1362.11123        0.29%        4      0      0      3010     1.4s
+
+10.1% inactive integer columns, restarting
+Model after restart has 81 rows, 77 cols (75 bin., 1 int., 1 impl., 0 cont.), and 282 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        4      0      0      3040     1.4s
+
+10.5% inactive integer columns, restarting
+Model after restart has 66 rows, 64 cols (62 bin., 1 int., 1 impl., 0 cont.), and 235 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      0      0      3062     1.4s
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      3      1      3083     1.4s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    1.80681132534e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            1.42 (total)
+                    0.06 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3089 (total)
+                    0 (strong br.)
+                    188 (separation)
+                    1216 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_FvXJ2_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_FvXJ2 has 10512 rows; 9839 cols; 50022 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4723 rows, 7446 cols, 29046 nonzeros  0s
+3865 rows, 5895 cols, 28722 nonzeros  0s
+3694 rows, 5533 cols, 22852 nonzeros  0s
+
+Solving MIP model with:
+   3694 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22852 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      3      1574     0.2s
+ R       0       0         0   0.00%   -1375.109833    -1181.81435       16.36%       10      4     17      1675     0.4s
+ L       0       0         0   0.00%   -1374.945078    -1359.11123        1.17%       13      5     87      1677     1.5s
+
+91.2% inactive integer columns, restarting
+Model after restart has 317 rows, 365 cols (360 bin., 0 int., 5 impl., 0 cont.), and 1535 nonzeros
+
+         0       0         0   0.00%   -1374.864837    -1359.11123        1.16%        2      0      0      3320     1.5s
+         0       0         0   0.00%   -1374.74032     -1359.11123        1.15%        2      2      4      3406     1.5s
+
+31.1% inactive integer columns, restarting
+Model after restart has 212 rows, 231 cols (225 bin., 1 int., 5 impl., 0 cont.), and 994 nonzeros
+
+         0       0         0   0.00%   -1369.175129    -1359.11123        0.74%        8      0      0      3980     1.6s
+         0       0         0   0.00%   -1369.159056    -1359.11123        0.74%        8      8      4      4010     1.6s
+
+29.2% inactive integer columns, restarting
+Model after restart has 144 rows, 151 cols (145 bin., 1 int., 5 impl., 0 cont.), and 654 nonzeros
+
+         0       0         0   0.00%   -1363.91382     -1359.11123        0.35%        9      0      0      4642     1.7s
+         0       0         0   0.00%   -1363.91382     -1359.11123        0.35%        9      9      6      4705     1.7s
+
+5.5% inactive integer columns, restarting
+Model after restart has 132 rows, 139 cols (133 bin., 1 int., 5 impl., 0 cont.), and 599 nonzeros
+
+         0       0         0   0.00%   -1361.511918    -1359.11123        0.18%       17      0      0      5140     1.9s
+         0       0         0   0.00%   -1361.511918    -1359.11123        0.18%       17     17      5      5232     1.9s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1359.11123
+  Dual bound        -1359.11123
+  Gap               0%
+  Solution status   feasible
+                    -1359.11123 (objective)
+                    0 (bound viol.)
+                    6.10622663544e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            1.94 (total)
+                    0.07 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     6151 (total)
+                    564 (strong br.)
+                    906 (separation)
+                    2779 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_FvXJ2_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_FvXJ2 has 10513 rows; 9839 cols; 50028 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4724 rows, 7446 cols, 29052 nonzeros  0s
+3866 rows, 5895 cols, 28728 nonzeros  0s
+3694 rows, 5533 cols, 22856 nonzeros  0s
+
+Solving MIP model with:
+   3694 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22856 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      3      1574     0.2s
+ R       0       0         0   0.00%   -1374.945078    -1139.037827      20.71%       13      5     25      1677     0.4s
+ L       0       0         0   0.00%   -1374.945078    -1357.463713       1.29%       13      5    120      1677     1.9s
+
+90.7% inactive integer columns, restarting
+Model after restart has 337 rows, 392 cols (387 bin., 0 int., 5 impl., 0 cont.), and 1639 nonzeros
+
+         0       0         0   0.00%   -1374.864837    -1357.463713       1.28%        2      0      0      3483     2.0s
+         0       0         0   0.00%   -1374.74032     -1357.463713       1.27%        2      2      2      3564     2.0s
+
+34.9% inactive integer columns, restarting
+Model after restart has 225 rows, 251 cols (245 bin., 1 int., 5 impl., 0 cont.), and 1109 nonzeros
+
+         0       0         0   0.00%   -1369.660779    -1357.463713       0.90%        3      0      0      3663     2.0s
+         0       0         0   0.00%   -1369.660779    -1357.463713       0.90%        3      3      4      3719     2.0s
+
+12.2% inactive integer columns, restarting
+Model after restart has 197 rows, 219 cols (213 bin., 1 int., 5 impl., 0 cont.), and 991 nonzeros
+
+         0       0         0   0.00%   -1364.922251    -1357.463713       0.55%        8      0      0      3979     2.1s
+         0       0         0   0.00%   -1364.922251    -1357.463713       0.55%        8      7      4      4045     2.1s
+
+3.7% inactive integer columns, restarting
+Model after restart has 193 rows, 211 cols (205 bin., 1 int., 5 impl., 0 cont.), and 961 nonzeros
+
+         0       0         0   0.00%   -1363.138094    -1357.463713       0.42%       14      0      0      4928     2.5s
+         0       0         0   0.00%   -1363.138094    -1357.463713       0.42%       14     14      4      5004     2.5s
+
+2.9% inactive integer columns, restarting
+Model after restart has 188 rows, 205 cols (199 bin., 1 int., 5 impl., 0 cont.), and 936 nonzeros
+
+         0       0         0   0.00%   -1362.959953    -1357.463713       0.40%       11      0      0      5360     2.6s
+         0       0         0   0.00%   -1362.959953    -1357.463713       0.40%       11     11      4      5433     2.6s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1357.463713
+  Dual bound        -1357.463713
+  Gap               0%
+  Solution status   feasible
+                    -1357.463713 (objective)
+                    0 (bound viol.)
+                    1.22124532709e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            2.71 (total)
+                    0.07 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     7041 (total)
+                    942 (strong br.)
+                    1094 (separation)
+                    2982 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_FvXJ2_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_08wiv has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1552     0.2s
+ R       0       0         0   0.00%   -1375.109833    -1074.518042      27.97%       10      4     18      1647     0.4s
+ L       0       0         0   0.00%   -1374.945078    -1362.11123        0.94%       13      5    124      1664     1.3s
+
+95.1% inactive integer columns, restarting
+Model after restart has 170 rows, 183 cols (179 bin., 1 int., 3 impl., 0 cont.), and 774 nonzeros
+
+         0       0         0   0.00%   -1374.610039    -1362.11123        0.92%        3      0      0      2674     1.4s
+         0       0         0   0.00%   -1374.400511    -1362.11123        0.90%        3      3      6      2732     1.4s
+
+46.1% inactive integer columns, restarting
+Model after restart has 95 rows, 91 cols (88 bin., 1 int., 2 impl., 0 cont.), and 344 nonzeros
+
+         0       0         0   0.00%   -1366.111662    -1362.11123        0.29%        4      0      0      3010     1.4s
+
+10.1% inactive integer columns, restarting
+Model after restart has 81 rows, 77 cols (75 bin., 1 int., 1 impl., 0 cont.), and 282 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        4      0      0      3040     1.4s
+
+10.5% inactive integer columns, restarting
+Model after restart has 66 rows, 64 cols (62 bin., 1 int., 1 impl., 0 cont.), and 235 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      0      0      3062     1.4s
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      3      1      3083     1.4s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    1.80681132534e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            1.44 (total)
+                    0.06 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3089 (total)
+                    0 (strong br.)
+                    188 (separation)
+                    1216 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_08wiv_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 3
+Number of BV entries in BOUNDS section is 348
+MIP  mp_h1_w0.0_lerxu has 462 rows; 355 cols; 1680 nonzeros; 351 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [1e+00, 8e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+302 rows, 241 cols, 1016 nonzeros  0s
+14 rows, 20 cols, 50 nonzeros  0s
+Objective function is integral with scale 100
+
+Solving MIP model with:
+   14 rows
+   20 cols (20 binary, 0 integer, 0 implied int., 0 continuous)
+   50 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -94.1           inf                  inf        0      0      0         0     0.0s
+
+Solving report
+  Status            Optimal
+  Primal bound      -94.1
+  Dual bound        -94.1
+  Gap               0%
+  Solution status   feasible
+                    -94.1 (objective)
+                    0 (bound viol.)
+                    0 (int. viol.)
+                    0 (row viol.)
+  Timing            0.00 (total)
+                    0.00 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3 (total)
+                    0 (strong br.)
+                    0 (separation)
+                    0 (heuristics)
+Writing the solution to solution_files/mp_h1_w0.0_lerxu_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 3
+Number of BV entries in BOUNDS section is 348
+MIP  mp_h1_w0.0_lerxu has 463 rows; 355 cols; 1681 nonzeros; 351 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [1e+00, 8e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+Presolve: Infeasible
+
+Solving report
+  Status            Infeasible
+  Primal bound      inf
+  Dual bound        -inf
+  Gap               inf
+  Solution status   -
+  Timing            0.00 (total)
+                    0.00 (presolve)
+                    0.00 (postsolve)
+  Nodes             0
+  LP iterations     0 (total)
+                    0 (strong br.)
+                    0 (separation)
+                    0 (heuristics)
+Writing the solution to solution_files/mp_h1_w0.0_lerxu_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 3
+Number of BV entries in BOUNDS section is 348
+MIP  mp_h1_w0.0_lerxu has 464 rows; 355 cols; 1682 nonzeros; 351 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [1e+00, 8e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+Presolve: Infeasible
+
+Solving report
+  Status            Infeasible
+  Primal bound      inf
+  Dual bound        -inf
+  Gap               inf
+  Solution status   -
+  Timing            0.00 (total)
+                    0.00 (presolve)
+                    0.00 (postsolve)
+  Nodes             0
+  LP iterations     0 (total)
+                    0 (strong br.)
+                    0 (separation)
+                    0 (heuristics)
+Writing the solution to solution_files/mp_h1_w0.0_lerxu_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_sXreS has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1552     0.2s
+ R       0       0         0   0.00%   -1375.109833    -1074.518042      27.97%       10      4     18      1647     0.4s
+ L       0       0         0   0.00%   -1374.945078    -1362.11123        0.94%       13      5    124      1664     1.3s
+
+95.1% inactive integer columns, restarting
+Model after restart has 170 rows, 183 cols (179 bin., 1 int., 3 impl., 0 cont.), and 774 nonzeros
+
+         0       0         0   0.00%   -1374.610039    -1362.11123        0.92%        3      0      0      2674     1.4s
+         0       0         0   0.00%   -1374.400511    -1362.11123        0.90%        3      3      6      2732     1.4s
+
+46.1% inactive integer columns, restarting
+Model after restart has 95 rows, 91 cols (88 bin., 1 int., 2 impl., 0 cont.), and 344 nonzeros
+
+         0       0         0   0.00%   -1366.111662    -1362.11123        0.29%        4      0      0      3010     1.4s
+
+10.1% inactive integer columns, restarting
+Model after restart has 81 rows, 77 cols (75 bin., 1 int., 1 impl., 0 cont.), and 282 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        4      0      0      3040     1.4s
+
+10.5% inactive integer columns, restarting
+Model after restart has 66 rows, 64 cols (62 bin., 1 int., 1 impl., 0 cont.), and 235 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      0      0      3062     1.4s
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      3      1      3083     1.4s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    1.80681132534e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            1.44 (total)
+                    0.06 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3089 (total)
+                    0 (strong br.)
+                    188 (separation)
+                    1216 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_sXreS_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_sXreS has 10512 rows; 9839 cols; 50022 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4723 rows, 7446 cols, 29046 nonzeros  0s
+3865 rows, 5895 cols, 28722 nonzeros  0s
+3694 rows, 5533 cols, 22852 nonzeros  0s
+
+Solving MIP model with:
+   3694 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22852 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      3      1574     0.2s
+ R       0       0         0   0.00%   -1375.109833    -1181.81435       16.36%       10      4     17      1675     0.4s
+ L       0       0         0   0.00%   -1374.945078    -1359.11123        1.17%       13      5     87      1677     1.5s
+
+91.2% inactive integer columns, restarting
+Model after restart has 317 rows, 365 cols (360 bin., 0 int., 5 impl., 0 cont.), and 1535 nonzeros
+
+         0       0         0   0.00%   -1374.864837    -1359.11123        1.16%        2      0      0      3320     1.5s
+         0       0         0   0.00%   -1374.74032     -1359.11123        1.15%        2      2      4      3406     1.5s
+
+31.1% inactive integer columns, restarting
+Model after restart has 212 rows, 231 cols (225 bin., 1 int., 5 impl., 0 cont.), and 994 nonzeros
+
+         0       0         0   0.00%   -1369.175129    -1359.11123        0.74%        8      0      0      3980     1.6s
+         0       0         0   0.00%   -1369.159056    -1359.11123        0.74%        8      8      4      4010     1.6s
+
+29.2% inactive integer columns, restarting
+Model after restart has 144 rows, 151 cols (145 bin., 1 int., 5 impl., 0 cont.), and 654 nonzeros
+
+         0       0         0   0.00%   -1363.91382     -1359.11123        0.35%        9      0      0      4642     1.7s
+         0       0         0   0.00%   -1363.91382     -1359.11123        0.35%        9      9      6      4705     1.7s
+
+5.5% inactive integer columns, restarting
+Model after restart has 132 rows, 139 cols (133 bin., 1 int., 5 impl., 0 cont.), and 599 nonzeros
+
+         0       0         0   0.00%   -1361.511918    -1359.11123        0.18%       17      0      0      5140     1.8s
+         0       0         0   0.00%   -1361.511918    -1359.11123        0.18%       17     17      5      5232     1.8s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1359.11123
+  Dual bound        -1359.11123
+  Gap               0%
+  Solution status   feasible
+                    -1359.11123 (objective)
+                    0 (bound viol.)
+                    6.10622663544e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            1.93 (total)
+                    0.07 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     6151 (total)
+                    564 (strong br.)
+                    906 (separation)
+                    2779 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_sXreS_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_sXreS has 10513 rows; 9839 cols; 50028 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4724 rows, 7446 cols, 29052 nonzeros  0s
+3866 rows, 5895 cols, 28728 nonzeros  0s
+3694 rows, 5533 cols, 22856 nonzeros  0s
+
+Solving MIP model with:
+   3694 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22856 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      3      1574     0.2s
+ R       0       0         0   0.00%   -1374.945078    -1139.037827      20.71%       13      5     25      1677     0.5s
+ L       0       0         0   0.00%   -1374.945078    -1357.463713       1.29%       13      5    120      1677     1.9s
+
+90.7% inactive integer columns, restarting
+Model after restart has 337 rows, 392 cols (387 bin., 0 int., 5 impl., 0 cont.), and 1639 nonzeros
+
+         0       0         0   0.00%   -1374.864837    -1357.463713       1.28%        2      0      0      3483     2.0s
+         0       0         0   0.00%   -1374.74032     -1357.463713       1.27%        2      2      2      3564     2.0s
+
+34.9% inactive integer columns, restarting
+Model after restart has 225 rows, 251 cols (245 bin., 1 int., 5 impl., 0 cont.), and 1109 nonzeros
+
+         0       0         0   0.00%   -1369.660779    -1357.463713       0.90%        3      0      0      3663     2.1s
+         0       0         0   0.00%   -1369.660779    -1357.463713       0.90%        3      3      4      3719     2.1s
+
+12.2% inactive integer columns, restarting
+Model after restart has 197 rows, 219 cols (213 bin., 1 int., 5 impl., 0 cont.), and 991 nonzeros
+
+         0       0         0   0.00%   -1364.922251    -1357.463713       0.55%        8      0      0      3979     2.2s
+         0       0         0   0.00%   -1364.922251    -1357.463713       0.55%        8      7      4      4045     2.2s
+
+3.7% inactive integer columns, restarting
+Model after restart has 193 rows, 211 cols (205 bin., 1 int., 5 impl., 0 cont.), and 961 nonzeros
+
+         0       0         0   0.00%   -1363.138094    -1357.463713       0.42%       14      0      0      4928     2.5s
+         0       0         0   0.00%   -1363.138094    -1357.463713       0.42%       14     14      4      5004     2.5s
+
+2.9% inactive integer columns, restarting
+Model after restart has 188 rows, 205 cols (199 bin., 1 int., 5 impl., 0 cont.), and 936 nonzeros
+
+         0       0         0   0.00%   -1362.959953    -1357.463713       0.40%       11      0      0      5360     2.6s
+         0       0         0   0.00%   -1362.959953    -1357.463713       0.40%       11     11      4      5433     2.6s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1357.463713
+  Dual bound        -1357.463713
+  Gap               0%
+  Solution status   feasible
+                    -1357.463713 (objective)
+                    0 (bound viol.)
+                    1.22124532709e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            2.73 (total)
+                    0.07 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     7041 (total)
+                    942 (strong br.)
+                    1094 (separation)
+                    2982 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_sXreS_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_9bUkg has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1552     0.2s
+ R       0       0         0   0.00%   -1375.109833    -1074.518042      27.97%       10      4     18      1647     0.4s
+ L       0       0         0   0.00%   -1374.945078    -1362.11123        0.94%       13      5    124      1664     1.3s
+
+95.1% inactive integer columns, restarting
+Model after restart has 170 rows, 183 cols (179 bin., 1 int., 3 impl., 0 cont.), and 774 nonzeros
+
+         0       0         0   0.00%   -1374.610039    -1362.11123        0.92%        3      0      0      2674     1.4s
+         0       0         0   0.00%   -1374.400511    -1362.11123        0.90%        3      3      6      2732     1.4s
+
+46.1% inactive integer columns, restarting
+Model after restart has 95 rows, 91 cols (88 bin., 1 int., 2 impl., 0 cont.), and 344 nonzeros
+
+         0       0         0   0.00%   -1366.111662    -1362.11123        0.29%        4      0      0      3010     1.4s
+
+10.1% inactive integer columns, restarting
+Model after restart has 81 rows, 77 cols (75 bin., 1 int., 1 impl., 0 cont.), and 282 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        4      0      0      3040     1.4s
+
+10.5% inactive integer columns, restarting
+Model after restart has 66 rows, 64 cols (62 bin., 1 int., 1 impl., 0 cont.), and 235 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      0      0      3062     1.4s
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      3      1      3083     1.4s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    1.80681132534e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            1.44 (total)
+                    0.06 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3089 (total)
+                    0 (strong br.)
+                    188 (separation)
+                    1216 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_9bUkg_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_9bUkg has 10512 rows; 9839 cols; 50022 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4723 rows, 7446 cols, 29046 nonzeros  0s
+3865 rows, 5895 cols, 28722 nonzeros  0s
+3694 rows, 5533 cols, 22852 nonzeros  0s
+
+Solving MIP model with:
+   3694 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22852 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      3      1574     0.2s
+ R       0       0         0   0.00%   -1375.109833    -1181.81435       16.36%       10      4     17      1675     0.4s
+ L       0       0         0   0.00%   -1374.945078    -1359.11123        1.17%       13      5     87      1677     1.5s
+
+91.2% inactive integer columns, restarting
+Model after restart has 317 rows, 365 cols (360 bin., 0 int., 5 impl., 0 cont.), and 1535 nonzeros
+
+         0       0         0   0.00%   -1374.864837    -1359.11123        1.16%        2      0      0      3320     1.5s
+         0       0         0   0.00%   -1374.74032     -1359.11123        1.15%        2      2      4      3406     1.5s
+
+31.1% inactive integer columns, restarting
+Model after restart has 212 rows, 231 cols (225 bin., 1 int., 5 impl., 0 cont.), and 994 nonzeros
+
+         0       0         0   0.00%   -1369.175129    -1359.11123        0.74%        8      0      0      3980     1.6s
+         0       0         0   0.00%   -1369.159056    -1359.11123        0.74%        8      8      4      4010     1.6s
+
+29.2% inactive integer columns, restarting
+Model after restart has 144 rows, 151 cols (145 bin., 1 int., 5 impl., 0 cont.), and 654 nonzeros
+
+         0       0         0   0.00%   -1363.91382     -1359.11123        0.35%        9      0      0      4642     1.7s
+         0       0         0   0.00%   -1363.91382     -1359.11123        0.35%        9      9      6      4705     1.7s
+
+5.5% inactive integer columns, restarting
+Model after restart has 132 rows, 139 cols (133 bin., 1 int., 5 impl., 0 cont.), and 599 nonzeros
+
+         0       0         0   0.00%   -1361.511918    -1359.11123        0.18%       17      0      0      5140     1.9s
+         0       0         0   0.00%   -1361.511918    -1359.11123        0.18%       17     17      5      5232     1.9s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1359.11123
+  Dual bound        -1359.11123
+  Gap               0%
+  Solution status   feasible
+                    -1359.11123 (objective)
+                    0 (bound viol.)
+                    6.10622663544e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            1.94 (total)
+                    0.07 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     6151 (total)
+                    564 (strong br.)
+                    906 (separation)
+                    2779 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_9bUkg_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_9bUkg has 10513 rows; 9839 cols; 50028 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4724 rows, 7446 cols, 29052 nonzeros  0s
+3866 rows, 5895 cols, 28728 nonzeros  0s
+3694 rows, 5533 cols, 22856 nonzeros  0s
+
+Solving MIP model with:
+   3694 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22856 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      3      1574     0.2s
+ R       0       0         0   0.00%   -1374.945078    -1139.037827      20.71%       13      5     25      1677     0.5s
+ L       0       0         0   0.00%   -1374.945078    -1357.463713       1.29%       13      5    120      1677     1.9s
+
+90.7% inactive integer columns, restarting
+Model after restart has 337 rows, 392 cols (387 bin., 0 int., 5 impl., 0 cont.), and 1639 nonzeros
+
+         0       0         0   0.00%   -1374.864837    -1357.463713       1.28%        2      0      0      3483     2.0s
+         0       0         0   0.00%   -1374.74032     -1357.463713       1.27%        2      2      2      3564     2.0s
+
+34.9% inactive integer columns, restarting
+Model after restart has 225 rows, 251 cols (245 bin., 1 int., 5 impl., 0 cont.), and 1109 nonzeros
+
+         0       0         0   0.00%   -1369.660779    -1357.463713       0.90%        3      0      0      3663     2.0s
+         0       0         0   0.00%   -1369.660779    -1357.463713       0.90%        3      3      4      3719     2.0s
+
+12.2% inactive integer columns, restarting
+Model after restart has 197 rows, 219 cols (213 bin., 1 int., 5 impl., 0 cont.), and 991 nonzeros
+
+         0       0         0   0.00%   -1364.922251    -1357.463713       0.55%        8      0      0      3979     2.1s
+         0       0         0   0.00%   -1364.922251    -1357.463713       0.55%        8      7      4      4045     2.1s
+
+3.7% inactive integer columns, restarting
+Model after restart has 193 rows, 211 cols (205 bin., 1 int., 5 impl., 0 cont.), and 961 nonzeros
+
+         0       0         0   0.00%   -1363.138094    -1357.463713       0.42%       14      0      0      4928     2.5s
+         0       0         0   0.00%   -1363.138094    -1357.463713       0.42%       14     14      4      5004     2.5s
+
+2.9% inactive integer columns, restarting
+Model after restart has 188 rows, 205 cols (199 bin., 1 int., 5 impl., 0 cont.), and 936 nonzeros
+
+         0       0         0   0.00%   -1362.959953    -1357.463713       0.40%       11      0      0      5360     2.6s
+         0       0         0   0.00%   -1362.959953    -1357.463713       0.40%       11     11      4      5433     2.6s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1357.463713
+  Dual bound        -1357.463713
+  Gap               0%
+  Solution status   feasible
+                    -1357.463713 (objective)
+                    0 (bound viol.)
+                    1.22124532709e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            2.72 (total)
+                    0.07 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     7041 (total)
+                    942 (strong br.)
+                    1094 (separation)
+                    2982 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_9bUkg_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9802
+MIP  mp_h7_w0.0_WdDNZ has 10511 rows; 9839 cols; 50016 nonzeros; 9817 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4722 rows, 7446 cols, 29040 nonzeros  0s
+3864 rows, 5895 cols, 28716 nonzeros  0s
+3693 rows, 5533 cols, 22846 nonzeros  0s
+
+Solving MIP model with:
+   3693 rows
+   5533 cols (5518 binary, 7 integer, 4 implied int., 4 continuous)
+   22846 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19558.06179    inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1552     0.2s
+ R       0       0         0   0.00%   -1375.109833    -1074.518042      27.97%       10      4     18      1647     0.4s
+ L       0       0         0   0.00%   -1374.945078    -1362.11123        0.94%       13      5    124      1664     1.3s
+
+95.1% inactive integer columns, restarting
+Model after restart has 170 rows, 183 cols (179 bin., 1 int., 3 impl., 0 cont.), and 774 nonzeros
+
+         0       0         0   0.00%   -1374.610039    -1362.11123        0.92%        3      0      0      2674     1.4s
+         0       0         0   0.00%   -1374.400511    -1362.11123        0.90%        3      3      6      2732     1.4s
+
+46.1% inactive integer columns, restarting
+Model after restart has 95 rows, 91 cols (88 bin., 1 int., 2 impl., 0 cont.), and 344 nonzeros
+
+         0       0         0   0.00%   -1366.111662    -1362.11123        0.29%        4      0      0      3010     1.5s
+
+10.1% inactive integer columns, restarting
+Model after restart has 81 rows, 77 cols (75 bin., 1 int., 1 impl., 0 cont.), and 282 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        4      0      0      3040     1.5s
+
+10.5% inactive integer columns, restarting
+Model after restart has 66 rows, 64 cols (62 bin., 1 int., 1 impl., 0 cont.), and 235 nonzeros
+
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      0      0      3062     1.5s
+         0       0         0   0.00%   -1366.093847    -1362.11123        0.29%        3      3      1      3083     1.5s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    1.80681132534e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            1.46 (total)
+                    0.07 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3089 (total)
+                    0 (strong br.)
+                    188 (separation)
+                    1216 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_WdDNZ_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 35
+Number of BV entries in BOUNDS section is 25645
+MIP  mp_h17_w0.0_9Ddik has 27345 rows; 25732 cols; 132386 nonzeros; 25680 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+11944 rows, 19291 cols, 75269 nonzeros  0s
+10259 rows, 16095 cols, 63347 nonzeros  0s
+10156 rows, 15784 cols, 59977 nonzeros  0s
+
+Solving MIP model with:
+   10156 rows
+   15784 cols (15742 binary, 20 integer, 11 implied int., 11 continuous)
+   59977 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -53543.569621   inf                  inf        0      0      0         0     0.2s
+         0       0         0   0.00%   -3108.118536    inf                  inf        0      0      0      6936     1.2s
+         0       0         0   0.00%   -3104.332876    inf                  inf       73     26    105      7753    15.3s
+ L       0       0         0   0.00%   -3103.016171    -3055.983651       1.54%       90     40    128      8190    23.0s
+
+35.9% inactive integer columns, restarting
+Model after restart has 6750 rows, 9201 cols (9180 bin., 0 int., 11 impl., 10 cont.), and 35596 nonzeros
+
+         0       0         0   0.00%   -3103.016171    -3055.983651       1.54%       23      0      0     13587    24.8s
+         0       0         0   0.00%   -3103.016171    -3055.983651       1.54%       23     16      5     15832    25.1s
+         0       0         0   0.00%   -3101.683376    -3055.983651       1.50%       78     15      5     21673    31.8s
+
+7.4% inactive integer columns, restarting
+Model after restart has 6232 rows, 8358 cols (8337 bin., 0 int., 11 impl., 10 cont.), and 32895 nonzeros
+
+         0       0         0   0.00%   -3101.683376    -3055.983651       1.50%       14      0      0     21673    31.9s
+         0       0         0   0.00%   -3101.683376    -3055.983651       1.50%       14     11      5     23161    32.1s
+ L       0       0         0   0.00%   -3101.072141    -3057.294884       1.43%      174     24      5     23372    35.3s
+
+3.0% inactive integer columns, restarting
+Model after restart has 6040 rows, 8032 cols (8011 bin., 0 int., 11 impl., 10 cont.), and 32022 nonzeros
+
+         0       0         0   0.00%   -3101.06887     -3057.294884       1.43%       16      0      0     27260    35.6s
+         0       0         0   0.00%   -3101.06887     -3057.294884       1.43%       16     16      4     27977    35.7s
+         4       0         1  12.50%   -3101.06887     -3057.294884       1.43%       35     16    565     66551    40.8s
+ B      10       0         4  40.62%   -3101.06887     -3058.8356         1.38%       71     16   1443     83074    45.3s
+        20       0         8  51.56%   -3101.06887     -3058.8356         1.38%      109     16   2613    138523    52.5s
+ T     126       8        58  55.44%   -3097.753195    -3059.930769       1.24%     1186     35   4730    149869    57.3s
+       202       9        93  65.79%   -3097.753195    -3059.930769       1.24%     1326     63   6522    160264    62.3s
+       263       7       125  86.88%   -3092.076789    -3059.930769       1.05%      668     54   8991    172734    67.4s
+
+Solving report
+  Status            Optimal
+  Primal bound      -3059.930769
+  Dual bound        -3059.930769
+  Gap               0%
+  Solution status   feasible
+                    -3059.930769 (objective)
+                    0 (bound viol.)
+                    0 (int. viol.)
+                    0 (row viol.)
+  Timing            69.28 (total)
+                    0.33 (presolve)
+                    0.00 (postsolve)
+  Nodes             297
+  LP iterations     178052 (total)
+                    120806 (strong br.)
+                    3915 (separation)
+                    14930 (heuristics)
+Writing the solution to solution_files/mp_h17_w0.0_9Ddik_sp.txt
+Running HiGHS 1.7.2 (git hash: n/a): Copyright (c) 2024 HiGHS under MIT licence terms
+Number of PL entries in BOUNDS section is 15
+Number of BV entries in BOUNDS section is 9759
+MIP  mp_h7_w0.0_T2hi9 has 10468 rows; 9796 cols; 49801 nonzeros; 9774 integer variables
+Coefficient ranges:
+  Matrix [1e+00, 2e+01]
+  Cost   [9e-01, 9e+01]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 1e+01]
+Presolving model
+4702 rows, 7412 cols, 28909 nonzeros  0s
+3795 rows, 5815 cols, 28918 nonzeros  0s
+3674 rows, 5403 cols, 21575 nonzeros  0s
+
+Solving MIP model with:
+   3674 rows
+   5403 cols (5388 binary, 7 integer, 4 implied int., 4 continuous)
+   21575 nonzeros
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+     Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -19361.991065   inf                  inf        0      0      0         0     0.1s
+         0       0         0   0.00%   -1380.58671     inf                  inf        0      0      2      1587     0.3s
+ R       0       0         0   0.00%   -1374.648984    -1159.55759       18.55%       23      8     11      1808     0.9s
+ L       0       0         0   0.00%   -1374.648984    -1362.11123        0.92%       23      8    101      1808     2.4s
+
+94.6% inactive integer columns, restarting
+Model after restart has 179 rows, 198 cols (191 bin., 2 int., 5 impl., 0 cont.), and 833 nonzeros
+
+         0       0         0   0.00%   -1374.495956    -1362.11123        0.91%        4      0      0      2863     2.6s
+         0       0         0   0.00%   -1374.294007    -1362.11123        0.89%        4      3      5      2934     2.6s
+
+46.1% inactive integer columns, restarting
+Model after restart has 92 rows, 92 cols (87 bin., 2 int., 3 impl., 0 cont.), and 355 nonzeros
+
+         0       0         0   0.00%   -1364.876317    -1362.11123        0.20%        5      0      0      3177     2.6s
+
+21.3% inactive integer columns, restarting
+Model after restart has 63 rows, 58 cols (54 bin., 1 int., 3 impl., 0 cont.), and 219 nonzeros
+
+         0       0         0   0.00%   -1363.166512    -1362.11123        0.08%        4      0      0      3211     2.6s
+
+Solving report
+  Status            Optimal
+  Primal bound      -1362.11123
+  Dual bound        -1362.11123
+  Gap               0%
+  Solution status   feasible
+                    -1362.11123 (objective)
+                    0 (bound viol.)
+                    6.62940320772e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            2.62 (total)
+                    0.11 (presolve)
+                    0.00 (postsolve)
+  Nodes             1
+  LP iterations     3238 (total)
+                    0 (strong br.)
+                    282 (separation)
+                    1237 (heuristics)
+Writing the solution to solution_files/mp_h7_w0.0_T2hi9_sp.txt

@@ -1,368 +1,347 @@
-import tkinter as tk
-from tkinter import messagebox
-import math
-from solve import solve_multi_period_NBA
-import customtkinter as ctk
-import pandas as pd
-from retrieve import get_team
+"""Deprecated legacy customtkinter GUI.
+
+The actively maintained GUI is the PySide6 app under ``public_solver/src/gui``.
+This module remains for backward compatibility only and should not receive new
+xMins editing features.
+"""
+
 import json
-from run import refresh_data
-from tksheet import Sheet
-from tksheet import float_formatter, int_formatter, num2alpha
-from matplotlib import colors as mcolors
+import math
 import os
 from datetime import datetime
+from tkinter import font, messagebox
+
+import customtkinter as ctk
+import pandas as pd
 import pytz
-from tkinter import font
+import tkinter as tk
+from matplotlib import colors as mcolors
+from tksheet import Sheet, float_formatter, int_formatter, num2alpha
+
+from retrieve import get_team
+from run import refresh_data
+from solve import solve_multi_period_NBA
+
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+DARK_BG = '#242424'
+TABLE_BG = '#2E5984'
+BORDER_COLOR = '#4a4a4a'
+FRONT_COLOR = '#C80044'
+BACK_COLOR = '#1B3B9A'
+SECTION_FONT = ("Helvetica", 16, "bold")
+TABLE_HEADER_FONT = ("Calibri", 13, "bold")
+TABLE_INDEX_FONT = ("Calibri", 13, "bold")
+
+
+def _parse_comma_list(text, cast=float):
+    """Parse a comma-separated string into a list, returning [] for empty input."""
+    text = text.strip()
+    if not text:
+        return []
+    return [cast(x.strip()) for x in text.split(',')]
+
+
+def _format_comma_list(items):
+    """Format a list of items into a comma-separated string."""
+    if not items:
+        return ""
+    return ", ".join(str(i) for i in items)
+
+
+# ---------------------------------------------------------------------------
+# Main GUI class
+# ---------------------------------------------------------------------------
 
 class NBAOptimizerGUI:
 
     def __init__(self, root):
         self.root = root
         self.root.title("NBA Fantasy Optimizer")
-
         ctk.set_default_color_theme("dark-blue")
 
-        # Create a button to retrieve the squad
-        get_id_button = ctk.CTkButton(root, text="Retrieve Squad", command= self.get_data, height=30, width=100)
-        get_id_button.grid(row=0, column=4, pady=(30,20), padx = 5, columnspan = 1, sticky="w" ) 
-
-        # Create a button to update the data
-        update_button = ctk.CTkButton(root, text="Update data", command= self.refresh_data, height=30, width=75)
-        update_button.grid(row=0, column=0, pady=(30,20), padx = 40, columnspan = 1, sticky="w") 
-
-        # Button to open projections window
-        projections_button = ctk.CTkButton(root, text="View Projections", command=self.open_projections_window, height=30, width=100)
-        projections_button.grid(row=0, column=7, padx=(0,40), pady=(30,20))
-
-        # Read options from the file
+        # Load solver settings
         with open('solver_settings.json') as f:
-            solver_options = json.load(f)
+            self.solver_options = json.load(f)
+        opts = self.solver_options
 
-        # Team ID Variable
-        self.team_id_var = ctk.IntVar(value=solver_options.get('team_id', 148))
+        # --- Buttons row ---
+        ctk.CTkButton(root, text="Update data", command=self.refresh_data, height=30, width=75
+                       ).grid(row=0, column=0, pady=(30, 20), padx=40, sticky="w")
 
-        # Game Day and ITB Variables
-        if solver_options.get('preseason', False):
+        team_id_label = ctk.CTkLabel(root, text="Team ID:")
+        team_id_label.grid(row=0, column=2, pady=(30, 20), padx=10, sticky="e")
+
+        self.team_id_var = ctk.IntVar(value=opts.get('team_id', 148))
+        ctk.CTkEntry(root, textvariable=self.team_id_var, width=50
+                      ).grid(row=0, column=3, pady=(30, 20), sticky="w")
+
+        ctk.CTkButton(root, text="Retrieve Squad", command=self.get_data, height=30, width=100
+                       ).grid(row=0, column=4, pady=(30, 20), padx=5, sticky="w")
+
+        ctk.CTkButton(root, text="View Projections", command=self.open_projections_window, height=30, width=100
+                       ).grid(row=0, column=7, padx=(0, 40), pady=(30, 20))
+
+        # --- Variables ---
+        is_preseason = opts.get('preseason', False)
+
+        self.horizon_var = ctk.IntVar(value=opts.get('horizon', 5))
+        self.tm_var = ctk.IntVar(value=opts.get('tm', 0))
+        self.preseason_var = ctk.BooleanVar(value=is_preseason)
+        self.captain_played = ctk.BooleanVar(value=opts.get('captain_played', False))
+        self.solve_time_var = ctk.IntVar(value=opts.get('solve_time', 300))
+
+        if is_preseason:
             self.gd_var = ctk.DoubleVar(value=1.1)
             self.itb_var = ctk.DoubleVar(value=0)
             self.captain_played_var = ctk.BooleanVar(value=False)
 
-        # Main Options Variables
-        self.horizon_var = ctk.IntVar(value=solver_options.get('horizon', 5))
-        self.tm_var = ctk.IntVar(value=solver_options.get('tm', 0))
-        self.preseason_var = ctk.BooleanVar(value=solver_options.get('preseason', False))
-        self.captain_played = ctk.BooleanVar(value=solver_options.get('captain_played', False))
-        self.solve_time_var = ctk.IntVar(value=solver_options.get('solve_time', 300))
+        # Chip options
+        self.wc_day_var = ctk.DoubleVar(value=opts.get('wc_day', 0))
+        self.wc_days_var = ctk.StringVar(value=_format_comma_list(opts.get('wc_days', [])))
+        self.wc_range_var = ctk.StringVar(value=_format_comma_list(opts.get('wc_range', [])))
+        self.all_star_day_var = ctk.DoubleVar(value=opts.get('all_star_day', 0))
+        self.all_star_days_var = ctk.StringVar(value=_format_comma_list(opts.get('all_star_days', [])))
+        self.all_star_range_var = ctk.StringVar(value=_format_comma_list(opts.get('all_star_range', [])))
 
-        # Chip Options Variables
-        self.wc_day_var = ctk.DoubleVar(value=solver_options.get('wc_day', 0))
-        wc_days_text = ""
-        for i in solver_options.get('wc_days', []):
-            wc_days_text += str(i) + ", "
-        wc_days_text = wc_days_text[:-2]
-        self.wc_days_var = ctk.StringVar(value=wc_days_text)
-        wc_range_text = ""
-        for i in solver_options.get('wc_range', []):
-            wc_range_text += str(i) + ", "
-        wc_range_text = wc_range_text[:-2]
-        self.wc_range_var = ctk.StringVar(value=wc_range_text)
-        self.all_star_day_var = ctk.DoubleVar(value=solver_options.get('all_star_day', 0))
-        all_star_days_text = ""
-        for i in solver_options.get('all_star_days', []):
-            all_star_days_text += str(i) + ", "
-        all_star_days_text = all_star_days_text[:-2]
-        self.all_star_days_var = ctk.StringVar(value=all_star_days_text)
-        all_star_range_text = ""
-        for i in solver_options.get('all_star_range', []):
-            all_star_range_text += str(i) + ", "
-        all_star_range_text = all_star_range_text[:-2]
-        self.all_star_range_var = ctk.StringVar(value=all_star_range_text)
+        # Forced decisions
+        self.banned_players_var = ctk.StringVar(value=', '.join(opts.get('banned_players', [])))
+        self.forced_players_var = ctk.StringVar(value=', '.join(opts.get('forced_players', [])))
 
-        # Forced Decisions Variables
-        banned_player_text = ', '.join(solver_options.get('banned_players', []))
-        self.banned_players_var = ctk.StringVar(value=banned_player_text)
-        forced_player_text = ', '.join(solver_options.get('forced_players', []))
-        self.forced_players_var = ctk.StringVar(value=forced_player_text)
+        # Advanced options
+        self.decay_base_var = ctk.DoubleVar(value=opts.get('decay_base'))
+        self.bench_weight_var = ctk.DoubleVar(value=opts.get('bench_weight'))
+        self.trf_last_var = ctk.IntVar(value=opts.get('trf_last_gw', 2))
+        self.ft_value_var = ctk.DoubleVar(value=opts.get('ft_value', 15))
+        self.ft_increment_var = ctk.DoubleVar(value=opts.get('ft_increment', 3))
+        self.threshold_var = ctk.DoubleVar(value=opts.get('threshold_value', 1.3))
+        self.no_sols_var = ctk.IntVar(value=opts.get('no_sols', 1))
+        self.alternative_solution_var = ctk.StringVar(value=opts.get('alternative_solution', '1gd_buy'))
 
-        # Advanced Options Variables
-        self.decay_base_var = ctk.DoubleVar(
-            value=solver_options.get('decay_base'))
-        self.bench_weight_var = ctk.DoubleVar(
-            value=solver_options.get('bench_weight'))
-        self.trf_last_var = ctk.IntVar(value=solver_options.get('trf_last_gw', 2))
-        self.ft_value_var = ctk.DoubleVar(value=solver_options.get('ft_value', 15))
-        self.ft_increment_var = ctk.DoubleVar(value=solver_options.get('ft_increment', 3))
-        self.threshold_var = ctk.DoubleVar(value=solver_options.get('threshold_value', 1.3))
-        self.no_sols_var = ctk.IntVar(value=solver_options.get('no_sols', 1))
-        self.alternative_solution_var = ctk.StringVar()
-        alternative_list = ["1gd_buy","1week_buy","2week_buy"]
-        self.alternative_solution_var.set(value=solver_options.get('alternative_solution','1gd_buy'))
-        
-        # Entry widget and label for team ID
-        team_id_entry = ctk.CTkEntry(root, textvariable=self.team_id_var,
-                                     width=50)
-        team_id_entry.grid(row=0, column=3, pady=(30,20),
-                           sticky="w", padx=0) 
-        team_id_label = ctk.CTkLabel(root, text="Team ID:")
-        team_id_label.grid(row=0, column=2, pady=(30,20), padx = 10,
-                           columnspan = 1, sticky="e" ) 
+        # --- Build layout ---
+        self._build_squad_inputs(root, is_preseason)
+        self._build_main_options(root, is_preseason)
+        self._build_chip_options(root, opts)
+        self._build_forced_options(root, opts)
+        self._build_advanced_options(root)
 
-        # Entry widget and label for squad inputs
-        players_label = ctk.CTkLabel(root, text="Initial Squad:")
-        self.players_entry = ctk.CTkEntry(root, placeholder_text="Retrieve squad or enter player names here")
-        prices_label = ctk.CTkLabel(root, text="Sell Prices:")
-        self.prices_entry = ctk.CTkEntry(root, placeholder_text="Retrieve squad or enter player prices here")
-
-        # Labels and entry widgets for main options
-        gd_label = ctk.CTkLabel(root, text="Game Day:")
-        if solver_options.get('preseason', False):
-            self.gd_entry = ctk.CTkEntry(root, textvariable=self.gd_var, width=50)
-        else:
-            self.gd_entry = ctk.CTkEntry(root, placeholder_text=1.1, width=50)
-        horizon_label = ctk.CTkLabel(root, text="Horizon:")
-        horizon_entry = ctk.CTkEntry(root, textvariable=self.horizon_var, width=50)
-        tm_label = ctk.CTkLabel(root, text="Transfers Made:")
-        tm_entry = ctk.CTkEntry(root, textvariable=self.tm_var, width=50)
-        itb_label = ctk.CTkLabel(root, text="Initial ITB:")
-        if solver_options.get('preseason', False):
-            self.itb_entry = ctk.CTkEntry(root, textvariable=self.itb_var, width=50)
-        else:
-            self.itb_entry = ctk.CTkEntry(root, placeholder_text=0, width=50)
-        preseason_label = ctk.CTkLabel(root, text="Preseason:")
-        preseason_checkbox = ctk.CTkCheckBox(root, variable=self.preseason_var, text="")
-        captain_played_label = ctk.CTkLabel(root, text="Captain Played:")
-        self.captain_played_checkbox = ctk.CTkCheckBox(root, variable=self.captain_played, text="")
-        solve_time_label = ctk.CTkLabel(root, text="Solver Limit:")
-        solve_time_entry = ctk.CTkEntry(root, textvariable=self.solve_time_var, width=100)
-
-        # Labels and entry widgets for chip options
-        wc_day_label = ctk.CTkLabel(root, text="Wildcard Day:")
-        wc_day_entry = ctk.CTkEntry(root, textvariable=self.wc_day_var, width=50)
-        wc_days_label = ctk.CTkLabel(root, text="Wildcard Days:")
-        if solver_options.get('wc_days', []) == []:
-            self.wc_days_entry = ctk.CTkEntry(root, placeholder_text="eg. 1.1, 1.3, 1.5", width=250)
-        else:
-            self.wc_days_entry = ctk.CTkEntry(root, textvariable=self.wc_days_var, width=250)
-        wc_range_label = ctk.CTkLabel(root, text="Wildcard Range:")
-        if solver_options.get('wc_range', []) == []:
-            self.wc_range_entry = ctk.CTkEntry(root, placeholder_text="eg. 1.1, 1.5")
-        else:
-            self.wc_range_entry = ctk.CTkEntry(root, textvariable=self.wc_range_var)
-        all_star_day_label = ctk.CTkLabel(root, text="All Star Day:")
-        all_star_day_entry = ctk.CTkEntry(root, textvariable=self.all_star_day_var, width=50)
-        all_star_days_label = ctk.CTkLabel(root, text="All Star Days:")
-        if solver_options.get('all_star_days', []) == []:
-            self.all_star_days_entry = ctk.CTkEntry(root, placeholder_text="eg. 1.1, 1.3, 1.5", width=250)
-        else:
-            self.all_star_days_entry = ctk.CTkEntry(root, textvariable=self.all_star_days_var, width=250)
-        all_star_range_label = ctk.CTkLabel(root, text="All Star Range:")
-        if solver_options.get('all_star_range', []) == []:
-            self.all_star_range_entry = ctk.CTkEntry(root, placeholder_text="eg. 1.1, 1.5")
-        else:
-            self.all_star_range_entry = ctk.CTkEntry(root, textvariable=self.all_star_range_var)
-
-        # Labels and entry widgets for forced decisions
-        forced_players_label = ctk.CTkLabel(root, text="Forced Players:")
-        if solver_options.get('forced_players', []) == []:
-            self.forced_players_entry = ctk.CTkEntry(root, placeholder_text="Enter forced players here")
-        else:
-            self.forced_players_entry = ctk.CTkEntry(root, textvariable=self.forced_players_var)
-        banned_players_label = ctk.CTkLabel(root, text="Banned Players:")
-        if solver_options.get('banned_players', []) == []:
-            self.banned_players_entry = ctk.CTkEntry(root, placeholder_text="Enter banned players here")
-        else:
-            self.banned_players_entry = ctk.CTkEntry(root, textvariable=self.banned_players_var)
-        
-        # Labels and entry widgets for advanced options
-        decay_base_label = ctk.CTkLabel(root, text="Decay Base:")
-        decay_base_entry = ctk.CTkEntry(root, textvariable=self.decay_base_var, width=50)
-        bench_weight_label = ctk.CTkLabel(root, text="Bench Weight:")
-        bench_weight_entry = ctk.CTkEntry(root, textvariable=self.bench_weight_var, width=50)
-        tf_last_label = ctk.CTkLabel(root, text="Transfers Last GW:")
-        tf_last_entry = ctk.CTkEntry(root, textvariable=self.trf_last_var, width=50)
-        ft_value_label = ctk.CTkLabel(root, text="FT Value:")
-        ft_value_entry = ctk.CTkEntry(root, textvariable=self.ft_value_var, width=50)
-        ft_increment_label = ctk.CTkLabel(root, text="FT Increment:")
-        ft_increment_entry = ctk.CTkEntry(root, textvariable=self.ft_increment_var, width=50)
-        threshold_label = ctk.CTkLabel(root, text= "Threshold:")
-        threshold_entry = ctk.CTkEntry(root, textvariable=self.threshold_var, width=50)
-        alternative_solution_label = ctk.CTkLabel(root, text="Alt Solution:")
-        self.alternative_menu = tk.OptionMenu(root, self.alternative_solution_var, *alternative_list)
-        self.alternative_menu.config(fg= "#353638", bg = "#242424")
-        no_sols_label = ctk.CTkLabel(root, text="No. Solutions:")
-        no_sols_entry = ctk.CTkEntry(root, textvariable=self.no_sols_var, width=50)
-        
-        # Labels for the different sections
-        main_options_label = ctk.CTkLabel(root, text="Main Options:", font=("Helvetica", 16, "bold"))
-        chip_options_label = ctk.CTkLabel(root, text="Chip Options:", font=("Helvetica", 16, "bold"))
-        forced_options_label = ctk.CTkLabel(root, text="Forced Options:", font=("Helvetica", 16, "bold"))
-        advanced_options_label = ctk.CTkLabel(root, text="Advanced Options:", font=("Helvetica", 16, "bold"))
-    
-        # Create button to run the optimizer
-        run_button = ctk.CTkButton(root, text="Run Solver", command=self.run_optimizer, width=50)
-
-        # Layout widgets using grid
-        players_label.grid(row=1, column=0, pady=5, padx=40, sticky="w")
-        self.players_entry.grid(row=1, column=1, pady=5, padx=(0,40), columnspan=7, sticky="ew")
-        prices_label.grid(row=2, column=0, pady=5, padx=40, sticky="w")
-        self.prices_entry.grid(row=2, column=1, pady=5, columnspan = 4, sticky="ew")
-
-        # Main options grid
-        main_options_label.grid(row=3, column=0, pady=(40,10), padx=60, columnspan = 2, sticky="w")
-        gd_label.grid(row=4, column=0, pady=5, padx=40, sticky="w")
-        self.gd_entry.grid(row=4, column=1, pady=5, padx=0, sticky="w")
-        itb_label.grid(row=4, column=2, pady=5, padx=(20,10), sticky="w")
-        self.itb_entry.grid(row=4, column=3, pady=5, padx=0, sticky="w")
-        captain_played_label.grid(row=4, column=4, pady=5, padx=(20,10), sticky="w")
-        self.captain_played_checkbox.grid(row=4, column=5, pady=5, padx=0, sticky="w")
-        solve_time_label.grid(row=4, column=6, pady=5, padx=(20,10), sticky="w")
-        solve_time_entry.grid(row=4, column=7, pady=5, padx=0, sticky="w")
-        horizon_label.grid(row=5, column=0, pady=5, padx=40, sticky="w")
-        horizon_entry.grid(row=5, column=1, pady=5, padx=0, sticky="w")
-        tm_label.grid(row=5, column=2, pady=5, padx=(20,10), sticky="w")
-        tm_entry.grid(row=5, column=3, pady=5, padx=0, sticky="w")
-        preseason_label.grid(row=5, column=4, pady=5, padx=(20,10), sticky="w")
-        preseason_checkbox.grid(row=5, column=5, pady=5, padx=0, sticky="w")
-
-        # Chip options grid
-        chip_options_label.grid(row=6, column=0, pady=(40,10), padx=60, columnspan = 2, sticky="w")
-        wc_day_label.grid(row=7, column=0, pady=5, padx=40, sticky="w")
-        wc_day_entry.grid(row=7, column=1, pady=5, padx=0, sticky="w")
-        wc_days_label.grid(row=7, column=2, pady=5, padx=(20,10), sticky="w")
-        self.wc_days_entry.grid(row=7, column=3, columnspan=4, pady=5, padx=0, sticky="w")
-        wc_range_label.grid(row=7, column=6, pady=5, padx=(20,10), sticky="w")
-        self.wc_range_entry.grid(row=7, column=7, pady=5, padx=(0,40), sticky="w")
-        all_star_day_label.grid(row=8, column=0, pady=5, padx=40, sticky="w")
-        all_star_day_entry.grid(row=8, column=1, pady=5, padx=0, sticky="w")
-        all_star_days_label.grid(row=8, column=2, pady=5, padx=(20,10), sticky="w")
-        self.all_star_days_entry.grid(row=8, column=3, columnspan=4, pady=5, padx=0, sticky="w")
-        all_star_range_label.grid(row=8, column=6, pady=5, padx=(20,10), sticky="w")
-        self.all_star_range_entry.grid(row=8, column=7, pady=5, padx=(0,40), sticky="w")
-
-        # Forced options grid
-        forced_options_label.grid(row=9, column=0, pady=(40,10), padx=60, columnspan = 2, sticky="w")
-        banned_players_label.grid(row=10, column=0, pady=5, padx=(40,10), sticky="w")
-        self.banned_players_entry.grid(row=10, column=1, pady=5, padx=0, columnspan = 6, sticky="ew")
-        forced_players_label.grid(row=11, column=0, pady=5, padx=(40,10), sticky="w")
-        self.forced_players_entry.grid(row=11, column=1, pady=5, padx=0, columnspan = 6, sticky="ew")
-
-        # Advanced options grid
-        advanced_options_label.grid(row=12, column=0, pady=(40,10), padx=60, columnspan = 2, sticky="w")
-        decay_base_label.grid(row=13, column=0, pady=5, padx=(40,10), sticky="w")
-        decay_base_entry.grid(row=13, column=1, pady=10, padx=0, sticky="w")
-        bench_weight_label.grid(row=13, column=2, pady=10, padx=(20,10), sticky="w")
-        bench_weight_entry.grid(row=13, column=3, pady=10, padx=0, sticky="w")
-        tf_last_label.grid(row=13, column=4, pady=5, padx=(20,10), sticky="w")
-        tf_last_entry.grid(row=13, column=5, pady=5, padx=0, sticky="w")
-        alternative_solution_label.grid(row=13, column=6, pady=5, padx=(20,10), sticky="w")
-        self.alternative_menu.grid(row=13, column=7, pady=5, padx=(0,40), sticky="w")
-        ft_value_label.grid(row=14, column=0, pady=(5,60), padx=(40,10), sticky="w")
-        ft_value_entry.grid(row=14, column=1, pady=(5,60), padx=0, sticky="w")
-        ft_increment_label.grid(row=14, column=2, pady=(5,60), padx=(20,10), sticky="w")
-        ft_increment_entry.grid(row=14, column=3, pady=(5,60), padx=0, sticky="w")
-        threshold_label.grid(row=14, column=4, pady=(5,60), padx=(20,10), sticky="w")
-        threshold_entry.grid(row=14, column=5, pady=(5,60), padx=0, sticky="w")
-        no_sols_label.grid(row=14, column=6, pady=(5,60), padx=(20,10), sticky="w")
-        no_sols_entry.grid(row=14, column=7, pady=(5,60), padx=(0,40), sticky="w")
-       
-        # Create a button to run the optimizer
-        run_button.grid(row=16, column=3, pady=(10,30), columnspan = 2, sticky="ew" )
+        # Run button
+        ctk.CTkButton(root, text="Run Solver", command=self.run_optimizer, width=50
+                       ).grid(row=16, column=3, pady=(10, 30), columnspan=2, sticky="ew")
 
         self.get_data()
 
-    def get_data(self):
+    # -------------------------------------------------------------------
+    # Layout builders
+    # -------------------------------------------------------------------
 
-        if self.preseason_var.get() == False:
+    def _build_squad_inputs(self, root, is_preseason):
+        ctk.CTkLabel(root, text="Initial Squad:").grid(row=1, column=0, pady=5, padx=40, sticky="w")
+        self.players_entry = ctk.CTkEntry(root, placeholder_text="Retrieve squad or enter player names here")
+        self.players_entry.grid(row=1, column=1, pady=5, padx=(0, 40), columnspan=7, sticky="ew")
 
-            # Destroy existing widgets
-            self.players_entry.destroy()
-            self.prices_entry.destroy()
-            self.gd_entry.destroy()
-            self.itb_entry.destroy()
-            self.captain_played_checkbox.destroy()
-            
-            # Read the team ID from the entry widget
-            gameday_data = pd.read_csv('data/fixture_info.csv')
-            squad = get_team(self.team_id_var.get())
+        ctk.CTkLabel(root, text="Sell Prices:").grid(row=2, column=0, pady=5, padx=40, sticky="w")
+        self.prices_entry = ctk.CTkEntry(root, placeholder_text="Retrieve squad or enter player prices here")
+        self.prices_entry.grid(row=2, column=1, pady=5, columnspan=4, sticky="ew")
 
-            # Create entry for squad
-            if squad['initial_squad']:
-                self.players_var = ctk.StringVar(value=squad['initial_squad'])
-                self.players_entry = ctk.CTkEntry(root, textvariable=self.players_var)
-                self.players_entry.grid(row=1, column=1, pady=5, padx=(0,40), columnspan = 7, sticky="ew")
+    def _build_main_options(self, root, is_preseason):
+        ctk.CTkLabel(root, text="Main Options:", font=SECTION_FONT
+                      ).grid(row=3, column=0, pady=(40, 10), padx=60, columnspan=2, sticky="w")
 
-            # Create entry for sell prices
-            self.prices_var = ctk.StringVar(value=squad['sell_prices'])
-            self.prices_entry = ctk.CTkEntry(root, textvariable=self.prices_var)
-            self.prices_entry.grid(row=2, column=1, pady=5, columnspan = 4, sticky="ew")
-
-            # Create entry for in the bank value
-            self.itb_var = ctk.DoubleVar(value=squad['itb'])
-            self.itb_entry = ctk.CTkEntry(root, textvariable=self.itb_var, width=50)
-            self.itb_entry.grid(row=4, column=3, pady=5, padx=0, sticky="w")
-
-            # Create entry for the game day
-            try:
-                period_index = gameday_data[gameday_data['id'] == (squad['gd'])].index.tolist()
-                period_index = list(map(int, period_index))
-                new_gd = gameday_data.loc[period_index, 'code'].astype(float).tolist()
-                new_gd = new_gd[0]
-                self.gd_var = ctk.DoubleVar(value=new_gd)
-            except Exception as e:
-                self.gd_var = ctk.DoubleVar(value=None)
-        
+        # Row 4
+        ctk.CTkLabel(root, text="Game Day:").grid(row=4, column=0, pady=5, padx=40, sticky="w")
+        if is_preseason:
             self.gd_entry = ctk.CTkEntry(root, textvariable=self.gd_var, width=50)
-            self.gd_entry.grid(row=4, column=1, pady=5, padx=0, sticky="w")
+        else:
+            self.gd_entry = ctk.CTkEntry(root, placeholder_text=1.1, width=50)
+        self.gd_entry.grid(row=4, column=1, pady=5, sticky="w")
 
-            # Create entry for captain played
-            self.captain_played_var = ctk.BooleanVar(value=squad['captain'])
-            self.captain_played_checkbox = ctk.CTkCheckBox(root, variable=self.captain_played_var, text="")
-            self.captain_played_checkbox.grid(row=4, column=5, pady=5, padx=0, sticky="w")
+        ctk.CTkLabel(root, text="Initial ITB:").grid(row=4, column=2, pady=5, padx=(20, 10), sticky="w")
+        if is_preseason:
+            self.itb_entry = ctk.CTkEntry(root, textvariable=self.itb_var, width=50)
+        else:
+            self.itb_entry = ctk.CTkEntry(root, placeholder_text=0, width=50)
+        self.itb_entry.grid(row=4, column=3, pady=5, sticky="w")
 
-            # Create entry for transfers made
-            self.tm_var = ctk.IntVar(value=squad['transfers_made'])
-            self.tm_entry = ctk.CTkEntry(root, textvariable=self.tm_var, width=50)
-            self.tm_entry.grid(row=5, column=3, pady=5, padx=0, sticky="w")
+        ctk.CTkLabel(root, text="Captain Played:").grid(row=4, column=4, pady=5, padx=(20, 10), sticky="w")
+        self.captain_played_checkbox = ctk.CTkCheckBox(root, variable=self.captain_played, text="")
+        self.captain_played_checkbox.grid(row=4, column=5, pady=5, sticky="w")
+
+        ctk.CTkLabel(root, text="Solver Limit:").grid(row=4, column=6, pady=5, padx=(20, 10), sticky="w")
+        ctk.CTkEntry(root, textvariable=self.solve_time_var, width=100).grid(row=4, column=7, pady=5, sticky="w")
+
+        # Row 5
+        ctk.CTkLabel(root, text="Horizon:").grid(row=5, column=0, pady=5, padx=40, sticky="w")
+        ctk.CTkEntry(root, textvariable=self.horizon_var, width=50).grid(row=5, column=1, pady=5, sticky="w")
+
+        ctk.CTkLabel(root, text="Transfers Made:").grid(row=5, column=2, pady=5, padx=(20, 10), sticky="w")
+        ctk.CTkEntry(root, textvariable=self.tm_var, width=50).grid(row=5, column=3, pady=5, sticky="w")
+
+        ctk.CTkLabel(root, text="Preseason:").grid(row=5, column=4, pady=5, padx=(20, 10), sticky="w")
+        ctk.CTkCheckBox(root, variable=self.preseason_var, text="").grid(row=5, column=5, pady=5, sticky="w")
+
+    def _build_chip_options(self, root, opts):
+        ctk.CTkLabel(root, text="Chip Options:", font=SECTION_FONT
+                      ).grid(row=6, column=0, pady=(40, 10), padx=60, columnspan=2, sticky="w")
+
+        # Wildcard row
+        ctk.CTkLabel(root, text="Wildcard Day:").grid(row=7, column=0, pady=5, padx=40, sticky="w")
+        ctk.CTkEntry(root, textvariable=self.wc_day_var, width=50).grid(row=7, column=1, pady=5, sticky="w")
+
+        ctk.CTkLabel(root, text="Wildcard Days:").grid(row=7, column=2, pady=5, padx=(20, 10), sticky="w")
+        self.wc_days_entry = ctk.CTkEntry(
+            root, textvariable=self.wc_days_var if opts.get('wc_days') else None,
+            placeholder_text="eg. 1.1, 1.3, 1.5", width=250,
+        )
+        self.wc_days_entry.grid(row=7, column=3, columnspan=4, pady=5, sticky="w")
+
+        ctk.CTkLabel(root, text="Wildcard Range:").grid(row=7, column=6, pady=5, padx=(20, 10), sticky="w")
+        self.wc_range_entry = ctk.CTkEntry(
+            root, textvariable=self.wc_range_var if opts.get('wc_range') else None,
+            placeholder_text="eg. 1.1, 1.5",
+        )
+        self.wc_range_entry.grid(row=7, column=7, pady=5, padx=(0, 40), sticky="w")
+
+        # All Star row
+        ctk.CTkLabel(root, text="All Star Day:").grid(row=8, column=0, pady=5, padx=40, sticky="w")
+        ctk.CTkEntry(root, textvariable=self.all_star_day_var, width=50).grid(row=8, column=1, pady=5, sticky="w")
+
+        ctk.CTkLabel(root, text="All Star Days:").grid(row=8, column=2, pady=5, padx=(20, 10), sticky="w")
+        self.all_star_days_entry = ctk.CTkEntry(
+            root, textvariable=self.all_star_days_var if opts.get('all_star_days') else None,
+            placeholder_text="eg. 1.1, 1.3, 1.5", width=250,
+        )
+        self.all_star_days_entry.grid(row=8, column=3, columnspan=4, pady=5, sticky="w")
+
+        ctk.CTkLabel(root, text="All Star Range:").grid(row=8, column=6, pady=5, padx=(20, 10), sticky="w")
+        self.all_star_range_entry = ctk.CTkEntry(
+            root, textvariable=self.all_star_range_var if opts.get('all_star_range') else None,
+            placeholder_text="eg. 1.1, 1.5",
+        )
+        self.all_star_range_entry.grid(row=8, column=7, pady=5, padx=(0, 40), sticky="w")
+
+    def _build_forced_options(self, root, opts):
+        ctk.CTkLabel(root, text="Forced Options:", font=SECTION_FONT
+                      ).grid(row=9, column=0, pady=(40, 10), padx=60, columnspan=2, sticky="w")
+
+        ctk.CTkLabel(root, text="Banned Players:").grid(row=10, column=0, pady=5, padx=(40, 10), sticky="w")
+        self.banned_players_entry = ctk.CTkEntry(
+            root, textvariable=self.banned_players_var if opts.get('banned_players') else None,
+            placeholder_text="Enter banned players here",
+        )
+        self.banned_players_entry.grid(row=10, column=1, pady=5, columnspan=6, sticky="ew")
+
+        ctk.CTkLabel(root, text="Forced Players:").grid(row=11, column=0, pady=5, padx=(40, 10), sticky="w")
+        self.forced_players_entry = ctk.CTkEntry(
+            root, textvariable=self.forced_players_var if opts.get('forced_players') else None,
+            placeholder_text="Enter forced players here",
+        )
+        self.forced_players_entry.grid(row=11, column=1, pady=5, columnspan=6, sticky="ew")
+
+    def _build_advanced_options(self, root):
+        ctk.CTkLabel(root, text="Advanced Options:", font=SECTION_FONT
+                      ).grid(row=12, column=0, pady=(40, 10), padx=60, columnspan=2, sticky="w")
+
+        # Row 13
+        for col, label, var, width in [
+            (0, "Decay Base:", self.decay_base_var, 50),
+            (2, "Bench Weight:", self.bench_weight_var, 50),
+            (4, "Transfers Last GW:", self.trf_last_var, 50),
+        ]:
+            ctk.CTkLabel(root, text=label).grid(row=13, column=col, pady=5, padx=(40 if col == 0 else 20, 10), sticky="w")
+            ctk.CTkEntry(root, textvariable=var, width=width).grid(row=13, column=col + 1, pady=10, sticky="w")
+
+        ctk.CTkLabel(root, text="Alt Solution:").grid(row=13, column=6, pady=5, padx=(20, 10), sticky="w")
+        alt_list = ["1gd_buy", "1week_buy", "2week_buy"]
+        self.alternative_menu = tk.OptionMenu(root, self.alternative_solution_var, *alt_list)
+        self.alternative_menu.config(fg="#353638", bg=DARK_BG)
+        self.alternative_menu.grid(row=13, column=7, pady=5, padx=(0, 40), sticky="w")
+
+        # Row 14
+        for col, label, var, width in [
+            (0, "FT Value:", self.ft_value_var, 50),
+            (2, "FT Increment:", self.ft_increment_var, 50),
+            (4, "Threshold:", self.threshold_var, 50),
+            (6, "No. Solutions:", self.no_sols_var, 50),
+        ]:
+            ctk.CTkLabel(root, text=label).grid(row=14, column=col, pady=(5, 60), padx=(40 if col == 0 else 20, 10), sticky="w")
+            ctk.CTkEntry(root, textvariable=var, width=width).grid(row=14, column=col + 1, pady=(5, 60), padx=(0, 40 if col == 6 else 0), sticky="w")
+
+    # -------------------------------------------------------------------
+    # Data retrieval
+    # -------------------------------------------------------------------
+
+    def get_data(self):
+        """Retrieve team data from the API and populate the GUI fields."""
+        if self.preseason_var.get():
+            return
+
+        # Destroy existing widgets to recreate them
+        for widget in (self.players_entry, self.prices_entry, self.gd_entry,
+                       self.itb_entry, self.captain_played_checkbox):
+            widget.destroy()
+
+        gameday_data = pd.read_csv('data/fixture_info.csv')
+        squad = get_team(self.team_id_var.get())
+
+        # Squad entry
+        if squad['initial_squad']:
+            self.players_var = ctk.StringVar(value=squad['initial_squad'])
+            self.players_entry = ctk.CTkEntry(root, textvariable=self.players_var)
+            self.players_entry.grid(row=1, column=1, pady=5, padx=(0, 40), columnspan=7, sticky="ew")
+
+        # Prices entry
+        self.prices_var = ctk.StringVar(value=squad['sell_prices'])
+        self.prices_entry = ctk.CTkEntry(root, textvariable=self.prices_var)
+        self.prices_entry.grid(row=2, column=1, pady=5, columnspan=4, sticky="ew")
+
+        # ITB entry
+        self.itb_var = ctk.DoubleVar(value=squad['itb'])
+        self.itb_entry = ctk.CTkEntry(root, textvariable=self.itb_var, width=50)
+        self.itb_entry.grid(row=4, column=3, pady=5, sticky="w")
+
+        # Gameday entry
+        try:
+            period_index = list(map(int, gameday_data[gameday_data['id'] == squad['gd']].index.tolist()))
+            new_gd = gameday_data.loc[period_index, 'code'].astype(float).tolist()[0]
+            self.gd_var = ctk.DoubleVar(value=new_gd)
+        except Exception:
+            self.gd_var = ctk.DoubleVar(value=None)
+
+        self.gd_entry = ctk.CTkEntry(root, textvariable=self.gd_var, width=50)
+        self.gd_entry.grid(row=4, column=1, pady=5, sticky="w")
+
+        # Captain played
+        self.captain_played_var = ctk.BooleanVar(value=bool(squad.get('captain', False)))
+        self.captain_played_checkbox = ctk.CTkCheckBox(root, variable=self.captain_played_var, text="")
+        self.captain_played_checkbox.grid(row=4, column=5, pady=5, sticky="w")
+
+        # Transfers made
+        self.tm_var = ctk.IntVar(value=squad.get('transfers_made', 0))
+        ctk.CTkEntry(root, textvariable=self.tm_var, width=50).grid(row=5, column=3, pady=5, sticky="w")
 
     def refresh_data(self):
         refresh_data()
         messagebox.showinfo("Data Update", "Data has been updated successfully")
 
-    def run_optimizer(self):
+    # -------------------------------------------------------------------
+    # Run optimiser
+    # -------------------------------------------------------------------
 
-    # Read options from the file
+    def run_optimizer(self):
+        """Collect GUI inputs and launch the solver."""
         with open('solver_settings.json') as f:
             solver_options = json.load(f)
 
         if self.preseason_var.get():
-            players = []
-            prices = []
+            players, prices = [], []
         else:
             players = self.players_entry.get().split(', ')
-            prices = [float(price) for price in self.prices_entry.get().split(', ')]
+            prices = [float(p) for p in self.prices_entry.get().split(', ')]
 
-        banned_players = self.banned_players_entry.get().split(', ')
-        forced_players = self.forced_players_entry.get().split(', ')
-
-        if self.wc_days_entry.get() == "":
-            wc_days_value = []
-        else:
-            wc_days_value = [float(day) for day in self.wc_days_entry.get().split(', ')]
-        if self.wc_range_entry.get() == "":
-            wc_range_value = []
-        else:
-            wc_range_value = [float(day) for day in self.wc_range_entry.get().split(', ')]
-        if self.all_star_days_entry.get() == "":
-            all_star_days_value = []
-        else:
-            all_star_days_value = [float(day) for day in self.all_star_days_entry.get().split(', ')]
-        if self.all_star_range_entry.get() == "":
-            all_star_range_value = []
-        else:
-            all_star_range_value = [float(day) for day in self.all_star_range_entry.get().split(', ')]
-
-        # Get options input
         new_options = {
             'horizon': self.horizon_var.get(),
             'tm': self.tm_var.get(),
@@ -370,16 +349,16 @@ class NBAOptimizerGUI:
             'bench_weight': self.bench_weight_var.get(),
             'trf_last_gw': self.trf_last_var.get(),
             'ft_value': self.ft_value_var.get(),
-            "ft_increment": self.ft_increment_var.get(),
+            'ft_increment': self.ft_increment_var.get(),
             'wc_day': self.wc_day_var.get(),
-            'wc_days': wc_days_value,
-            'wc_range': wc_range_value,
+            'wc_days': _parse_comma_list(self.wc_days_entry.get()),
+            'wc_range': _parse_comma_list(self.wc_range_entry.get()),
             'all_star_day': self.all_star_day_var.get(),
-            'all_star_days': all_star_days_value,
-            'all_star_range': all_star_range_value,
+            'all_star_days': _parse_comma_list(self.all_star_days_entry.get()),
+            'all_star_range': _parse_comma_list(self.all_star_range_entry.get()),
             'solve_time': self.solve_time_var.get(),
-            'banned_players': banned_players,
-            'forced_players': forced_players,
+            'banned_players': _parse_comma_list(self.banned_players_entry.get(), cast=str),
+            'forced_players': _parse_comma_list(self.forced_players_entry.get(), cast=str),
             'forced_players_days': solver_options.get('forced_players_days', {}),
             'no_sols': self.no_sols_var.get(),
             'threshold_value': self.threshold_var.get(),
@@ -389,449 +368,421 @@ class NBAOptimizerGUI:
             'team_id': self.team_id_var.get(),
             'solver': solver_options.get('solver'),
             'cbc_path': solver_options.get('cbc_path'),
-            'highs_path': solver_options.get('highs_path')
+            'highs_path': solver_options.get('highs_path'),
         }
-        
+
         if self.gd_entry.get() is None:
             print("Game day not found")
-            
-        if self.itb_entry.get() is None: 
+            return
+        if self.itb_entry.get() is None:
             print("ITB not found")
-        
-        # Importing Data
+            return
+
+        # Load projections
         if os.path.exists('data/projections_overwrite.csv'):
             all_data = pd.read_csv('data/projections_overwrite.csv')
-        else:    
+        else:
             all_data = pd.read_csv('data/projections.csv')
 
-        # Run the optimizer
-        r = solve_multi_period_NBA(all_data=all_data, squad=players, sell_prices=prices, gd=self.gd_entry.get(), itb=float(self.itb_entry.get()), options=new_options)
-        print()
+        r = solve_multi_period_NBA(
+            all_data=all_data, squad=players, sell_prices=prices,
+            gd=self.gd_entry.get(), itb=float(self.itb_entry.get()),
+            options=new_options,
+        )
 
-        # Display result in a new windowz
+        self._display_results(r, new_options)
+
+    # -------------------------------------------------------------------
+    # Results display
+    # -------------------------------------------------------------------
+
+    def _display_results(self, solver_output, options):
+        """Show optimisation results in a new tabbed window."""
         result_window = ctk.CTkToplevel(self.root)
         result_window.title("Plan")
-        
-        # Splitting window into tabs
+
         tabs = ctk.CTkTabview(result_window)
         tabs.grid(row=0, column=0, padx=20)
 
-        for i in range(new_options['no_sols']):
+        for i in range(options['no_sols']):
+            result = solver_output['results'][i]
+            planner_tab = tabs.add(f"Plan {i + 1}")
+            self._render_plan_tab(planner_tab, result)
 
-            result = r['results']
-            result = result[i]
-            
-            planner_tab = tabs.add(f"Plan {i+1}")
-            #transfer_tab = tabs.add("Transfers")
-        
-            # Define the width of each column
-            gameday_width = 5
-            name_width = 15
-            team_width = 4
-            price_width = 4
-            xP_width = 6
+    def _render_plan_tab(self, tab, result):
+        """Render a single plan tab with weekly breakdown."""
+        name_width = 15
 
-            # Function to truncate names
-            def truncate_name(name, max_length):
-                return (name[:max_length - 3] + '...') if len(name) > max_length else name
+        def truncate_name(name, max_len):
+            return (name[:max_len - 3] + '...') if len(name) > max_len else name
 
-            # Extract week number from gameday
-            result['picks']['week'] = (result['picks']['gameday']).apply(lambda x: math.floor(x))
+        result['picks']['week'] = result['picks']['gameday'].apply(lambda x: math.floor(x))
+        unique_weeks = result['picks']['week'].unique()
+        chips_used = result['chips_used']
 
-            # Determine the range of weeks and gamedays
-            unique_weeks = result['picks']['week'].unique()
-            unique_gamedays = result['picks']['gameday'].unique()
+        my_frame = ctk.CTkScrollableFrame(tab, width=1350, height=750, corner_radius=0, fg_color="transparent")
+        my_frame.grid(row=0, column=0, sticky="nsew")
 
-            # Calculate the number of lines in the weekly summary
-            num_lines = len(result['weekly_summary'].split('\n'))
+        # Summary box
+        summary_lines = result['weekly_summary'].splitlines()
+        weekly_summary_text = tk.Text(my_frame, height=4, width=20, bg=DARK_BG, fg='white',
+                                       highlightbackground=BORDER_COLOR, font=('.AppleSystemUIFont', 13))
+        weekly_summary_text.grid(row=0, column=0, pady=(5, 20), padx=35, sticky="w")
+        weekly_summary_text.insert(tk.END, f'\n    {summary_lines[-2]}\n    {summary_lines[-1]}\n')
 
-            # Create a frame widget for the planner tab
-            my_frame = ctk.CTkScrollableFrame(planner_tab, width=1350, height=750, corner_radius=0, fg_color="transparent")
-            my_frame.grid(row=0, column=0, sticky="nsew")
-            
-            # Create a single text widget for the weekly summary
-            weekly_summary_text = tk.Text(my_frame, height=4, width=20, bg='#242424', fg='white', highlightbackground='#4a4a4a', font=('.AppleSystemUIFont', 13))
-            weekly_summary_text.grid(row=0, column=0, pady=(5, 20), padx=35, sticky="w")
+        # Render each week
+        for i, week in enumerate(unique_weeks):
+            week_picks = result['picks'][result['picks']['week'] == week]
+            current_week_gamedays = week_picks['gameday'].unique()
 
-            # Get the last line of the summary
-            last_summary_line = result['weekly_summary'].splitlines()[-1]
-            second_last_summary_line = result['weekly_summary'].splitlines()[-2]
+            week_header = summary_lines[i] if i < len(summary_lines) else f"Week {week}"
+            ctk.CTkLabel(my_frame, text=week_header).grid(row=(2 * i + 1), column=0, padx=35, sticky="w")
 
-            # Insert the last line to the left of the text widget
-            weekly_summary_text.insert(tk.END, f'\n    {second_last_summary_line}\n    {last_summary_line}\n')
+            frame_widget = ctk.CTkScrollableFrame(my_frame, orientation="horizontal", width=1300, height=210)
+            frame_widget.grid(row=(2 * i + 2), column=0, padx=(20, 40), pady=(0, 10),
+                              columnspan=len(current_week_gamedays), sticky="ew")
 
-            # Chips used
-            chips_used = result['chips_used']
+            for j, gameday in enumerate(current_week_gamedays):
+                gd_picks = week_picks[(week_picks['gameday'] == gameday) & (week_picks['transfer_out'] == 0)]
+                if gd_picks.empty:
+                    continue
 
-            # Iterate through unique weeks
-            for i, week in enumerate(unique_weeks):
-                
-                # Filter picks for the current week
-                week_picks = result['picks'][result['picks']['week'] == week]
+                # Header
+                chip_suffix = chips_used.get(gameday, "")
+                header_line = f'{gameday:.1f}{chip_suffix}'.center(34)
 
-                # Get unique gamedays for the current week
-                current_week_gamedays = week_picks['gameday'].unique()
+                text_widget = tk.Text(frame_widget, height=15, width=34, bg=DARK_BG, fg='white',
+                                       highlightbackground=BORDER_COLOR)
+                text_widget.grid(row=1, column=j, padx=5, pady=5)
+                text_widget.insert(tk.END, f"\n{header_line}\n\n")
 
-                # Create a header for the week including the summary line
-                week_header = f'{result['weekly_summary'].splitlines()[i]}'
-                header_label = ctk.CTkLabel(my_frame, text=week_header)
-                header_label.grid(row=(2*i+1), column=0, padx=35, sticky="w")
+                bold_font = font.Font(family="Helvetica", size=12, weight="bold")
 
-                # Create a frame widget for the current week
-                frame_widget = ctk.CTkScrollableFrame(my_frame, orientation="horizontal",width=1300, height=210)
-                frame_widget.grid(row=(2*i+2), column=0, padx=(20,40), pady=(0,10), columnspan=len(current_week_gamedays), sticky="ew")
+                for _, row in gd_picks.iterrows():
+                    self._render_player_row(text_widget, row, name_width, bold_font)
+                    text_widget.insert(tk.END, "\n")
 
-                # Iterate through unique gamedays
-                for j, gameday in enumerate(current_week_gamedays):
-                    
-                    # Create a text widget for each gameday column
-                    text_widget = ctk.CTkLabel(frame_widget, height=14, width=21)
-                    text_widget.grid(row=1, column=j, padx=5, pady=5)
+    def _render_player_row(self, text_widget, row, name_width, bold_font):
+        """Render a single player row in a gameday text widget."""
+        truncated_name = row['name'][:name_width - 3] + '...' if len(row['name']) > name_width else row['name']
+        xp_text = f"{row['xP']:.2f}"
+        team_width, price_width = 4, 4
 
-                    # Filter picks for the current gameday and week where transfer_out is 0
-                    gameday_week_picks = week_picks[(week_picks['gameday'] == gameday) & (week_picks['transfer_out'] == 0)]
+        # Determine colors
+        xp_color = 'red' if row['xP'] == 0 else 'yellow' if row['xP'] < 20 else 'green'
+        pos_color = FRONT_COLOR if row['pos'] == "FRONT" else BACK_COLOR
 
-                    # Filter picks based on the players in the squad
-                    squad_picks = gameday_week_picks
+        # Configure tags
+        text_widget.tag_configure(pos_color, foreground=pos_color, font=bold_font)
+        text_widget.tag_configure('transferred_in', background='orange', foreground='white')
+        text_widget.tag_configure('captain', background='green', foreground='white')
+        text_widget.tag_configure(xp_color, foreground=xp_color)
 
-                    # Check if there are picks for the current gameday and squad
-                    if not squad_picks.empty:
-                        # Gameday header
-                        if gameday in chips_used.keys():
-                            chip_used = chips_used[gameday]
-                            gameday_header = f'{gameday:.1f}' + f'{chip_used}'
-                            header_line = gameday_header.center(34)
-                        else:
-                            gameday_header = f'{gameday:.1f}'
-                            header_line = gameday_header.center(34)
+        # Position indicator
+        text_widget.insert(tk.END, '  | ', pos_color)
 
-                        # Create a text widget for each gameday column
-                        text_widget = tk.Text(frame_widget, height=15, width=34, bg='#242424', fg='white', highlightbackground='#4a4a4a')
-                        text_widget.grid(row=1, column=j, padx=5, pady=5)
-                        text_widget.insert(tk.END, f"\n{header_line}\n\n")
+        # Player name + team + price
+        player_info = f"{truncated_name:{name_width}} {row['team']:{team_width}} {row['price']:{price_width}.1f}"
 
-                        # Iterate through the picks for the current gameday, week, and squad
-                        for k, (index, row) in enumerate(squad_picks.iterrows()):
-                            truncated_name = truncate_name(row['name'], name_width)
-                            xP_text = f"{row['xP']:.2f}"  
-                            
-                            # Check xP value for coloring
-                            color = 'red' if row['xP'] == 0 else 'yellow' if row['xP'] < 20 else 'green'
+        is_transfer = row['transfer_in'] == 1
+        is_captain = row['captain'] == 1
 
-                            # Check player position for the colored line
-                            position_line_color = '#C80044' 
-                            if row['pos'] == "FRONT":
-                                position_line_color = '#C80044' 
-                            else:
-                                position_line_color = '#1B3B9A'
+        if is_transfer:
+            text_widget.insert(tk.END, player_info, 'transferred_in')
+        else:
+            text_widget.insert(tk.END, player_info)
 
-                            # Define a tag for transferred in players
-                            text_widget.tag_configure('transferred_in', background='orange', foreground='white')
+        # xP value
+        text_widget.insert(tk.END, " ")
+        if is_captain:
+            text_widget.insert(tk.END, xp_text, 'captain')
+        else:
+            text_widget.insert(tk.END, xp_text, xp_color)
 
-                            # Define a tag for captained players
-                            text_widget.tag_configure('captain', background='green', foreground='white')
-                            
-                            # Define a bold font
-                            bold_font = tk.font.Font(family="Helvetica", size=12, weight="bold")
-                        
-                            # Tags for players that are transferred in and captained
-                            if row['transfer_in'] + row['captain'] == 2:
-
-                                # Position tag
-                                text_widget.tag_configure(position_line_color, foreground=position_line_color, font=bold_font)
-                                text_widget.insert(tk.END, '  | ', position_line_color)
-
-                                # Insert player name with transfer tag
-                                text_widget.insert(tk.END, f"{truncated_name:{name_width}} {row['team']:{team_width}} {row['price']:{price_width}.1f}", 'transferred_in')
-                                
-                                # Insert xPoints with Captain tag
-                                text_widget.insert(tk.END, " ")
-                                text_widget.insert(tk.END, xP_text, 'captain')
-                            
-                            # Tags for players that are transferred in
-                            elif row['transfer_in'] == 1:
-
-                                # Position tag
-                                text_widget.tag_configure(position_line_color, foreground=position_line_color, font=bold_font)
-                                text_widget.insert(tk.END, '  | ', position_line_color)
-                                
-                                # Insert player name with captain tag
-                                text_widget.insert(tk.END, f"{truncated_name:{name_width}} {row['team']:{team_width}} {row['price']:{price_width}.1f}", 'transferred_in')
-                                
-                                # xPoints tag
-                                text_widget.tag_configure(color, foreground=color)
-                                text_widget.insert(tk.END, " ")
-                                text_widget.insert(tk.END, xP_text, color)
-
-                            # Tags for players that are captained
-                            elif row['captain'] == 1:
-
-                                # Position tag
-                                text_widget.tag_configure(position_line_color, foreground=position_line_color, font=bold_font)
-                                text_widget.insert(tk.END, '  | ', position_line_color)
-
-                                # Insert player name
-                                text_widget.insert(tk.END, f"{truncated_name:{name_width}} {row['team']:{team_width}} {row['price']:{price_width}.1f}")
-                                
-                                # Insert xPoints with Captain tag
-                                text_widget.tag_configure(color, foreground=color)
-                                text_widget.insert(tk.END, " ")
-                                text_widget.insert(tk.END, xP_text, 'captain')
-                                
-                            else:
-
-                                # Position tag
-                                text_widget.tag_configure(position_line_color, foreground=position_line_color, font=bold_font)
-                                text_widget.insert(tk.END, '  | ', position_line_color)
-
-                                # Insert player name
-                                text_widget.insert(tk.END, f"{truncated_name:{name_width}} {row['team']:{team_width}} {row['price']:{price_width}.1f}")
-                                
-                                # Insert xPoints
-                                text_widget.tag_configure(color, foreground=color)
-                                text_widget.insert(tk.END, " ")
-                                text_widget.insert(tk.END, xP_text, color)
-
-                            # Insert a new line at the end of the widget
-                            text_widget.insert(tk.END, "\n")
+    # -------------------------------------------------------------------
+    # Projections window
+    # -------------------------------------------------------------------
 
     def open_projections_window(self):
-        # Create a new window for projections
+        """Open a window showing projections, xMins, and fixtures tables."""
         self.projections_window = ctk.CTkToplevel(self.root)
         self.projections_window.title("Projections, xMins, and Fixtures")
-
-        # Set the window size close to full screen
-        self.projections_window.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}+0+0")
-
-        # Create a Tab view
-        tabs = ctk.CTkTabview(self.projections_window, width=1200, height=800)
-        tabs.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
-
-        # Configure the new window to expand properly
+        self.projections_window.geometry(
+            f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}+0+0"
+        )
         self.projections_window.grid_rowconfigure(0, weight=1)
         self.projections_window.grid_columnconfigure(0, weight=1)
 
-        # Add xPoints tab
+        tabs = ctk.CTkTabview(self.projections_window, width=1200, height=800)
+        tabs.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
+
         self.xpoints_tab = tabs.add("xPoints")
         self.xmins_tab = tabs.add("xMins")
-        
-        self.create_table_tab(csv_file='data/projections.csv', tab= self.xpoints_tab, sheet_name = "xpoints_sheet")
-
-        # Add xMins tab
-        self.create_table_tab(csv_file='data/xmins.csv', tab=self.xmins_tab,sheet_name = "xmins_sheet")
-
-        # Add Fixtures tab
         self.fixtures_tab = tabs.add("Fixtures")
-        self.create_table_tab_fix(self.fixtures_tab,'data/fixture_ticker.csv')
 
-    def create_table_tab(self, csv_file, tab, sheet_name):
+        self.create_table_tab(csv_file='data/projections.csv', tab=self.xpoints_tab, sheet_name="xpoints_sheet")
+        self.create_table_tab(csv_file='data/xmins.csv', tab=self.xmins_tab, sheet_name="xmins_sheet")
+        self.create_table_tab_fix(self.fixtures_tab, 'data/fixture_ticker.csv')
 
-        # Read the data from CSV
+    def _load_table_data(self, csv_file, sheet_name):
+        """Load and prepare data for a table tab."""
         data = pd.read_csv(csv_file)
         if 'G' in data.columns:
-            data = data.drop(columns=['G'])
-        data = data.reset_index(drop=True)
-        mins_exceptions_path = "data/mins_changes.json"
-        projections_custom_path = "data/projections_overwrite.csv"
+            data.drop(columns=['G'], inplace=True)
+        data.reset_index(drop=True, inplace=True)
+
         mins_players = []
         mins_column_name = []
         mins_value = []
+        mins_exceptions_path = "data/mins_changes.json"
+        projections_custom_path = "data/projections_overwrite.csv"
 
         if csv_file == "data/xmins.csv" and os.path.exists(mins_exceptions_path):
             with open(mins_exceptions_path, 'r') as f:
                 mins_exceptions = json.load(f)
-
-            # Apply changes to the xMins DataFrame
             for change in mins_exceptions:
                 player_name = change.get("name")
-                if isinstance(player_name, tuple):
+                if isinstance(player_name, (tuple, list)):
                     player_name = player_name[0]
-                # Ensure player_name is a string, not a list
-                if isinstance(player_name, list):
-                    player_name = player_name[0]
-                # Add player name to mins_players list
                 mins_players.append(player_name)
                 mins_column_name.append(str(change.get("column")))
                 mins_value.append(change.get("value"))
 
             custom_mins = pd.read_csv('data/xmins_overwrite.csv')
+            custom_idx = custom_mins[custom_mins['name'].isin(mins_players)].index
+            mins_idx = data[data['name'].isin(mins_players)].index
+            data.iloc[mins_idx, 5:] = custom_mins.iloc[custom_idx, 5:].values
 
-            # Get the index of the players in the custom_mins DataFrame
-            custom_mins_index = custom_mins[custom_mins['name'].isin(mins_players)].index
-
-            # get the index of the players in the mins DataFrame
-            mins_index = data[data['name'].isin(mins_players)].index
-
-            # Update the entire row of the mins DataFrame with the custom_mins values
-            data.iloc[mins_index, 5:] = custom_mins.iloc[custom_mins_index, 5:]
-        
         if csv_file == "data/projections.csv" and os.path.exists(projections_custom_path):
             data = pd.read_csv(projections_custom_path)
 
-        # Create a frame to hold the search entry and table
-        setattr(self,f"search_frame_{sheet_name}", ctk.CTkFrame(tab))
-        getattr(self,f"search_frame_{sheet_name}").grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        return data, mins_players, mins_column_name, mins_value
 
-        # Add a search label and entry widget
-        search_label = ctk.CTkLabel(getattr(self,f"search_frame_{sheet_name}"), text="Search Player:")
-        search_label.grid(row=0, column=0, padx=(10, 0), pady=5, sticky="w")
+    def _prepare_display_data(self, data):
+        """Format data for display: rename columns, sort, map gameday codes."""
+        data = data.drop(columns=['id'], errors='ignore')
+        data.columns = data.columns.str.lower().str.capitalize()
+        data.sort_values(by=['Price', 'Name'], ascending=False, inplace=True)
+        data.reset_index(drop=True, inplace=True)
 
-        setattr(self,f"search_bar_{sheet_name}",ctk.CTkEntry(getattr(self,f"search_frame_{sheet_name}"), placeholder_text="Enter player name", width=200))
-        getattr(self,f"search_bar_{sheet_name}").grid(row=0, column=1, padx=(5, 10), pady=5, sticky="ew")
-
-        # Add dropdown for Team
-        team_label = ctk.CTkLabel(getattr(self, f"search_frame_{sheet_name}"), text="Team:")
-        team_label.grid(row=0, column=2, padx=(10, 0), pady=5, sticky="w")
-
-        unique_teams = sorted(data['team'].unique())
-        setattr(self, f"team_dropdown_{sheet_name}", ctk.CTkComboBox(getattr(self, f"search_frame_{sheet_name}"), values=["All"] + unique_teams, width=100))
-        getattr(self, f"team_dropdown_{sheet_name}").grid(row=0, column=3, padx=(5, 10), pady=5, sticky="ew")
-
-        # Add dropdown for Position
-        position_label = ctk.CTkLabel(getattr(self, f"search_frame_{sheet_name}"), text="Position:")
-        position_label.grid(row=0, column=4, padx=(10, 0), pady=5, sticky="w")
-
-        unique_positions = sorted(data['position'].unique())
-        setattr(self, f"position_dropdown_{sheet_name}", ctk.CTkComboBox(getattr(self, f"search_frame_{sheet_name}"), values=["All"] + unique_positions, width=100))
-        getattr(self, f"position_dropdown_{sheet_name}").grid(row=0, column=5, padx=(5, 10), pady=5, sticky="ew")
-
-        # Add dropdown for Price (max price selection)
-        price_label = ctk.CTkLabel(getattr(self, f"search_frame_{sheet_name}"), text="Max Price:")
-        price_label.grid(row=0, column=6, padx=(10, 0), pady=5, sticky="w")
-
-        max_price = int(round(data['price'].max()))
-        price_values = list(range(0, max_price+1, 1))  
-        setattr(self, f"price_dropdown_{sheet_name}", ctk.CTkComboBox(getattr(self, f"search_frame_{sheet_name}"), values=[str(p) for p in price_values], width=100))
-        getattr(self, f"price_dropdown_{sheet_name}").set(str(max_price+1))
-        getattr(self, f"price_dropdown_{sheet_name}").grid(row=0, column=7, padx=(5, 10), pady=5, sticky="ew")
-
-        data = data.drop(columns=['id'])
-        
-        # Change the column names to lower case
-        data.columns = data.columns.str.lower()
-
-        # Change the first letter of the column names to uppercase
-        data.columns = data.columns.str.capitalize()
-
-        # Sort data by price in descending order
-        data = data.sort_values(by=['Price','Name'], ascending=False)
-        data = data.reset_index(drop=True)
-
-        # Change name of Min column to xMins
         if 'Min' in data.columns:
-            data = data.rename(columns={'Min': 'xMins'})
+            data.rename(columns={'Min': 'xMins'}, inplace=True)
 
-        # Import fixture info
         fixture_info = pd.read_csv('data/fixture_info.csv')
-        
-        # Create a mapping from fixture_info 'id' to 'code'
-        id_to_code_mapping = fixture_info.set_index('id')['code'].to_dict()
+        id_to_code = fixture_info.set_index('id')['code'].to_dict()
+        data.rename(columns=lambda x: id_to_code[int(x)] if x.isdigit() and int(x) in id_to_code else x, inplace=True)
 
-        # Rename the columns in projections_df that correspond to game days using the mapping
-        data.rename(columns=lambda x: id_to_code_mapping[int(x)] if x.isdigit() and int(x) in id_to_code_mapping else x, inplace=True)
+        return data
 
-        self.data = data
+    def create_table_tab(self, csv_file, tab, sheet_name):
+        """Create a data table tab with search/filter controls."""
+        data, mins_players, mins_column_name, mins_value = self._load_table_data(csv_file, sheet_name)
+        data = self._prepare_display_data(data)
 
-        # Store the data in an instance variable for later access
         self.original_data = data
         self.filtered_data = data.copy()
 
-        # Extract column names and row data
-        headers = list(self.original_data.columns)
-        rows = self.original_data.values.tolist()  
+        # Search/filter controls
+        search_frame = ctk.CTkFrame(tab)
+        search_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        setattr(self, f"search_frame_{sheet_name}", search_frame)
 
-        # Create a tksheet table inside the tab
-        setattr(self, sheet_name, Sheet(tab,
-                      headers=headers,
-                      data=rows,
-                      header_font= ("Calibri", 13, "bold"),
-                      index_font= ("Calibri", 13, "bold"),
-                      auto_resize_columns=140,
-                      show_row_index=True,
-                      default_column_width=40,
-                      top_left_bg =  "#242424",
-                      top_left_fg =  "#242424",
-                      table_grid_fg = "#242424",
-                      table_bg = "#2E5984",
-                      table_fg = "white",
-                      header_bg = "#242424",
-                      index_bg = "#242424",
-                      header_fg = "white",
-                      index_fg = "white",
-                      align = 'c',
-                      width=1470,
-                      height=790))
-        getattr(self,sheet_name).grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
-        
-        getattr(self,sheet_name).column_width(0,150)
-        getattr(self,sheet_name).column_width(1,60)
-        getattr(self,sheet_name).column_width(2,50)
-        getattr(self,sheet_name).column_width(3,75)
-        getattr(self,sheet_name).align(getattr(self,sheet_name).span('A'),align="w")
-        getattr(self,sheet_name)['A:D'].readonly()
+        ctk.CTkLabel(search_frame, text="Search Player:").grid(row=0, column=0, padx=(10, 0), pady=5, sticky="w")
+        search_bar = ctk.CTkEntry(search_frame, placeholder_text="Enter player name", width=200)
+        search_bar.grid(row=0, column=1, padx=(5, 10), pady=5, sticky="ew")
+        setattr(self, f"search_bar_{sheet_name}", search_bar)
 
-        # Apply conditional formatting to numeric columns
-        new_data = self.original_data.drop(columns=['Name', 'Team','Price','Position'])
-        numeric_columns = new_data.columns  # Define numeric columns for formatting
-        self.apply_conditional_formatting(self.original_data, numeric_columns, sheet_name)
+        # Team dropdown
+        ctk.CTkLabel(search_frame, text="Team:").grid(row=0, column=2, padx=(10, 0), pady=5, sticky="w")
+        team_dd = ctk.CTkComboBox(search_frame, values=["All"] + sorted(data['Team'].unique()), width=100)
+        team_dd.grid(row=0, column=3, padx=(5, 10), pady=5, sticky="ew")
+        setattr(self, f"team_dropdown_{sheet_name}", team_dd)
 
-        # Set options for appearance (optional)
-        getattr(self,sheet_name).enable_bindings()
+        # Position dropdown
+        ctk.CTkLabel(search_frame, text="Position:").grid(row=0, column=4, padx=(10, 0), pady=5, sticky="w")
+        pos_dd = ctk.CTkComboBox(search_frame, values=["All"] + sorted(data['Position'].unique()), width=100)
+        pos_dd.grid(row=0, column=5, padx=(5, 10), pady=5, sticky="ew")
+        setattr(self, f"position_dropdown_{sheet_name}", pos_dd)
 
-        # Bind the search functionality to the entry widget
-        getattr(self,f"search_bar_{sheet_name}").bind("<KeyRelease>", lambda event: self.filter_table(getattr(self,f"search_bar_{sheet_name}").get(), sheet_name))
-        getattr(self, f"team_dropdown_{sheet_name}").bind("<<ComboboxSelected>>", lambda event: self.filter_table(sheet_name))
-        getattr(self, f"position_dropdown_{sheet_name}").bind("<<ComboboxSelected>>", lambda event: self.filter_table(sheet_name))
-        getattr(self, f"price_dropdown_{sheet_name}").bind("<<ComboboxSelected>>", lambda event: self.filter_table(sheet_name))
+        # Price dropdown
+        ctk.CTkLabel(search_frame, text="Max Price:").grid(row=0, column=6, padx=(10, 0), pady=5, sticky="w")
+        max_price = int(round(data['Price'].max()))
+        price_dd = ctk.CTkComboBox(search_frame, values=[str(p) for p in range(0, max_price + 1)], width=100)
+        price_dd.set(str(max_price + 1))
+        price_dd.grid(row=0, column=7, padx=(5, 10), pady=5, sticky="ew")
+        setattr(self, f"price_dropdown_{sheet_name}", price_dd)
 
+        # Create sheet
+        headers = list(data.columns)
+        rows = data.values.tolist()
+
+        sheet = Sheet(
+            tab, headers=headers, data=rows,
+            header_font=TABLE_HEADER_FONT, index_font=TABLE_INDEX_FONT,
+            auto_resize_columns=140, show_row_index=True, default_column_width=40,
+            top_left_bg=DARK_BG, top_left_fg=DARK_BG, table_grid_fg=DARK_BG,
+            table_bg=TABLE_BG, table_fg="white", header_bg=DARK_BG, index_bg=DARK_BG,
+            header_fg="white", index_fg="white", align='c', width=1470, height=790,
+        )
+        sheet.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+        setattr(self, sheet_name, sheet)
+
+        sheet.column_width(0, 150)
+        sheet.column_width(1, 60)
+        sheet.column_width(2, 50)
+        sheet.column_width(3, 75)
+        sheet.align(sheet.span('A'), align="w")
+        sheet['A:D'].readonly()
+
+        # Conditional formatting
+        numeric_cols = data.drop(columns=['Name', 'Team', 'Price', 'Position']).columns
+        self.apply_conditional_formatting(data, numeric_cols, sheet_name)
+
+        sheet.enable_bindings()
+
+        # Bind search/filter events
+        search_bar.bind("<KeyRelease>", lambda e: self.filter_table(search_bar.get(), sheet_name))
+        team_dd.bind("<<ComboboxSelected>>", lambda e: self.filter_table(search_bar.get(), sheet_name))
+        pos_dd.bind("<<ComboboxSelected>>", lambda e: self.filter_table(search_bar.get(), sheet_name))
+        price_dd.bind("<<ComboboxSelected>>", lambda e: self.filter_table(search_bar.get(), sheet_name))
 
         if sheet_name == 'xmins_sheet':
-            getattr(self,sheet_name)['E:'].format(int_formatter())
-            header_data = getattr(self,sheet_name)["A:"].options(table=False, header=True).data
+            sheet['E:'].format(int_formatter())
+            header_data = sheet["A:"].options(table=False, header=True).data
 
-            mins_column_index = []
-            mins_row_index = []
-            for i in mins_column_name:
-                mins_column_index.append(header_data.index(i))
-            for i in mins_players:
-                mins_row_index.append(getattr(self,sheet_name)['A'].data.index(i))
-            for i in range(len(mins_row_index)):
-                getattr(self,sheet_name).highlight_cells(mins_row_index[i], mins_column_index[i], bg='#800080', fg='white')
+            for player_name, col_name in zip(mins_players, mins_column_name):
+                if col_name in header_data and player_name in sheet['A'].data:
+                    col_idx = header_data.index(col_name)
+                    row_idx = sheet['A'].data.index(player_name)
+                    sheet.highlight_cells(row_idx, col_idx, bg='#800080', fg='white')
 
-            # Bind a function to track changes when the xMins values are edited
-            getattr(self, sheet_name).bind("<<SheetModified>>", lambda event: self.on_xmins_edit(sheet_name, event))
-            # Add the Delete Custom xMins button
-            delete_button = ctk.CTkButton(getattr(self, f"search_frame_{sheet_name}"), text="Delete Custom xMins", command=self.delete_custom_xmins)
-            delete_button.grid(row=0, column=9, pady=5, padx=(10, 0), sticky="w")
-        
-        # Hiding past gds
+            sheet.bind("<<SheetModified>>", lambda e: self.on_xmins_edit(sheet_name, e))
+
+            ctk.CTkButton(search_frame, text="Delete Custom xMins", command=self.delete_custom_xmins
+                           ).grid(row=0, column=9, pady=5, padx=(10, 0), sticky="w")
+
+        # Hide past gamedays
         if float(self.gd_entry.get()) != 1.1:
             gameday_value = self.gd_entry.get()
-            header_data_hide = getattr(self,sheet_name)["A:"].options(table=False, header=True).data
+            header_data_hide = sheet["A:"].options(table=False, header=True).data
+            if gameday_value in header_data_hide:
+                gameday_index = header_data_hide.index(gameday_value)
+                start_col = 5 if sheet_name == 'xmins_sheet' else 4
+                sheet.hide_columns(list(range(start_col, gameday_index)))
+
+    def create_table_tab_fix(self, tab, csv_file):
+        """Create the fixtures table tab."""
+        data = pd.read_csv(csv_file)
+        data.columns = data.columns.str.lower().str.capitalize()
+
+        fixture_info = pd.read_csv('data/fixture_info.csv')
+        id_to_code = fixture_info.set_index('id')['code'].to_dict()
+        data.rename(columns=lambda x: id_to_code[int(x)] if x.isdigit() and int(x) in id_to_code else x, inplace=True)
+        data.fillna("", inplace=True)
+
+        headers = list(data.columns[1:])
+        rows = data.values[:, 1:].tolist()
+
+        self.sheet = Sheet(
+            tab, headers=headers, data=rows,
+            header_font=TABLE_HEADER_FONT, show_row_index=True,
+            row_index=data.values[:, 0].tolist(), default_column_width=40,
+            top_left_bg=DARK_BG, top_left_fg=DARK_BG, table_grid_fg=DARK_BG,
+            table_bg=TABLE_BG, table_fg="white", header_bg=DARK_BG, index_bg=DARK_BG,
+            header_fg="white", index_fg="white", align='c', width=2000, height=790,
+        )
+        self.sheet.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+
+        self.sheet.align(self.sheet.span('A'), align="w")
+        self.sheet.set_options(grid_vert_lines=True, grid_horiz_lines=True)
+
+        # Color cells: green = has fixture, red = no fixture
+        for r_idx, row in enumerate(data.values[:, 1:]):
+            for c_idx, cell in enumerate(row):
+                color = "green" if cell else "red"
+                self.sheet.highlight_cells(row=r_idx, column=c_idx, bg=color)
+
+        self.sheet.frozen_columns = 2
+        self.sheet.enable_bindings()
+
+        # Hide past gamedays
+        gameday_value = self.gd_entry.get()
+        header_data_hide = self.sheet["A:"].options(table=False, header=True).data
+        if gameday_value in header_data_hide:
             gameday_index = header_data_hide.index(gameday_value)
-            if sheet_name == 'xmins_sheet':
-                columns_to_hide = list(range(5, gameday_index))
-                getattr(self, sheet_name).hide_columns(columns_to_hide)
-            else:
-                columns_to_hide = list(range(4, gameday_index))
-                getattr(self, sheet_name).hide_columns(columns_to_hide)
+            self.sheet.hide_columns(list(range(0, gameday_index)))
+
+    # -------------------------------------------------------------------
+    # Table utilities
+    # -------------------------------------------------------------------
+
+    def filter_table(self, search_query, sheet_name):
+        """Filter the table based on search query and dropdown selections."""
+        search_query = search_query.lower()
+        filtered = self.original_data
+        if search_query:
+            filtered = filtered[filtered['Name'].str.lower().str.contains(search_query)]
+
+        selected_team = getattr(self, f"team_dropdown_{sheet_name}").get()
+        selected_position = getattr(self, f"position_dropdown_{sheet_name}").get()
+        selected_max_price = getattr(self, f"price_dropdown_{sheet_name}").get()
+
+        if selected_team != "All":
+            filtered = filtered[filtered['Team'] == selected_team]
+        if selected_position != "All":
+            filtered = filtered[filtered['Position'] == selected_position]
+        if selected_max_price.isdigit():
+            filtered = filtered[filtered['Price'] <= int(selected_max_price)]
+
+        sheet = getattr(self, sheet_name)
+        sheet.display_rows(rows=filtered.index.tolist(), all_displayed=False)
+        sheet.redraw()
+
+    def apply_conditional_formatting(self, data, numeric_columns, sheet_name):
+        """Apply red-yellow-green gradient formatting to numeric columns."""
+        sheet = getattr(self, sheet_name)
+        for col in numeric_columns:
+            if col not in data.columns:
+                continue
+            col_index = list(data.columns).index(col)
+            min_val = data[col].min()
+            max_val = data[col].max()
+            for row_index, value in enumerate(data[col]):
+                color = self._get_color_for_value(value, min_val, max_val)
+                sheet.highlight_cells(row=row_index, column=col_index, bg=color, fg="black")
+
+    def _get_color_for_value(self, value, min_val, max_val):
+        """Interpolate between red (low), yellow (mid), and green (high)."""
+        if max_val == min_val:
+            return "#ffffe0"
+        norm = (value - min_val) / (max_val - min_val)
+        if norm < 0.5:
+            return self._interpolate_color("red", "yellow", norm * 2)
+        return self._interpolate_color("yellow", "green", (norm - 0.5) * 2)
+
+    @staticmethod
+    def _interpolate_color(color1, color2, factor):
+        """Linearly interpolate between two named colors."""
+        c1 = mcolors.to_rgb(color1)
+        c2 = mcolors.to_rgb(color2)
+        return mcolors.to_hex([(1 - factor) * c1[i] + factor * c2[i] for i in range(3)])
+
+    # -------------------------------------------------------------------
+    # xMins editing
+    # -------------------------------------------------------------------
 
     def xmins_overwrite(self, row_final, column):
-        # Paths to the input CSV and changes log JSON
+        """Apply xMins override and recalculate projections."""
         xmins_csv_path = 'data/xmins.csv'
         changes_log_path = 'data/mins_changes.json'
         output_csv_path = 'data/xmins_overwrite.csv'
 
-        # Read the original xMins CSV file
         if not os.path.exists(xmins_csv_path):
             messagebox.showerror("Error", f"{xmins_csv_path} not found.")
             return
 
-        xmins_df = pd.read_csv(xmins_csv_path)
-        #sort xmins by id
-        xmins_df = xmins_df.sort_values(by='id').reset_index(drop=True)
+        xmins_df = pd.read_csv(xmins_csv_path).sort_values(by='id').reset_index(drop=True)
 
-        # Read the changes log JSON file
         if not os.path.exists(changes_log_path):
             messagebox.showinfo("No Changes", "No custom xMins found to apply.")
             return
@@ -839,332 +790,159 @@ class NBAOptimizerGUI:
         with open(changes_log_path, 'r') as f:
             changes = json.load(f)
 
-        # Apply changes to the xMins DataFrame
         for change in changes:
             player_name = change.get("name")
-            if isinstance(player_name, tuple):
-                player_name = player_name[0]
-            # Ensure player_name is a string, not a list
-            if isinstance(player_name, list):
+            if isinstance(player_name, (tuple, list)):
                 player_name = player_name[0]
             column_name = change.get("column")
             new_value = change.get("value")
 
-            def convert_to_aest_and_remove_time(date_str):
-                # Convert the string to datetime in UTC
-                utc_time = pd.to_datetime(date_str)
+            if player_name not in xmins_df['name'].values:
+                continue
 
-                # Convert from UTC to AEST (UTC+10)
-                aest_time = utc_time.tz_convert('Australia/Sydney')
+            row_index = xmins_df.index[xmins_df['name'] == player_name].tolist()[0]
+            player_team = xmins_df.loc[row_index, 'team']
+            fixture_info = pd.read_csv('data/fixture_info.csv')
+            fixture_info['deadline'] = fixture_info['deadline'].apply(convert_to_aest_and_remove_time)
 
-                # Return just the date part (YYYY-MM-DD)
-                return aest_time.date()
+            if column_name == "xMins":
+                # Apply full minutes override with b2b decay
+                fixture_ticker = pd.read_csv('data/fixture_ticker.csv')
+                fixture_idx = fixture_ticker[fixture_ticker['team'] == player_team].index.tolist()
+                for col in fixture_ticker.columns[1:]:
+                    fixture_ticker[col] = fixture_ticker[col].apply(lambda x: 1 if isinstance(x, str) else x)
+                fixture_ticker.fillna(0, inplace=True)
+                fixture_ticker = fixture_ticker.loc[fixture_idx]
 
-            # Locate the row corresponding to the player
-            if player_name in xmins_df['name'].values:
-                row_index = xmins_df.index[xmins_df['name'] == player_name].tolist()[0]
-                player_team = xmins_df.loc[row_index, 'team']
-                fixture_info = pd.read_csv('data/fixture_info.csv')
-                # Convert the date strings to AEST and remove the time
-                fixture_info['deadline'] = fixture_info['deadline'].apply(convert_to_aest_and_remove_time)
+                xmins_df.iloc[row_index, 6:] = (
+                    (xmins_df.iloc[row_index, 6:].astype(float) + fixture_ticker.iloc[:, 1:].astype(float).values[0])
+                    / (xmins_df.iloc[row_index, 6:].astype(float) + fixture_ticker.iloc[:, 1:].astype(float).values[0])
+                )
+                xmins_df.iloc[row_index, 6:] *= new_value
+                xmins_df.at[row_index, 'MIN'] = new_value
 
-                if column_name == "xMins":
-                    column_name = "MIN"
-                    fixture_ticker = pd.read_csv('data/fixture_ticker.csv')
-                    fixture_index = fixture_ticker[fixture_ticker['team'] == player_team].index.tolist()
-                    for col in fixture_ticker.columns[1:]:
-                        fixture_ticker[col] = fixture_ticker[col].apply(lambda x: 1 if isinstance(x, str) else x)
-                    fixture_ticker = fixture_ticker.fillna(0)
-                    fixture_ticker = fixture_ticker.loc[fixture_index]
-                    xmins_df.iloc[row_index, 6:] = (
-                        (xmins_df.iloc[row_index, 6:].astype(float) + fixture_ticker.iloc[:, 1:].astype(float)) /
-                        (xmins_df.iloc[row_index, 6:].astype(float) + fixture_ticker.iloc[:, 1:].astype(float)))
+                # Apply b2b decay
+                gds = list(map(float, xmins_df.columns.tolist()[6:]))
+                solver_options = _load_solver_options() if hasattr(self, '_so') else json.load(open('solver_settings.json'))
+                b2b_decay = solver_options.get('b2b_decay', [0.975, 0.95])
+                xmins_df.fillna(0, inplace=True)
+                _apply_b2b_decay_display(xmins_df, row_index, gds, fixture_info, b2b_decay)
+            else:
+                fixture_info_dict = fixture_info.set_index('code')['id'].to_dict()
+                column_name = str(fixture_info_dict.get(column_name, column_name))
+                xmins_df.at[row_index, column_name] = new_value
 
-                    xmins_df.iloc[row_index, 6:] = xmins_df.iloc[row_index, 6:].multiply(new_value)
-                    xmins_df.at[row_index, column_name] = new_value
-                    gds = xmins_df.columns.tolist()
-                    gds = gds[6:]
-
-                    # Convert the list of strings to floats using map()
-                    gds = list(map(float, gds))
-
-                    # Read options from the file
-                    with open('solver_settings.json') as f:
-                        solver_options = json.load(f)
-
-                    b2b_decay = solver_options.get('b2b_decay')
-                    
-                    # Define the back-to-back decay function
-                    def back_to_back_decay(projected_mins, row, first_game, second_game):
-                        # Reduce minutes for the first game
-                        projected_mins.loc[row, f'{int(first_game)}'] *= b2b_decay[0]
-                        # Reduce minutes for the second game
-                        projected_mins.loc[row, f'{int(second_game)}'] *= b2b_decay[1]
-                        return projected_mins
-                    
-                    xmins_df = xmins_df.fillna(0)
-
-                    for i, gd in enumerate(gds):
-                        if xmins_df.loc[row_index,f'{int(gd)}'] != 0:
-                            # Check for consecutive games
-                            if i < len(gds) - 1:  # Ensure not to go out of bounds
-                                next_gd = gds[i + 1]
-
-                                # Get the dates for the current game day and the next game day
-                                current_date = fixture_info.loc[fixture_info['id'] == int(gd), 'deadline'].values[0]
-                                next_date = fixture_info.loc[fixture_info['id'] == int(next_gd), 'deadline'].values[0]
-
-                                if (next_date - current_date).days == 1 and xmins_df.loc[row_index, f'{int(next_gd)}'] != 0:  
-                                    # Apply back-to-back minute reductions
-                                    xmins_df = back_to_back_decay(xmins_df, row_index, gd, next_gd)
-
+            # Update sheet display
+            xmins_sheet = getattr(self, "xmins_sheet")
+            for col_idx, value in enumerate(xmins_df.iloc[row_index, 1:]):
+                if col_idx >= 5:
+                    max_val = 50 if value > 36 else 36
+                    color = self._get_color_for_value(value, 0, max_val)
+                    xmins_sheet.set_cell_data(int(row_final), col_idx, value).highlight_cells(
+                        row=int(row_final), column=col_idx, bg=color, fg="black")
                 else:
-                    fixture_info_dict = fixture_info.set_index('code')['id'].to_dict()
-                    column_name = str(fixture_info_dict[column_name])
-                    xmins_df.at[row_index, column_name] = new_value
-                
-            
-            # Iterate over each column in the row and update the corresponding cell
-            for col_index, value in enumerate(xmins_df.iloc[row_index, 1:]):
-                if col_index >= 5:
-                    if value > 36:
-                        color = self.get_color_for_value(value, 0, 50)
-                    else:
-                        color = self.get_color_for_value(value, 0, 36)
-                    getattr(self, "xmins_sheet").set_cell_data(int(row_final), col_index, value).highlight_cells(row=int(row_final), column=col_index, bg=color, fg="black")
-                else:
-                    getattr(self, "xmins_sheet").set_cell_data(int(row_final), col_index, value)
-            
-            getattr(self, "xmins_sheet").highlight_cells(row=row_final, column=column, bg='#800080', fg='white')
+                    xmins_sheet.set_cell_data(int(row_final), col_idx, value)
 
-            # Redraw the sheet to reflect changes
-            getattr(self, "xmins_sheet").redraw()
+            xmins_sheet.highlight_cells(row=row_final, column=column, bg='#800080', fg='white')
+            xmins_sheet.redraw()
 
+            # Update projections sheet
             projections36 = pd.read_csv("data/projections36.csv")
-           
             projections_overwrite = projections36.copy()
-            projections_overwrite.iloc[:,5:] = (projections36.iloc[:,5:].multiply(xmins_df.iloc[:,6:]))/36
+            projections_overwrite.iloc[:, 5:] = (projections36.iloc[:, 5:].multiply(xmins_df.iloc[:, 6:].values)) / 36
 
             proj_row_index = projections_overwrite.index[projections_overwrite['name'] == player_name].tolist()[0]
-
-            for col_index, value in enumerate(projections_overwrite.iloc[proj_row_index, 1:]):
-                if col_index >= 4:
-                    if value > 60:
-                        color = self.get_color_for_value(value, 0, 100)
-                    else:
-                        color = self.get_color_for_value(value, 0, 60)
-                    getattr(self, "xpoints_sheet").set_cell_data(int(row_final), col_index, value.round(1)).highlight_cells(row=int(row_final), column=col_index, bg=color, fg="black")
-
+            xpoints_sheet = getattr(self, "xpoints_sheet")
+            for col_idx, value in enumerate(projections_overwrite.iloc[proj_row_index, 1:]):
+                if col_idx >= 4:
+                    max_val = 100 if value > 60 else 60
+                    color = self._get_color_for_value(value, 0, max_val)
+                    xpoints_sheet.set_cell_data(int(row_final), col_idx, round(value, 1)).highlight_cells(
+                        row=int(row_final), column=col_idx, bg=color, fg="black")
                 else:
-                    getattr(self, "xpoints_sheet").set_cell_data(int(row_final), col_index, value)
+                    xpoints_sheet.set_cell_data(int(row_final), col_idx, value)
 
-            getattr(self, "xpoints_sheet").redraw()
+            xpoints_sheet.redraw()
             projections_overwrite = projections_overwrite.round(1)
             xmins_df = xmins_df.round(2)
 
-        # Save the modified DataFrame to a new CSV file
         xmins_df.to_csv(output_csv_path, index=False)
         projections_overwrite.to_csv('data/projections_overwrite.csv', index=False)
 
     def on_xmins_edit(self, sheet_name, event):
-        # Get the row and column of the edited cell
+        """Handle cell edits in the xMins sheet."""
         edited_cell = event.get('cells', {}).get('table', {})
-        mins_changes = []
-        row, column =  list(edited_cell.keys())[0]
+        row, column = list(edited_cell.keys())[0]
 
-        getattr(self, sheet_name).highlight_cells(row=row, column=column, bg='#800080', fg='white')
-        getattr(self, sheet_name).redraw()
+        sheet = getattr(self, sheet_name)
+        sheet.highlight_cells(row=row, column=column, bg='#800080', fg='white')
+        sheet.redraw()
 
-        player_name = getattr(self, sheet_name)[row,0].data, 
-        new_mins = getattr(self, sheet_name)[row,column].data
-        column_name = getattr(self, sheet_name)[f'{num2alpha(column)}'].options(table=False, hdisp=False, header=True).data
-        change_entry = {
-            "name": player_name,
-            "column": column_name,
-            "value": new_mins
-        }
+        player_name = sheet[row, 0].data
+        new_mins = sheet[row, column].data
+        column_name = sheet[f'{num2alpha(column)}'].options(table=False, hdisp=False, header=True).data
 
-        # Add the change entry to the list
-        mins_changes.append(change_entry)
+        change_entry = {"name": player_name, "column": column_name, "value": new_mins}
 
-        # Path to the JSON file where changes will be stored
         json_file_path = "data/mins_changes.json"
-
-        # Check if the file already exists and load existing data if it does
+        existing_changes = []
         if os.path.exists(json_file_path):
-            with open(json_file_path, 'r') as file:
-                existing_mins_changes = json.load(file)
-        else:
-            existing_mins_changes = []
+            with open(json_file_path, 'r') as f:
+                existing_changes = json.load(f)
 
-        # Append new changes to the existing data
-        existing_mins_changes.extend(mins_changes)
+        existing_changes.append(change_entry)
 
-        # Write the updated data back to the JSON file
-        with open(json_file_path, 'w') as file:
-            json.dump(existing_mins_changes, file, indent=4)
+        with open(json_file_path, 'w') as f:
+            json.dump(existing_changes, f, indent=4)
 
-        # Output to console for verification
-        print(f"Changes saved to {json_file_path}: {mins_changes}")
-        self.xmins_overwrite(row,column)
+        print(f"Changes saved to {json_file_path}: {change_entry}")
+        self.xmins_overwrite(row, column)
 
     def delete_custom_xmins(self):
-        # Path to the JSON file where changes are stored
+        """Delete all custom xMins overrides and refresh the projections window."""
         json_file_path = "data/mins_changes.json"
 
-        # Check if the file exists
-        if os.path.exists(json_file_path):
-            # Delete the file
-            os.remove(json_file_path)
-            if os.path.exists('data/xmins_overwrite.csv'):
-                os.remove('data/xmins_overwrite.csv')
-                os.remove('data/projections_overwrite.csv')
-            messagebox.showinfo("Success", "Custom xMins have been deleted.")
-            self.projections_window.destroy()
-            self.open_projections_window()
-        else:
+        if not os.path.exists(json_file_path):
             messagebox.showinfo("No Changes", "No custom xMins to delete.")
-        
-    def filter_table(self, search_query, sheet_name):
+            return
 
-        search_query = search_query.lower()
-        # Check if search query is empty
-        if search_query == "":
-            filtered_data = self.original_data
-        else:
-            filtered_data = self.original_data[self.original_data['Name'].str.lower().str.contains(search_query)]
-        
-        # Get filter values from dropdowns
-        selected_team = getattr(self, f"team_dropdown_{sheet_name}").get()
-        selected_position = getattr(self, f"position_dropdown_{sheet_name}").get()
-        selected_max_price = getattr(self, f"price_dropdown_{sheet_name}").get()
-    
-        # Apply team filter
-        if selected_team != "All":
-            filtered_data = filtered_data[filtered_data['Team'] == selected_team]
+        os.remove(json_file_path)
+        for path in ('data/xmins_overwrite.csv', 'data/projections_overwrite.csv'):
+            if os.path.exists(path):
+                os.remove(path)
 
-        # Apply position filter
-        if selected_position != "All":
-            filtered_data = filtered_data[filtered_data['Position'] == selected_position]
+        messagebox.showinfo("Success", "Custom xMins have been deleted.")
+        self.projections_window.destroy()
+        self.open_projections_window()
 
-        # Apply price filter
-        if selected_max_price.isdigit():
-            filtered_data = filtered_data[filtered_data['Price'] <= int(selected_max_price)]
 
-        indexes = filtered_data.index.tolist()
+def _apply_b2b_decay_display(df, row_idx, gds, fixture_info, b2b_decay):
+    """Apply back-to-back decay for the display/overwrite logic."""
+    for i, gd_val in enumerate(gds):
+        col = str(int(gd_val))
+        if df.loc[row_idx, col] == 0 or i >= len(gds) - 1:
+            continue
+        next_gd = gds[i + 1]
+        next_col = str(int(next_gd))
+        current_date = fixture_info.loc[fixture_info['id'] == int(gd_val), 'deadline'].values
+        next_date = fixture_info.loc[fixture_info['id'] == int(next_gd), 'deadline'].values
+        if len(current_date) > 0 and len(next_date) > 0:
+            if (next_date[0] - current_date[0]).days == 1 and df.loc[row_idx, next_col] != 0:
+                df.loc[row_idx, col] *= b2b_decay[0]
+                df.loc[row_idx, next_col] *= b2b_decay[1]
 
-        getattr(self,sheet_name).display_rows(rows=indexes, all_displayed = False)
-        getattr(self,sheet_name).redraw()
 
-    def create_table_tab_fix(self, tab, csv_file):
-        # Read the data from CSV
-        data = pd.read_csv(csv_file)
+def _load_solver_options():
+    """Load solver settings."""
+    with open('solver_settings.json') as f:
+        return json.load(f)
 
-        # Change the column names to lower case
-        data.columns = data.columns.str.lower()
 
-        # Change the first letter of the column names to uppercase
-        data.columns = data.columns.str.capitalize()
-
-        # Import fixture info
-        fixture_info = pd.read_csv('data/fixture_info.csv')
-        
-        # Create a mapping from fixture_info 'id' to 'code'
-        id_to_code_mapping = fixture_info.set_index('id')['code'].to_dict()
-
-        # Rename the columns in projections_df that correspond to game days using the mapping
-        data.rename(columns=lambda x: id_to_code_mapping[int(x)] if x.isdigit() and int(x) in id_to_code_mapping else x, inplace=True)
-        
-        # Replace NaN values with an empty string for display purposes
-        data.fillna("", inplace=True)
-
-        self.data = data
-
-        # Extract column names and row data
-        headers = list(data.columns)
-        headers = headers[1:]
-        rows = data.values[:,1:].tolist()
-        
-        # Create a tksheet table inside the tab
-        self.sheet = Sheet(tab,
-                      headers=headers,
-                      data=rows,
-                      header_font= ("Calibri", 13, "bold"),
-                      show_row_index=True,
-                      row_index=data.values[:,0].tolist(),
-                      default_column_width=40,
-                      top_left_bg =  "#242424",
-                      top_left_fg =  "#242424",
-                      table_grid_fg = "#242424",
-                      table_bg = "#2E5984",
-                      table_fg = "white",
-                      header_bg = "#242424",
-                      index_bg = "#242424",
-                      header_fg = "white",
-                      index_fg = "white",
-                      align = 'c',
-                      width=2000,
-                      height=790)
-        self.sheet.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
-
-        self.sheet.align(self.sheet.span('A'),align="w")
-        self.sheet.set_options(grid_vert_lines=True, grid_horiz_lines=True)
-
-        # Style the cells based on their content
-        for r_idx, row in enumerate(data.values[:,1:]):
-            for c_idx, cell in enumerate(row):
-                if cell == "":
-                    self.sheet.highlight_cells(row = r_idx, column = c_idx, bg ="red")
-                else:
-                    self.sheet.highlight_cells(row = r_idx, column = c_idx, bg ="green")
-        # Freeze the index column
-        self.sheet.frozen_columns = 2
-
-        # Set options for appearance (optional)
-        self.sheet.enable_bindings()
-
-        # Hiding past gds
-        gameday_value = self.gd_entry.get()
-        header_data_hide = self.sheet["A:"].options(table=False, header=True).data
-        gameday_index = header_data_hide.index(gameday_value)
-        columns_to_hide = list(range(0, gameday_index))
-        self.sheet.hide_columns(columns_to_hide)
-
-    def apply_conditional_formatting(self, data, numeric_columns,sheet_name):
-        """Apply conditional formatting to numeric columns: red for low values, yellow for middle, green for high"""
-        for col in numeric_columns:
-            if col in data.columns:
-                col_index = list(data.columns).index(col)
-                min_val = data[col].min()
-                max_val = data[col].max()
-
-                # Apply color gradient based on value
-                for row_index, value in enumerate(data[col]):
-                    color = self.get_color_for_value(value, min_val, max_val)
-                    getattr(self,sheet_name).highlight_cells(row=row_index, column=col_index, bg=color, fg="black")
-
-    def get_color_for_value(self, value, min_val, max_val):
-        """Interpolate between red (low), yellow (mid), and green (high) based on value"""
-        if max_val == min_val:
-            return "#ffffe0"  # Neutral yellow if all values are the same
-
-        # Normalize value between 0 (min_val) and 1 (max_val)
-        norm_value = (value - min_val) / (max_val - min_val)
-
-        # Red to yellow (low to mid), yellow to green (mid to high)
-        if norm_value < 0.5:
-            # Interpolate between red and yellow
-            return self.interpolate_color("red", "yellow", norm_value * 2)
-        else:
-            # Interpolate between yellow and green
-            return self.interpolate_color("yellow", "green", (norm_value - 0.5) * 2)
-
-    def interpolate_color(self, color1, color2, factor):
-        """Interpolate between two colors based on a factor between 0 and 1"""
-        c1 = mcolors.to_rgb(color1)
-        c2 = mcolors.to_rgb(color2)
-        interpolated = [(1 - factor) * c1[i] + factor * c2[i] for i in range(3)]
-        return mcolors.to_hex(interpolated)
+def convert_to_aest_and_remove_time(date_str):
+    """Convert a UTC datetime string to AEST date."""
+    utc_time = pd.to_datetime(date_str)
+    aest_time = utc_time.tz_convert('Australia/Sydney')
+    return aest_time.date()
 
 
 if __name__ == "__main__":
@@ -1172,4 +950,3 @@ if __name__ == "__main__":
     root = ctk.CTk()
     app = NBAOptimizerGUI(root)
     root.mainloop()
-    

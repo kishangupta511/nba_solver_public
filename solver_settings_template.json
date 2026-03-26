@@ -15,7 +15,8 @@
     
     "banned_players": ["Jalyin Williams", "Joel Embiid", "Zion Williamson", "Giannis Antetokounmpo", "LaMelo Ball", "Anthony Davis", "Walker Kessler", "Mark Williams"],
     "forced_players": [],
-    
+    "forced_players_days": {},
+
     "no_sols": 1,
     "alternative_solution": "1week_buy",
     

@@ -1,34 +1,38 @@
 import json
-from solve import solve_multi_period_NBA
-import pandas as pd
-from retrieve import get_fixtures, get_players
-from retrieve import get_team
 import os
 import sys
+
+import pandas as pd
+from solve import solve_multi_period_NBA
+from retrieve import get_fixtures, get_players, get_team
 
 # Read options from the file
 with open('solver_settings.json') as f:
     solver_options = json.load(f)
 
-def refresh_data():
- # Attempt to add the private src folder to the path if projections.py exists
-    projections_path = "/Users/kishangupta/dev/nba_fantasy/nba_solver/src/project.py"
 
-    if os.path.exists(projections_path):
-        # Add the private src folder to sys.path
-        sys.path.append("/Users/kishangupta/dev/nba_fantasy/nba_solver/src")
-        projections_available = True
+def refresh_data():
+    """Refresh player/fixture data and optionally regenerate projections."""
+    # Try to import private projection modules
+    projections_available = False
+    project_path = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'project.py')
+
+    if os.path.exists(os.path.abspath(project_path)):
+        src_dir = os.path.dirname(os.path.abspath(project_path))
+        if src_dir not in sys.path:
+            sys.path.append(src_dir)
         try:
             from project import mins_projection, player_projection, hashtagbb_retrieve
+            projections_available = True
         except ImportError:
-            projections_available = False
             print("Could not import from project.py")
     else:
-        projections_available = False
-        print("Public solver does not allow projections updates, please pull the latest projections from the Github before solver execution")
-    
+        print("Public solver does not allow projections updates, "
+              "please pull the latest projections from the Github before solver execution")
+
     get_players()
     get_fixtures()
+
     if projections_available:
         if solver_options.get('data_source') == 'hashtagbb':
             projected_stats = hashtagbb_retrieve()
@@ -38,22 +42,27 @@ def refresh_data():
         player_projection(projected_stats, xmins)
         print('Data Successfully Updated\n')
 
+
 def run_optimisation():
-    # Refresh the data
+    """Refresh data and run the optimisation solver."""
     refresh_data()
 
-    # Importing Data
     if os.path.exists('data/projections_overwrite.csv'):
         all_data = pd.read_csv('data/projections_overwrite.csv')
-    else:    
+    else:
         all_data = pd.read_csv('data/projections.csv')
+
     fantasy_team = get_team(solver_options.get('team_id'))
 
-    # Solve the NBA problem
-    solve_multi_period_NBA(all_data=all_data, squad=fantasy_team['initial_squad'],
-                        sell_prices=fantasy_team['sell_prices'], 
-                        gd=fantasy_team['gd'], itb=fantasy_team['itb'], options=solver_options)
-    
+    solve_multi_period_NBA(
+        all_data=all_data,
+        squad=fantasy_team['initial_squad'],
+        sell_prices=fantasy_team['sell_prices'],
+        gd=fantasy_team['gd'],
+        itb=fantasy_team['itb'],
+        options=solver_options,
+    )
+
+
 if __name__ == '__main__':
     refresh_data()
-    #run_optimisation()
